@@ -8,3 +8,12 @@ Plan for requirements: -
 3.	Add objects and interaction with main player: Other ships, clouds
 4.	Non-player character: Another ship with canon firing back
 5.	Change of view: Player’s view and Top view
+
+# Code quality
+- Using Standard JS
+- Using ts-check and typings (but not using typescript)
+
+# Running
+
+Requires a static http server, eg `python3 -m http.server` or something like
+[host these things please](https://github.com/thecoshman/http)
