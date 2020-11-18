@@ -1,6 +1,16 @@
 // @ts-check
 'use strict'
 
+// useful references:
+// collision: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
+
+/*
+three tiers of objects
+  actor: move, physics, complex scripting, visual, audio
+  pawn: physics, visual, audio, simple scripting
+  prop: visual, audio
+*/
+
 main()
 
 function main () {
