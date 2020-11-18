@@ -18,6 +18,16 @@ three tiers of objects
   init drawing objects?
 
   main loop
+
+  update physics
+    - update velocity and gravity
+    - check for collisions
+    - send events for collisions (queue for scripts to pick up)
+      - includes collision info (entity id of other collider???)
+  update system components
+  poll inputs
+  update 'scripts'
+
 */
 
 // const appState = {
@@ -67,6 +77,10 @@ function main () {
   ))
   appState.debugTextElement.innerText = appState.debugValue.toString()
 
+  // TODO: initialize components, entities, and management related stuff
+
+  // TODO: load meshes and textures, assign data to appropriate components
+
   loadStuff()
 
   initializeGlStuff(webGLContext)
@@ -75,6 +89,10 @@ function main () {
   runSimulationLoop(0)
   startRendering(webGLContext)
 }
+
+function loadStuff () {}
+
+function initializeGlStuff (webGLContext) {}
 
 function initializeTickTimeStats () {
   tickTimeStats.previousTicks = new Float32Array(tickTimeStats.totalTicks)
@@ -169,8 +187,3 @@ function drawScene (webGLContext, deltaTime) {
 
   // draw objects here
 }
-
-function loadStuff () {
-}
-
-function initializeGlStuff (webGLContext) {}
