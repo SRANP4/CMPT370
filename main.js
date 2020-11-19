@@ -1,6 +1,14 @@
 // @ts-check
 'use strict'
 
+import {
+  addComponent,
+  componentSets,
+  createEntity,
+  initializeComponentSets
+} from './entityComponentManagement.js'
+import { vec3, vec4 } from './lib/gl-matrix/index.js'
+
 // useful references:
 // collision: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
 
@@ -78,6 +86,18 @@ function main () {
   appState.debugTextElement.innerText = appState.debugValue.toString()
 
   // TODO: initialize components, entities, and management related stuff
+  initializeComponentSets()
+
+  const id = createEntity()
+  /** @type { TransformComponent} */
+  const transform = {
+    entityId: -1,
+    position: vec3.fromValues(0, 0, 0),
+    rotation: vec4.fromValues(0, 0, 0, 1)
+  }
+  addComponent(componentSets.transforms, transform, id)
+
+  // TODO: register filters, add systems to an update loop of sorts
 
   // TODO: load meshes and textures, assign data to appropriate components
 
