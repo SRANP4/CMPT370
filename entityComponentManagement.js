@@ -59,6 +59,11 @@ export const componentSets = {
 
 /** @type { Map<number, Array<number>> } */
 export const bitfieldFilters = new Map()
+
+/**
+ *
+ * @param {number} bitfieldFilter
+ */
 export function registerFilter (bitfieldFilter) {
   // init the array for the filter
   bitfieldFilters[bitfieldFilter] = []

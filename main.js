@@ -3,9 +3,11 @@
 
 import {
   addComponent,
+  bitfieldFilters,
   componentSets,
   createEntity,
-  initializeComponentSets
+  initializeComponentSets,
+  registerFilter
 } from './entityComponentManagement.js'
 import { vec3, vec4 } from './lib/gl-matrix/index.js'
 
@@ -95,9 +97,20 @@ function main () {
     position: vec3.fromValues(0, 0, 0),
     rotation: vec4.fromValues(0, 0, 0, 1)
   }
+
+  /** @type {HealthComponent} */
+  const health = {
+    entityId: -1,
+    currentHealth: 100,
+    maxHealth: 100
+  }
   addComponent(componentSets.transforms, transform, id)
+  addComponent(componentSets.healths, health, id)
 
   // TODO: register filters, add systems to an update loop of sorts
+  registerFilter(
+    componentSets.transforms.bitfield | componentSets.healths.bitfield
+  )
 
   // TODO: load meshes and textures, assign data to appropriate components
 
@@ -161,6 +174,16 @@ function simulate (lastTickTime) {
     'Average tick time: ' +
     tickTimeStats.averageTickRate.toFixed(6).toString() +
     'ms'
+
+  // update healths
+  const healthEntities = bitfieldFilters.get(
+    componentSets.transforms.bitfield | componentSets.healths.bitfield
+  )
+  for (let index = 0; index < healthEntities.length; index++) {
+    const element = healthEntities[index]
+    const healthComponent = componentSets.healths.components[componentSets.healths.entityMap.get(element)]
+    // healthComponent.
+  }
 }
 
 function startRendering (webGLContext) {

@@ -1,4 +1,5 @@
 declare type AppState = {
+    
 }
 
 declare type ComponentSet<T> = {
@@ -7,7 +8,7 @@ declare type ComponentSet<T> = {
     bitfield: number
 }
 
-declare type Component {
+declare type Component = {
     entityId: number
 }
 
