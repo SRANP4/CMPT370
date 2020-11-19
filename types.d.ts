@@ -1,5 +1,8 @@
 declare type AppState = {
-    
+    lights: Array<LightComponent>,
+    cameras: Array<CameraComponent>,
+    rigidbodies: Array<RigidbodyComponent>
+
 }
 
 declare type ComponentSet<T> = {
@@ -8,55 +11,37 @@ declare type ComponentSet<T> = {
     bitfield: number
 }
 
-declare type Component = {
-    entityId: number
+declare type CameraComponent = {
 }
 
-declare type TransformComponent  = Component & {
-    position: vec3,
-    rotation: vec4
-}
-
-declare type CameraComponent = Component & {
-}
-
-declare type LightComponent = Component & {
+declare type LightComponent = {
     colour: vec3,
     strength: number
 }
 
-declare type AABBColliderComponent = Component & {
+declare type AABBCollider = {
     width: number,
     height: number
 }
 
-declare type SphereColliderComponent = Component & {
+declare type SphereCollider = {
     radius: number
 }
 
-declare type RigidbodyComponent = Component & {
+declare type RigidbodyComponent = {
     velocity: vec3,
     gravityDirection: vec3,
-    gravityStrength: number
+    gravityStrength: number,
+    aabbColliders: Array<AABBCollider>,
+    sphereColliders: Array<SphereCollider>
 }
 
-declare type MeshDataComponent = Component & {
+declare type MeshDataComponent = {
     mesh: number,
     textureId: number
 }
 
-declare type HealthComponent = Component & {
+declare type HealthComponent = {
     currentHealth: number,
     maxHealth: number
-}
-
-declare type ComponentSets = {
-    transforms: ComponentSet<TransformComponent>,
-    cameras: ComponentSet<CameraComponent>,
-    lights: ComponentSet<LightComponent>,
-    meshDatas: ComponentSet<MeshDataComponent>,
-    aabbColliders: ComponentSet<AABBColliderComponent>,
-    sphereColliders: ComponentSet<SphereColliderComponent>,
-    rigidbodies: ComponentSet<RigidbodyComponent>,
-    healths: ComponentSet<HealthComponent>
 }
