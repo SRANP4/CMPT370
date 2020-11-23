@@ -26,21 +26,10 @@
     <!-- This will only be populated when an error on the JavaScript side occurs -->
     <div id="webglError"></div>
 
-    <!-- Loading bar using a simple gif -->
-    <div
-      id="loadingPage"
-      style="
-    width: 100%;
-    height: 100%;
-    position: absolute; 
-    background-color: black; 
-    background-image: url(./loading.gif); 
-    background-repeat: no-repeat; 
-    background-position: center; "
-    ></div>
-
     <div id="overlay">
-      <div><span id="debug_text">DEBUG TEXT</span></div>
+      <div><span id="tick_time">DEBUG TEXT</span></div>
+      <div><span id="render_time">DEBUG TEXT</span></div>
+      <div><span id="tick_delta_time">DEBUG TEXT</span></div>
     </div>
 
     <!-- main canvas to be rendered -->

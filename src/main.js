@@ -52,17 +52,25 @@ let state = {}
 const TICK_RATE_MS = 16
 
 const OLDappState = {
-  debugValue: 0,
-  debugTextElement: undefined
+  tickTimeTextElement: undefined,
+  renderTimeTextElement: undefined,
+  tickDeltaTimeTextElement: undefined
 }
 
 // previousTicks is a circular array
 // initial second of data will be bunk due to a lot of 0s in the array
 const tickTimeStats = {
-  totalTicks: 120, // this is configurable (120 is 2 seconds worth of ticks)
-  previousTicks: undefined, // this is initialized in initializeTickTimeStats as Float32Array
-  previousTicksIndex: 0,
-  averageTickRate: 0
+  totalElements: 120, // this is configurable (120 is 2 seconds worth of ticks)
+  previousTime: undefined, // this is initialized in initializeTickTimeStats as Float32Array
+  previousElementIndex: 0,
+  averageTime: 0
+}
+
+const frameTimeStats = {
+  totalElements: 120, // this is configurable (120 is 2 seconds worth of ticks)
+  previousTime: undefined, // this is initialized in initializeTickTimeStats as Float32Array
+  previousElementIndex: 0,
+  averageTime: 0
 }
 
 // This function loads on window load, uses async functions to load the scene then try to render it
@@ -199,73 +207,84 @@ function main () {
     return null
   })
 
-  OLDappState.debugTextElement = /** @type {HTMLElement} */ (document.querySelector(
-    '#debug_text'
+  OLDappState.tickTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
+    '#tick_time'
   ))
-  OLDappState.debugTextElement.innerText = OLDappState.debugValue.toString()
+  OLDappState.tickTimeTextElement.innerText = 'TICK TIME'
 
-  if (!state.gameStarted) {
-    startGame(state)
-    state.gameStarted = true
-    const loadingPage = document.getElementById('loadingPage')
-    loadingPage.remove()
-  }
+  OLDappState.renderTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
+    '#render_time'
+  ))
+  OLDappState.renderTimeTextElement.innerText = 'RENDER TIME'
 
-  initializeTickTimeStats()
+  OLDappState.tickDeltaTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
+    '#tick_delta_time'
+  ))
+  OLDappState.tickDeltaTimeTextElement.innerText = 'TICK DELTA TIME'
+
+  initializeTimeStats()
+  startGame(OLDappState)
   runSimulationLoop(0)
 
   startRendering(gl, state) // now that scene is setup, start rendering it
 }
 
-function initializeTickTimeStats () {
-  tickTimeStats.previousTicks = new Float32Array(tickTimeStats.totalTicks)
+function initializeTimeStats () {
+  tickTimeStats.previousTime = new Float32Array(tickTimeStats.totalElements)
+  frameTimeStats.previousTime = new Float32Array(frameTimeStats.totalElements)
 }
 
-function runSimulationLoop (lastTickTime) {
+function updateTimeStats (statObj, lastTickTime) {
+  statObj.previousTime[statObj.previousElementIndex] = lastTickTime
+  statObj.previousElementIndex =
+    (statObj.previousElementIndex + 1) % statObj.totalElements
+
+  let sum = 0
+  statObj.previousTime.forEach(element => {
+    sum += element
+  })
+
+  statObj.averageTime = sum / statObj.totalElements
+}
+
+function runSimulationLoop (lastTickTime, lastTickEndTime) {
   const start = window.performance.now()
-  updateTickRateStats(lastTickTime)
+  updateTimeStats(tickTimeStats, lastTickTime)
+  // update the overlay
+  OLDappState.tickTimeTextElement.innerText =
+    'Average tick time: ' +
+    tickTimeStats.averageTime.toFixed(6).toString() +
+    'ms'
+
+  const deltaTime = window.performance.now() - lastTickEndTime
+  state.deltaTime = deltaTime
+  OLDappState.tickDeltaTimeTextElement.innerText =
+    'Tick delta time: ' + deltaTime.toFixed(6).toString() + 'ms'
 
   // don't hog cpu if the page isn't visible (effectively pauses the game when it
   // backgrounds)
   // NOTE: For debugging it might be useful to use hasFocus instead,
   // as the game will pause when you click into the F12 debug panel
   if (document.visibilityState === 'visible') {
-    simulate(lastTickTime)
+    simulate(deltaTime)
   }
 
   // always pass back to the browser, even if this means a janky tick rate,
   // its more important to let the browser function properly
   // ideally this will callback immediately if we're *redline* (taking up
   // 16 ms or more per tick)
-  const elapsed = window.performance.now() - start
+  const now = window.performance.now()
+  const elapsed = now - start
   window.setTimeout(
     runSimulationLoop,
     Math.max(0, TICK_RATE_MS - elapsed),
-    elapsed
+    elapsed,
+    now
   )
 }
 
-function updateTickRateStats (lastTickTime) {
-  tickTimeStats.previousTicks[tickTimeStats.previousTicksIndex] = lastTickTime
-  tickTimeStats.previousTicksIndex =
-    (tickTimeStats.previousTicksIndex + 1) % tickTimeStats.totalTicks
-
-  let sum = 0
-  tickTimeStats.previousTicks.forEach(element => {
-    sum += element
-  })
-
-  tickTimeStats.averageTickRate = sum / tickTimeStats.totalTicks
-}
-
-function simulate (lastTickTime) {
-  OLDappState.debugValue += 1
-  OLDappState.debugTextElement.innerText =
-    'Average tick time: ' +
-    tickTimeStats.averageTickRate.toFixed(6).toString() +
-    'ms'
-
-  gameLoop(OLDappState, lastTickTime) // constantly call our game loop
+function simulate (deltaTime) {
+  gameLoop(OLDappState, deltaTime) // constantly call our game loop
 }
 
 /**
@@ -287,24 +306,24 @@ function addObjectToScene (state, object) {
  */
 function startRendering (gl, state) {
   // A variable for keeping track of time between frames
-  let then = 0.0
+
+  let lastFrameElapsed = 0
 
   // This function is called when we want to render a frame to the canvas
-  function render (now) {
-    now *= 0.001 // convert to seconds
-    const deltaTime = now - then
-    then = now
+  function render () {
+    const start = window.performance.now()
+    updateTimeStats(frameTimeStats, lastFrameElapsed)
+    OLDappState.renderTimeTextElement.innerText =
+      'Average frame time: ' +
+      frameTimeStats.averageTime.toFixed(6).toString() +
+      'ms'
 
-    state.deltaTime = deltaTime
-
-    // wait until the scene is completely loaded to render it
-    if (state.numberOfObjectsToLoad <= state.objects.length) {
-      // Draw our scene
-      drawScene(gl, deltaTime, state)
-    }
+    // Draw our scene
+    drawScene(gl, state)
 
     // Request another frame when this one is done
     window.requestAnimationFrame(render)
+    lastFrameElapsed = window.performance.now() - start
   }
   // Draw the scene
   window.requestAnimationFrame(render)
@@ -313,11 +332,10 @@ function startRendering (gl, state) {
 /**
  *
  * @param {WebGL2RenderingContext} gl
- * @param {number} deltaTime
  * @param {any} state contains the state for the scene
  * @purpose Iterate through game objects and render the objects as well as update uniforms
  */
-function drawScene (gl, deltaTime, state) {
+function drawScene (gl, state) {
   gl.clearColor(
     state.settings.backgroundColor[0],
     state.settings.backgroundColor[1],
