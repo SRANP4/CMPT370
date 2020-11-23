@@ -17,3 +17,5 @@ Plan for requirements: -
 
 Requires a static http server, eg `python3 -m http.server` or something like
 [host these things please](https://github.com/thecoshman/http)
+
+# Thanks to Zach Shaw for letting us uss his framework (http://constructionyard.ca/#/refinery)
