@@ -13,6 +13,22 @@ import { printError } from './uiSetup.js'
 
 let state = {}
 
+const TICK_RATE_MS = 16
+
+const OLD_appState = {
+  debugValue: 0,
+  debugTextElement: undefined
+}
+
+// previousTicks is a circular array
+// initial second of data will be bunk due to a lot of 0s in the array
+const tickTimeStats = {
+  totalTicks: 120, // this is configurable (120 is 2 seconds worth of ticks)
+  previousTicks: undefined, // this is initialized in initializeTickTimeStats as Float32Array
+  previousTicksIndex: 0,
+  averageTickRate: 0
+}
+
 // This function loads on window load, uses async functions to load the scene then try to render it
 window.onload = async () => {
   try {
@@ -146,7 +162,74 @@ function main () {
     }
     return null
   })
+
+  OLD_appState.debugTextElement = /** @type {HTMLElement} */ (document.querySelector(
+    '#debug_text'
+  ))
+  OLD_appState.debugTextElement.innerText = OLD_appState.debugValue.toString()
+
+  if (!state.gameStarted) {
+    startGame(state)
+    state.gameStarted = true
+    const loadingPage = document.getElementById('loadingPage')
+    loadingPage.remove()
+  }
+
+  initializeTickTimeStats()
+  runSimulationLoop(0)
+
   startRendering(gl, state) // now that scene is setup, start rendering it
+}
+
+function initializeTickTimeStats () {
+  tickTimeStats.previousTicks = new Float32Array(tickTimeStats.totalTicks)
+}
+
+function runSimulationLoop (lastTickTime) {
+  const start = window.performance.now()
+  updateTickRateStats(lastTickTime)
+
+  // don't hog cpu if the page isn't visible (effectively pauses the game when it
+  // backgrounds)
+  // NOTE: For debugging it might be useful to use hasFocus instead,
+  // as the game will pause when you click into the F12 debug panel
+  if (document.visibilityState === 'visible') {
+    simulate(lastTickTime)
+  }
+
+  // always pass back to the browser, even if this means a janky tick rate,
+  // its more important to let the browser function properly
+  // ideally this will callback immediately if we're *redline* (taking up
+  // 16 ms or more per tick)
+  const elapsed = window.performance.now() - start
+  window.setTimeout(
+    runSimulationLoop,
+    Math.max(0, TICK_RATE_MS - elapsed),
+    elapsed
+  )
+}
+
+function updateTickRateStats (lastTickTime) {
+  tickTimeStats.previousTicks[tickTimeStats.previousTicksIndex] = lastTickTime
+  tickTimeStats.previousTicksIndex =
+    (tickTimeStats.previousTicksIndex + 1) % tickTimeStats.totalTicks
+
+  let sum = 0
+  tickTimeStats.previousTicks.forEach(element => {
+    sum += element
+  })
+
+  tickTimeStats.averageTickRate = sum / tickTimeStats.totalTicks
+}
+
+function simulate (lastTickTime) {
+  OLD_appState.debugValue += 1
+  OLD_appState.debugTextElement.innerText =
+    'Average tick time: ' +
+    tickTimeStats.averageTickRate.toFixed(6).toString() +
+    'ms'
+
+  gameLoop(OLD_appState, lastTickTime) // constantly call our game loop
 }
 
 /**
@@ -180,17 +263,9 @@ function startRendering (gl, state) {
 
     // wait until the scene is completely loaded to render it
     if (state.numberOfObjectsToLoad <= state.objects.length) {
-      if (!state.gameStarted) {
-        startGame(state)
-        state.gameStarted = true
-        const loadingPage = document.getElementById('loadingPage')
-        loadingPage.remove()
-      }
       // Draw our scene
       drawScene(gl, deltaTime, state)
     }
-
-    gameLoop(state, deltaTime) // constantly call our game loop
 
     // Request another frame when this one is done
     window.requestAnimationFrame(render)
