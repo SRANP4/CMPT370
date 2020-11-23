@@ -98,12 +98,12 @@ window.onload = async () => {
 
 /**
  *
- * @param {any} mesh contains vertex, normal, uv information for the mesh to be made
- * @param {any} object the game object that will use the mesh information
+ * @param {OBJMesh} mesh contains vertex, normal, uv information for the mesh to be made
+ * @param {StateFileObject} loadObject the game object that will use the mesh information
  * @purpose - Helper function called as a callback function when the mesh is done loading for the object
  */
-function createMesh (mesh, object) {
-  const testModel = new Model(state.gl, object, mesh)
+function createMesh (mesh, loadObject) {
+  const testModel = new Model(state.gl, loadObject, mesh)
   testModel.vertShader = state.vertShaderSample
   testModel.fragShader = state.fragShaderSample
   testModel.setup()
@@ -188,29 +188,31 @@ function main () {
     gameStarted: false,
     samplerExists: 0,
     samplerNormExists: 0,
-    constVal: 1
+    constVal: 1,
+    lights: [],
+    objects: []
   }
 
   state.numLights = state.pointLights.length
 
   // iterate through the level's objects and add them
-  state.loadObjects.map(object => {
-    if (object.type === 'mesh') {
-      parseOBJFileToJSON(object.model, createMesh, object)
-    } else if (object.type === 'cube') {
-      const tempCube = new Cube(gl, object)
+  state.loadObjects.map(loadObject => {
+    if (loadObject.type === 'mesh') {
+      parseOBJFileToJSON(loadObject.model, createMesh, loadObject)
+    } else if (loadObject.type === 'cube') {
+      const tempCube = new Cube(gl, loadObject)
       tempCube.vertShader = vertShaderSample
       tempCube.fragShader = fragShaderSample
       tempCube.setup()
       addObjectToScene(state, tempCube)
-    } else if (object.type === 'plane') {
-      const tempPlane = new Plane(gl, object)
+    } else if (loadObject.type === 'plane') {
+      const tempPlane = new Plane(gl, loadObject)
       tempPlane.vertShader = vertShaderSample
       tempPlane.fragShader = fragShaderSample
       tempPlane.setup()
       addObjectToScene(state, tempPlane)
-    } else if (object.type.includes('Custom')) {
-      const tempObject = new CustomObject(gl, object)
+    } else if (loadObject.type.includes('Custom')) {
+      const tempObject = new CustomObject(gl, loadObject)
       tempObject.vertShader = vertShaderSample
       tempObject.fragShader = fragShaderSample
       tempObject.setup()
@@ -236,7 +238,7 @@ function main () {
 
   initializeTimeStats()
   startGame(OLDappState)
-  runSimulationLoop(0)
+  runSimulationLoop(0, 0)
 
   startRendering(gl, state) // now that scene is setup, start rendering it
 }
@@ -301,8 +303,8 @@ function simulate (deltaTime) {
 
 /**
  *
- * @param {any} state object containing scene values
- * @param {any} object the object to be added to the scene
+ * @param {AppState} state object containing scene values
+ * @param {Model | Cube | Plane | CustomObject} object the object to be added to the scene
  * @purpose - Helper function for adding a new object to the scene and refreshing the GUI
  */
 function addObjectToScene (state, object) {
@@ -313,7 +315,7 @@ function addObjectToScene (state, object) {
 /**
  *
  * @param {WebGL2RenderingContext} gl
- * @param {any} state object containing scene values
+ * @param {AppState} state object containing scene values
  * @purpose - Calls the drawscene per frame
  */
 function startRendering (gl, state) {
@@ -344,7 +346,7 @@ function startRendering (gl, state) {
 /**
  *
  * @param {WebGL2RenderingContext} gl
- * @param {any} state contains the state for the scene
+ * @param {AppState} state contains the state for the scene
  * @purpose Iterate through game objects and render the objects as well as update uniforms
  */
 function drawScene (gl, state) {
