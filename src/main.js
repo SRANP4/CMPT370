@@ -15,7 +15,7 @@ let state = {}
 
 const TICK_RATE_MS = 16
 
-const OLD_appState = {
+const OLDappState = {
   debugValue: 0,
   debugTextElement: undefined
 }
@@ -163,10 +163,10 @@ function main () {
     return null
   })
 
-  OLD_appState.debugTextElement = /** @type {HTMLElement} */ (document.querySelector(
+  OLDappState.debugTextElement = /** @type {HTMLElement} */ (document.querySelector(
     '#debug_text'
   ))
-  OLD_appState.debugTextElement.innerText = OLD_appState.debugValue.toString()
+  OLDappState.debugTextElement.innerText = OLDappState.debugValue.toString()
 
   if (!state.gameStarted) {
     startGame(state)
@@ -223,13 +223,13 @@ function updateTickRateStats (lastTickTime) {
 }
 
 function simulate (lastTickTime) {
-  OLD_appState.debugValue += 1
-  OLD_appState.debugTextElement.innerText =
+  OLDappState.debugValue += 1
+  OLDappState.debugTextElement.innerText =
     'Average tick time: ' +
     tickTimeStats.averageTickRate.toFixed(6).toString() +
     'ms'
 
-  gameLoop(OLD_appState, lastTickTime) // constantly call our game loop
+  gameLoop(OLDappState, lastTickTime) // constantly call our game loop
 }
 
 /**
