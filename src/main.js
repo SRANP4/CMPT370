@@ -11,6 +11,42 @@ import { Plane } from './objects/Plane.js'
 import { getObject } from './sceneFunctions.js'
 import { printError } from './uiSetup.js'
 
+// useful references:
+// collision: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
+
+/*
+  three tiers of objects?
+    actor: move, physics, complex scripting, visual, audio
+    pawn: physics, visual, audio, simple scripting
+    prop: visual, audio
+*/
+
+/*
+  main loop
+
+  update physics
+    - update velocity and gravity
+    - check for collisions
+    - send events for collisions (queue for scripts to pick up)
+      - includes collision info (entity id of other collider???)
+  update system components
+  poll inputs
+  update 'scripts'
+
+  TODO add frame timer for rendering
+
+  TODO basic non-transparent rendering (use a state file from Zach's refinery engine)
+  TODO transparent rendering as a layer on top of opaque rendering pass (basically just for water)
+  TODO camera controls
+  TODO correct rendering with rotation and position
+  TODO collision checking for AABB and Sphere
+  TODO physics loop, send collision events to callback functions
+  TODO load shaders from glsl files, per object shaders
+  TODO write basic blinn-phong shader and basic fragment shader
+
+  TODO game mechanics lul
+*/
+
 let state = {}
 
 const TICK_RATE_MS = 16
