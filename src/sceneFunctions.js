@@ -3,7 +3,7 @@
 
 /**
  *
- * @param {AppState} state
+ * @param {import("./types").AppState} state
  * @param {string} name
  */
 export function getObject (state, name) {
@@ -21,8 +21,8 @@ export function getObject (state, name) {
 
 /**
  *
- * @param {BoundingBox} a
- * @param {BoundingBox} b
+ * @param {import("./types").BoundingBox} a
+ * @param {import("./types").BoundingBox} b
  * @returns {boolean}
  */
 export function intersect (a, b) {
@@ -39,7 +39,7 @@ export function intersect (a, b) {
 /**
  *
  * @param {number[][]} vertices array of arrays, vertices numbers
- * @returns {BoundingBox}
+ * @returns {import("./types").BoundingBox}
  */
 export function getBoundingBox (vertices) {
   let xMin = 0

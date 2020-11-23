@@ -110,7 +110,7 @@ export class Plane {
       this.fragShader
     )
     // Collect all the info needed to use the shader program.
-    /** @type {ProgramInfo} */
+    /** @type {import('../types').ProgramInfo} */
     const programInfo = {
       // The actual shader program
       program: shaderProgram,

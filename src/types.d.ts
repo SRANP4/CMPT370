@@ -1,11 +1,12 @@
-declare type AppState = {
-    // lights: Array<LightComponent>,
-    // cameras: Array<CameraComponent>,
-    // rigidbodies: Array<RigidbodyComponent>
+import { Cube } from "./objects/Cube";
+import { CustomObject } from "./objects/CustomObject";
+import { Model } from "./objects/Model";
+import { Plane } from "./objects/Plane";
 
-    tickTimeTextElement?: HTMLElement;
-    renderTimeTextElement?: HTMLElement;
-    tickDeltaTimeTextElement?: HTMLElement;
+declare type AppState = {
+    tickTimeTextElement: HTMLElement;
+    renderTimeTextElement: HTMLElement;
+    tickDeltaTimeTextElement: HTMLElement;
 
     loadObjects: Array<StateFileObject>;
     pointLights: Array<StateFileLight>;
@@ -13,6 +14,36 @@ declare type AppState = {
     camera: StateFileCamera;
     numberOfObjectsToLoad: number;
 
+    gl: WebGL2RenderingContext;
+    vertShaderSample: string;
+    fragShaderSample: string;
+    canvas: HTMLCanvasElement;
+    objectCount: number;
+    lightIndices: Array<any>; //appears to not be used
+    keyboard: KeyboardState;
+    mouse: MouseConfiguration;
+    gameStarted: boolean;
+    samplerExists: number;
+    samplerNormExists: number;
+    constVal: number;
+    lights: Array<any>; //appears to not be used
+    objects: Array<Model | Cube | Plane | CustomObject>;
+
+    numLights: number;
+
+    deltaTime: number;
+
+    projectionMatrix: mat4;
+    viewMatrix: mat4;
+    samplerExists: number;
+    samplerNormExists: number;
+}
+
+declare type MouseConfiguration = {
+    sensitivity: number;
+}
+
+declare type KeyboardState = {
 
 }
 

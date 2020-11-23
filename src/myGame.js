@@ -5,7 +5,7 @@
 
 /**
  *
- * @param { AppState } state Game state
+ * @param { import("./types").AppState } state Game state
  * @usage Use this function for initializing any in game values in our state or adding event listeners
  */
 export function startGame (state) {
@@ -23,7 +23,7 @@ export function startGame (state) {
 
 /**
  *
- * @param { AppState } state Game state
+ * @param { import("./types").AppState } state Game state
  * @param { number } deltaTime time difference between the previous frame that was drawn and the current frame
  */
 export function gameLoop (state, deltaTime) {

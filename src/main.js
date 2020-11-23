@@ -1,4 +1,5 @@
 // @ts-check
+
 'use strict'
 
 import { mat4, vec3 } from '../lib/gl-matrix/index.js'
@@ -58,16 +59,11 @@ import { printError } from './uiSetup.js'
   TODO game mechanics lul
 */
 
-/** @type { AppState } */
+/** @type { import('./types').AppState } */
+// @ts-ignore
 let state = {}
 
 const TICK_RATE_MS = 16
-
-const OLDappState = {
-  tickTimeTextElement: undefined,
-  renderTimeTextElement: undefined,
-  tickDeltaTimeTextElement: undefined
-}
 
 // previousTicks is a circular array
 // initial second of data will be bunk due to a lot of 0s in the array
@@ -98,8 +94,8 @@ window.onload = async () => {
 
 /**
  *
- * @param {OBJMesh} mesh contains vertex, normal, uv information for the mesh to be made
- * @param {StateFileObject} loadObject the game object that will use the mesh information
+ * @param {import('./types').OBJMesh} mesh contains vertex, normal, uv information for the mesh to be made
+ * @param {import('./types').StateFileObject} loadObject the game object that will use the mesh information
  * @purpose - Helper function called as a callback function when the mesh is done loading for the object
  */
 function createMesh (mesh, loadObject) {
@@ -221,23 +217,23 @@ function main () {
     return null
   })
 
-  OLDappState.tickTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
+  state.tickTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
     '#tick_time'
   ))
-  OLDappState.tickTimeTextElement.innerText = 'TICK TIME'
+  state.tickTimeTextElement.innerText = 'TICK TIME'
 
-  OLDappState.renderTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
+  state.renderTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
     '#render_time'
   ))
-  OLDappState.renderTimeTextElement.innerText = 'RENDER TIME'
+  state.renderTimeTextElement.innerText = 'RENDER TIME'
 
-  OLDappState.tickDeltaTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
+  state.tickDeltaTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
     '#tick_delta_time'
   ))
-  OLDappState.tickDeltaTimeTextElement.innerText = 'TICK DELTA TIME'
+  state.tickDeltaTimeTextElement.innerText = 'TICK DELTA TIME'
 
   initializeTimeStats()
-  startGame(OLDappState)
+  startGame(state)
   runSimulationLoop(0, 0)
 
   startRendering(gl, state) // now that scene is setup, start rendering it
@@ -265,14 +261,14 @@ function runSimulationLoop (lastTickTime, lastTickEndTime) {
   const start = window.performance.now()
   updateTimeStats(tickTimeStats, lastTickTime)
   // update the overlay
-  OLDappState.tickTimeTextElement.innerText =
+  state.tickTimeTextElement.innerText =
     'Average tick time: ' +
     tickTimeStats.averageTime.toFixed(6).toString() +
     'ms'
 
   const deltaTime = window.performance.now() - lastTickEndTime
   state.deltaTime = deltaTime
-  OLDappState.tickDeltaTimeTextElement.innerText =
+  state.tickDeltaTimeTextElement.innerText =
     'Tick delta time: ' + deltaTime.toFixed(6).toString() + 'ms'
 
   // don't hog cpu if the page isn't visible (effectively pauses the game when it
@@ -297,13 +293,17 @@ function runSimulationLoop (lastTickTime, lastTickEndTime) {
   )
 }
 
+/**
+ *
+ * @param {number} deltaTime
+ */
 function simulate (deltaTime) {
-  gameLoop(OLDappState, deltaTime) // constantly call our game loop
+  gameLoop(state, deltaTime) // constantly call our game loop
 }
 
 /**
  *
- * @param {AppState} state object containing scene values
+ * @param {import('./types.js').AppState} state object containing scene values
  * @param {Model | Cube | Plane | CustomObject} object the object to be added to the scene
  * @purpose - Helper function for adding a new object to the scene and refreshing the GUI
  */
@@ -315,7 +315,7 @@ function addObjectToScene (state, object) {
 /**
  *
  * @param {WebGL2RenderingContext} gl
- * @param {AppState} state object containing scene values
+ * @param {import('./types.js').AppState} state object containing scene values
  * @purpose - Calls the drawscene per frame
  */
 function startRendering (gl, state) {
@@ -327,7 +327,7 @@ function startRendering (gl, state) {
   function render () {
     const start = window.performance.now()
     updateTimeStats(frameTimeStats, lastFrameElapsed)
-    OLDappState.renderTimeTextElement.innerText =
+    state.renderTimeTextElement.innerText =
       'Average frame time: ' +
       frameTimeStats.averageTime.toFixed(6).toString() +
       'ms'
@@ -346,7 +346,7 @@ function startRendering (gl, state) {
 /**
  *
  * @param {WebGL2RenderingContext} gl
- * @param {AppState} state contains the state for the scene
+ * @param {import('./types').AppState} state contains the state for the scene
  * @purpose Iterate through game objects and render the objects as well as update uniforms
  */
 function drawScene (gl, state) {

@@ -388,7 +388,7 @@ export function getTextures (gl, imgPath) {
  *
  * @param {string} objFileURL
  * @param {CallableFunction} cb
- * @param {StateFileObject} loadObject
+ * @param {import('./types').StateFileObject} loadObject
  */
 export function parseOBJFileToJSON (objFileURL, cb, loadObject) {
   window
@@ -424,7 +424,7 @@ export function hexToRGB (hex) {
 /**
  *
  * @param {string} file
- * @param {AppState} state
+ * @param {import('./types').AppState} state
  */
 export function parseSceneFile (file, state) {
   return new Promise((resolve, reject) => {
