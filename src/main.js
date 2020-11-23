@@ -22,31 +22,43 @@ import { printError } from './uiSetup.js'
 */
 
 /*
-  main loop
-
   update physics
     - update velocity and gravity
     - check for collisions
     - send events for collisions (queue for scripts to pick up)
       - includes collision info (entity id of other collider???)
-  update system components
-  poll inputs
-  update 'scripts'
 
-  TODO add frame timer for rendering
+  TODO document app state
+  TODO migrate old state into new state object
+  TODO break state into smaller state objects, monolithic state is hard to keep in my small brain
 
-  TODO basic non-transparent rendering (use a state file from Zach's refinery engine)
-  TODO transparent rendering as a layer on top of opaque rendering pass (basically just for water)
-  TODO camera controls
+  TODO basic non-transparent (diffuse) rendering (use a state file from Zach's refinery engine)
   TODO correct rendering with rotation and position
-  TODO collision checking for AABB and Sphere
+
+  TODO enemy ship that moves back and forth, rotates in direction it is moving
+
+  TODO collision checking for spheres (use spheres for ships and cannonball)
   TODO physics loop, send collision events to callback functions
-  TODO load shaders from glsl files, per object shaders
+
+  TODO add fire cannonball mechanic, log when collision detected with ship
+
+  =================================================================================================
+
   TODO write basic blinn-phong shader and basic fragment shader
+  TODO transparent rendering as a layer on top of opaque rendering pass (basically just for water)
+  TODO camera / aim controls
+
+  TODO collision checking for AABB
+
+  TODO load shaders from glsl files, per object shaders
+
+  TODO sound effects for cannon fire, cannon ball in air, cannon ball impact, ship sink
+  TODO cannonball fire visual effect, cannonball impact visual effect
 
   TODO game mechanics lul
 */
 
+/** @type { AppState } */
 let state = {}
 
 const TICK_RATE_MS = 16
