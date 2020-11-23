@@ -1,3 +1,5 @@
+// adding references to outside classes makes it so that we have to add
+// import('./types') to everything and I hate it
 import { Cube } from "./objects/Cube";
 import { CustomObject } from "./objects/CustomObject";
 import { Model } from "./objects/Model";
