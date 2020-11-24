@@ -26,6 +26,11 @@ export function startGame (state) {
  * @param { import("./types").AppState } state Game state
  * @param { number } deltaTime time difference between the previous frame that was drawn and the current frame
  */
-export function gameLoop (state, deltaTime) {
+export function fixedUpdate (state, deltaTime) {
+  // handle physics here
   // TODO - Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
+}
+
+export function update (state) {
+  // handle inputs here
 }

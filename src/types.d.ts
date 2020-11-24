@@ -9,6 +9,7 @@ declare type AppState = {
     tickTimeTextElement: HTMLElement;
     renderTimeTextElement: HTMLElement;
     tickDeltaTimeTextElement: HTMLElement;
+    updateTimeTextElement: HTMLElement;
 
     loadObjects: Array<StateFileObject>;
     pointLights: Array<StateFileLight>;

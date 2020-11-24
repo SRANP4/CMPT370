@@ -4,7 +4,7 @@
 
 import { mat4, vec3 } from '../lib/gl-matrix/index.js'
 import { parseOBJFileToJSON, parseSceneFile } from './commonFunctions.js'
-import { gameLoop, startGame } from './myGame.js'
+import { fixedUpdate, startGame, update } from './myGame.js'
 import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
 import { Plane } from './objects/Plane.js'
@@ -64,7 +64,14 @@ const TICK_RATE_MS = 16
 
 // previousTicks is a circular array
 // initial second of data will be bunk due to a lot of 0s in the array
-const tickTimeStats = {
+const fixedUpdateTimeStats = {
+  totalElements: 120, // this is configurable (120 is 2 seconds worth of ticks)
+  previousTime: undefined, // this is initialized in initializeTickTimeStats as Float32Array
+  previousElementIndex: 0,
+  averageTime: 0
+}
+
+const updateTimeStats = {
   totalElements: 120, // this is configurable (120 is 2 seconds worth of ticks)
   previousTime: undefined, // this is initialized in initializeTickTimeStats as Float32Array
   previousElementIndex: 0,
@@ -295,19 +302,26 @@ function main () {
   ))
   state.tickDeltaTimeTextElement.innerText = 'TICK DELTA TIME'
 
+  state.updateTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
+    '#update_delta_time'
+  ))
+  state.updateTimeTextElement.innerText = 'UPDATE TIME'
+
   initializeTimeStats()
   startGame(state)
-  runSimulationLoop(0, 0)
+  runFixedUpdateLoop(0, 0)
+  runUpdateLoop(0)
 
   startRendering(gl, state) // now that scene is setup, start rendering it
 }
 
 function initializeTimeStats () {
-  tickTimeStats.previousTime = new Float32Array(tickTimeStats.totalElements)
+  fixedUpdateTimeStats.previousTime = new Float32Array(fixedUpdateTimeStats.totalElements)
+  updateTimeStats.previousTime = new Float32Array(updateTimeStats.totalElements)
   frameTimeStats.previousTime = new Float32Array(frameTimeStats.totalElements)
 }
 
-function updateTimeStats (statObj, lastTickTime) {
+function calcTimeStats (statObj, lastTickTime) {
   statObj.previousTime[statObj.previousElementIndex] = lastTickTime
   statObj.previousElementIndex =
     (statObj.previousElementIndex + 1) % statObj.totalElements
@@ -320,13 +334,13 @@ function updateTimeStats (statObj, lastTickTime) {
   statObj.averageTime = sum / statObj.totalElements
 }
 
-function runSimulationLoop (lastTickTime, lastTickEndTime) {
+function runFixedUpdateLoop (lastTickTime, lastTickEndTime) {
   const start = window.performance.now()
-  updateTimeStats(tickTimeStats, lastTickTime)
+  calcTimeStats(fixedUpdateTimeStats, lastTickTime)
   // update the overlay
   state.tickTimeTextElement.innerText =
-    'Average tick time: ' +
-    tickTimeStats.averageTime.toFixed(6).toString() +
+    'Average fixed update time: ' +
+    fixedUpdateTimeStats.averageTime.toFixed(6).toString() +
     'ms'
 
   const deltaTime = window.performance.now() - lastTickEndTime
@@ -339,7 +353,7 @@ function runSimulationLoop (lastTickTime, lastTickEndTime) {
   // NOTE: For debugging it might be useful to use hasFocus instead,
   // as the game will pause when you click into the F12 debug panel
   if (document.visibilityState === 'visible') {
-    simulate(deltaTime)
+    fixedUpdate(state, deltaTime) // constantly call our game loop
   }
 
   // always pass back to the browser, even if this means a janky tick rate,
@@ -349,19 +363,32 @@ function runSimulationLoop (lastTickTime, lastTickEndTime) {
   const now = window.performance.now()
   const elapsed = now - start
   window.setTimeout(
-    runSimulationLoop,
+    runFixedUpdateLoop,
     Math.max(0, TICK_RATE_MS - elapsed),
     elapsed,
     now
   )
 }
 
-/**
- *
- * @param {number} deltaTime
- */
-function simulate (deltaTime) {
-  gameLoop(state, deltaTime) // constantly call our game loop
+function runUpdateLoop (lastTickTime) {
+  const start = window.performance.now()
+  calcTimeStats(updateTimeStats, lastTickTime)
+  // update the overlay
+  state.updateTimeTextElement.innerText =
+    'Average update time: ' +
+    updateTimeStats.averageTime.toFixed(6).toString() +
+    'ms'
+
+  if (document.visibilityState === 'visible') {
+    update(state) // constantly call our game loop
+  }
+
+  const elapsed = window.performance.now() - start
+  window.setTimeout(
+    runUpdateLoop,
+    0,
+    elapsed
+  )
 }
 
 /**
@@ -389,7 +416,7 @@ function startRendering (gl, state) {
   // This function is called when we want to render a frame to the canvas
   function render () {
     const start = window.performance.now()
-    updateTimeStats(frameTimeStats, lastFrameElapsed)
+    calcTimeStats(frameTimeStats, lastFrameElapsed)
     state.renderTimeTextElement.innerText =
       'Average frame time: ' +
       frameTimeStats.averageTime.toFixed(6).toString() +
