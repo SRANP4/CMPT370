@@ -29,7 +29,7 @@ declare type AppState = {
     samplerNormExists: number;
     constVal: number;
     lights: Array<any>; //appears to not be used
-    objects: Array<Model | Cube | Plane | CustomObject>;
+    objects: Array<Model | Cube | Plane>;
 
     numLights: number;
 
@@ -144,16 +144,53 @@ declare type Material = {
 }
 
 declare type BoundingBox = {
-    xMin: number,
-    yMin: number,
-    zMin: number,
-    xMax: number,
-    yMax: number,
-    zMax: number
+    xMin: number;
+    yMin: number;
+    zMin: number;
+    xMax: number;
+    yMax: number;
+    zMax: number;
 }
 
 declare type ProgramInfo = {
+    program: WebGLProgram;
+    attribLocations: {
+        vertexPosition: number;
+        vertexNormal: number;
+        vertexUV: number;
+        // vertexBitangent: number;
+    }
+    uniformLocations: {
+        projection: WebGLUniformLocation;
+        view: WebGLUniformLocation;
+        model: WebGLUniformLocation;
+        normalMatrix: WebGLUniformLocation;
+        diffuseVal: WebGLUniformLocation;
+        ambientVal: WebGLUniformLocation;
+        specularVal: WebGLUniformLocation;
+        nVal: WebGLUniformLocation;
+        cameraPosition: WebGLUniformLocation;
+        // numLights: WebGLUniformLocation;
+        lightPositions: WebGLUniformLocation;
+        lightColours: WebGLUniformLocation;
+        lightStrengths: WebGLUniformLocation;
+        samplerExists: WebGLUniformLocation;
+        sampler: WebGLUniformLocation
+        // normalSamplerExists: WebGLUniformLocation;
+        // normalSampler: WebGLUniformLocation;
+    }
+}
 
+declare type GlBuffers = {
+    vao: WebGLVertexArrayObject
+    attributes: {
+        position: WebGLBuffer
+        normal: WebGLBuffer
+        uv: WebGLBuffer
+        // bitangents: WebGLBuffer
+    },
+    indices: WebGLBuffer
+    numVertices: number
 }
 
 declare type ComponentSet<T> = {
