@@ -6,10 +6,10 @@ import {
   getTextures,
   asyncCalcCentroid,
   initPositionAttribute,
-  initNormalAttribute,
   initShaderProgram,
   initTextureCoords,
-  initBitangentBuffer
+  initIndexBuffer,
+  initNormalAttribute
 } from '../commonFunctions.js'
 import { shaderValuesErrorCheck } from '../uiSetup.js'
 
@@ -34,9 +34,12 @@ export class Model {
       rotation: object.rotation
     }
     this.material = { ...object.material }
+    this.buffers = null
+    this.programInfo = null
     this.model = {
-      normals: meshDetails.normals,
       vertices: meshDetails.vertices,
+      triangles: [], // models don't support triangles atm
+      normals: meshDetails.normals,
       uvs: meshDetails.uvs,
       bitangents: [], // models don't support bitangents atm, but we need model object data unified
       position: vec3.fromValues(0.0, 0.0, 0.0),
@@ -88,39 +91,6 @@ export class Model {
       this.model.position,
       vec3.fromValues(translateVec[0], translateVec[1], translateVec[2])
     )
-  }
-
-  async setup () {
-    this.centroid = await asyncCalcCentroid(this.model.vertices)
-    this.lightingShader()
-    this.scale(this.initialTransform.scale)
-    this.translate(this.initialTransform.position)
-    this.model.rotation = new Float32Array(this.initialTransform.rotation)
-    this.initBuffers()
-  }
-
-  initBuffers () {
-    // create vertices, normal and indices arrays
-    const positions = new Float32Array(this.model.vertices)
-    const normals = new Float32Array(this.model.normals)
-    const textureCoords = new Float32Array(this.model.uvs)
-    const bitangents = new Float32Array(this.model.bitangents)
-    const vertexArrayObject = this.gl.createVertexArray()
-    this.gl.bindVertexArray(vertexArrayObject)
-
-    this.buffers = {
-      vao: vertexArrayObject,
-      attributes: {
-        position: initPositionAttribute(this.gl, this.programInfo, positions),
-        normal: initNormalAttribute(this.gl, this.programInfo, normals),
-        uv: initTextureCoords(this.gl, this.programInfo, textureCoords),
-        bitangents: initBitangentBuffer(this.gl, this.programInfo, bitangents)
-      },
-      numVertices: positions.length
-    }
-
-    this.loaded = true
-    console.log(this.name + ' loaded successfully!')
   }
 
   lightingShader () {
@@ -187,5 +157,42 @@ export class Model {
     }
     shaderValuesErrorCheck(programInfo)
     this.programInfo = programInfo
+  }
+
+  initBuffers () {
+    // create vertices, normal and indices arrays
+    const positions = new Float32Array(this.model.vertices.flat())
+    const normals = new Float32Array(this.model.normals.flat())
+    const indices = new Uint16Array(this.model.triangles.flat())
+    const textureCoords = new Float32Array(this.model.uvs.flat())
+    // const bitangents = new Float32Array(this.model.bitangents.flat())
+
+    const vertexArrayObject = this.gl.createVertexArray()
+    this.gl.bindVertexArray(vertexArrayObject)
+
+    /** @type {import('../types.js').GlBuffers} */
+    this.buffers = {
+      vao: vertexArrayObject,
+      attributes: {
+        position: initPositionAttribute(this.gl, this.programInfo, positions),
+        normal: initNormalAttribute(this.gl, this.programInfo, normals),
+        uv: initTextureCoords(this.gl, this.programInfo, textureCoords)
+        // bitangents: initBitangentBuffer(this.gl, this.programInfo, bitangents)
+      },
+      indices: initIndexBuffer(this.gl, indices),
+      numVertices: positions.length
+    }
+
+    this.loaded = true
+    console.log(this.name + ' loaded successfully!')
+  }
+
+  async setup () {
+    this.centroid = await asyncCalcCentroid(this.model.vertices)
+    this.lightingShader()
+    this.scale(this.initialTransform.scale)
+    this.translate(this.initialTransform.position)
+    this.model.rotation = new Float32Array(this.initialTransform.rotation)
+    this.initBuffers()
   }
 }

@@ -5,12 +5,11 @@ import { mat4, vec3 } from '../../lib/gl-matrix/index.js'
 import {
   getTextures,
   initPositionAttribute,
-  initNormalAttribute,
   initShaderProgram,
   initIndexBuffer,
   calculateCentroid,
   initTextureCoords,
-  initBitangentBuffer
+  initNormalAttribute
 } from '../commonFunctions.js'
 import { shaderValuesErrorCheck } from '../uiSetup.js'
 
@@ -71,15 +70,13 @@ export class Plane {
       textureNorm: object.normalTexture
         ? getTextures(glContext, object.normalTexture)
         : null,
-      buffers: null,
       modelMatrix: mat4.create(),
       position: vec3.fromValues(0.0, 0.0, 0.0),
       rotation: mat4.create(),
-      scale: vec3.fromValues(1.0, 1.0, 1.0),
-      programInfo: null,
-      fragShader: '',
-      vertShader: ''
+      scale: vec3.fromValues(1.0, 1.0, 1.0)
     }
+    this.buffers = null
+    this.programInfo = null
   }
 
   rotate (axis, angle) {
@@ -181,19 +178,20 @@ export class Plane {
     const normals = new Float32Array(this.model.normals.flat())
     const indices = new Uint16Array(this.model.triangles)
     const textureCoords = new Float32Array(this.model.uvs)
-    const bitangents = new Float32Array(this.model.bitangents)
+    // const bitangents = new Float32Array(this.model.bitangents)
 
     const vertexArrayObject = this.gl.createVertexArray()
 
     this.gl.bindVertexArray(vertexArrayObject)
 
+    /** @type {import('../types.js').GlBuffers} */
     this.buffers = {
       vao: vertexArrayObject,
       attributes: {
         position: initPositionAttribute(this.gl, this.programInfo, positions),
         normal: initNormalAttribute(this.gl, this.programInfo, normals),
-        uv: initTextureCoords(this.gl, this.programInfo, textureCoords),
-        bitangents: initBitangentBuffer(this.gl, this.programInfo, bitangents)
+        uv: initTextureCoords(this.gl, this.programInfo, textureCoords)
+        // bitangents: initBitangentBuffer(this.gl, this.programInfo, bitangents)
       },
       indices: initIndexBuffer(this.gl, indices),
       numVertices: indices.length

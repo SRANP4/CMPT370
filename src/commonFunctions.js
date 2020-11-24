@@ -138,6 +138,12 @@ export function asyncCalcCentroid (vertices) {
   })
 }
 
+/**
+ *
+ * @param {WebGL2RenderingContext} gl
+ * @param {import('./types.js').ProgramInfo} programInfo
+ * @param {Float32Array} positionArray
+ */
 export function initPositionAttribute (gl, programInfo, positionArray) {
   // Create a buffer for the positions.
   const positionBuffer = gl.createBuffer()
@@ -181,6 +187,12 @@ export function initPositionAttribute (gl, programInfo, positionArray) {
   return positionBuffer
 }
 
+/**
+ *
+ * @param {WebGL2RenderingContext} gl
+ * @param {import('./types.js').ProgramInfo} programInfo
+ * @param {Float32Array} normalArray
+ */
 export function initNormalAttribute (gl, programInfo, normalArray) {
   // Create a buffer for the positions.
   const normalBuffer = gl.createBuffer()
@@ -224,6 +236,12 @@ export function initNormalAttribute (gl, programInfo, normalArray) {
   return normalBuffer
 }
 
+/**
+ *
+ * @param {WebGL2RenderingContext} gl
+ * @param {import('./types.js').ProgramInfo} programInfo
+ * @param {Float32Array} textureCoords
+ */
 export function initTextureCoords (gl, programInfo, textureCoords) {
   if (textureCoords != null && textureCoords.length > 0) {
     // Create a buffer for the positions.
@@ -271,6 +289,12 @@ export function initTextureCoords (gl, programInfo, textureCoords) {
   }
 }
 
+/**
+ *
+ * @param {WebGL2RenderingContext} gl
+ * @param {import('./types.js').ProgramInfo} programInfo
+ * @param {Float32Array} bitangents
+ */
 export function initBitangentBuffer (gl, programInfo, bitangents) {
   if (bitangents != null && bitangents.length > 0) {
     // Create a buffer for the positions.
@@ -318,6 +342,12 @@ export function initBitangentBuffer (gl, programInfo, bitangents) {
   }
 }
 
+/**
+ *
+ * @param {WebGL2RenderingContext} gl
+ * @param {import('./types.js').ProgramInfo} programInfo
+ * @param {Uint16Array} elementArray
+ */
 export function initIndexBuffer (gl, elementArray) {
   // Create a buffer for the positions.
   const indexBuffer = gl.createBuffer()

@@ -5,12 +5,11 @@ import { mat4, vec3 } from '../../lib/gl-matrix/index.js'
 import {
   getTextures,
   initPositionAttribute,
-  initNormalAttribute,
   initShaderProgram,
   initIndexBuffer,
   calculateCentroid,
   initTextureCoords,
-  initBitangentBuffer
+  initNormalAttribute
 } from '../commonFunctions.js'
 import { shaderValuesErrorCheck } from '../uiSetup.js'
 
@@ -21,7 +20,7 @@ export class Cube {
    * @param {import('../types.js').StateFileObject} object
    */
   constructor (glContext, object) {
-    this.state = {}
+    // this.state = {}
     this.gl = glContext
     this.vertShader = ''
     this.fragShader = ''
@@ -35,6 +34,8 @@ export class Cube {
       rotation: object.rotation
     }
     this.material = { ...object.material }
+    this.buffers = null
+    this.programInfo = null
     this.model = {
       vertices: [
         [0.0, 0.0, 0.0],
@@ -324,6 +325,10 @@ export class Cube {
         0,
         -1 // Bot
       ],
+      position: vec3.fromValues(0.0, 0.0, 0.0),
+      rotation: mat4.create(),
+      scale: vec3.fromValues(1.0, 1.0, 1.0),
+      modelMatrix: mat4.create(),
       diffuseTexture: object.diffuseTexture
         ? object.diffuseTexture
         : 'default.png',
@@ -335,15 +340,7 @@ export class Cube {
         : null,
       textureNorm: object.normalTexture
         ? getTextures(glContext, object.normalTexture)
-        : null,
-      buffers: null,
-      modelMatrix: mat4.create(),
-      position: vec3.fromValues(0.0, 0.0, 0.0),
-      rotation: mat4.create(),
-      scale: vec3.fromValues(1.0, 1.0, 1.0),
-      programInfo: null,
-      fragShader: '',
-      vertShader: ''
+        : null
     }
   }
 
@@ -427,11 +424,11 @@ export class Cube {
           shaderProgram,
           'uLightStrengths'
         ),
+        sampler: this.gl.getUniformLocation(shaderProgram, 'uTexture'),
         samplerExists: this.gl.getUniformLocation(
           shaderProgram,
           'samplerExists'
-        ),
-        sampler: this.gl.getUniformLocation(shaderProgram, 'uTexture')
+        )
         // normalSamplerExists: this.gl.getUniformLocation(
         //   shaderProgram,
         //   'uTextureNormExists'
@@ -448,21 +445,21 @@ export class Cube {
     // create vertices, normal and indices arrays
     const positions = new Float32Array(this.model.vertices.flat())
     const normals = new Float32Array(this.model.normals.flat())
-    const indices = new Uint16Array(this.model.triangles)
-    const textureCoords = new Float32Array(this.model.uvs)
-    const bitangents = new Float32Array(this.model.bitangents)
+    const indices = new Uint16Array(this.model.triangles.flat())
+    const textureCoords = new Float32Array(this.model.uvs.flat())
+    // const bitangents = new Float32Array(this.model.bitangents.flat())
 
     const vertexArrayObject = this.gl.createVertexArray()
-
     this.gl.bindVertexArray(vertexArrayObject)
 
+    /** @type {import('../types.js').GlBuffers} */
     this.buffers = {
       vao: vertexArrayObject,
       attributes: {
         position: initPositionAttribute(this.gl, this.programInfo, positions),
         normal: initNormalAttribute(this.gl, this.programInfo, normals),
-        uv: initTextureCoords(this.gl, this.programInfo, textureCoords),
-        bitangents: initBitangentBuffer(this.gl, this.programInfo, bitangents)
+        uv: initTextureCoords(this.gl, this.programInfo, textureCoords)
+        // bitangents: initBitangentBuffer(this.gl, this.programInfo, bitangents)
       },
       indices: initIndexBuffer(this.gl, indices),
       numVertices: indices.length

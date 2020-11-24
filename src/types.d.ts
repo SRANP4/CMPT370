@@ -181,6 +181,18 @@ declare type ProgramInfo = {
     }
 }
 
+declare type GlBuffers = {
+    vao: WebGLVertexArrayObject
+    attributes: {
+        position: WebGLBuffer
+        normal: WebGLBuffer
+        uv: WebGLBuffer
+        // bitangents: WebGLBuffer
+    },
+    indices: WebGLBuffer
+    numVertices: number
+}
+
 declare type ComponentSet<T> = {
     components: Array<T>,
     entityMap: Map<number, number>,

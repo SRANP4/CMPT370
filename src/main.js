@@ -135,7 +135,6 @@ function main () {
         in vec3 aNormal;
         in vec2 aUV;
         
-
         uniform mat4 uProjectionMatrix;
         uniform mat4 uViewMatrix;
         uniform mat4 uModelMatrix;
@@ -153,6 +152,7 @@ function main () {
             gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0);
 
             oFragPosition = (uModelMatrix * vec4(aPosition, 1.0)).xyz;
+
             oNormal = normalize((uModelMatrix * vec4(aNormal, 1.0)).xyz);
             normalInterp = vec3(normalMatrix * vec4(aNormal, 0.0));
             oCameraPosition = uCameraPosition;
@@ -186,6 +186,8 @@ function main () {
           vec3 normal = normalize(normalInterp);
 
           // Get the direction of the light relative to the object
+          //float attenuation = light.strength / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+          float scaledLightStrength = uLightStrengths / 2.0;
           vec3 lightDirection = normalize(uLightPositions - oFragPosition);
           vec3 cameraDirection = normalize(oCameraPosition - oFragPosition);
 
@@ -193,12 +195,12 @@ function main () {
 
           // calculate ambient term Ka * La * LightStrength
           vec3 Ka = ambientVal;
-          if (samplerExists == 0) {
+          if (samplerExists == 1) {
             //Ka = mix(ambientVal, textureColor.rgb, 0.1);
             Ka = ambientVal * textureColor.rgb;
             //Ka = ambientVal;
           }
-          vec3 ambient = ambientVal * uLightColours * uLightStrengths * 0.01;
+          vec3 ambient = Ka * uLightColours * scaledLightStrength;
   
           // Diffuse term : Ld * (N dot L)
           // We don't multiply Kd for now as it changes with texture 
@@ -206,11 +208,11 @@ function main () {
           float diff = abs(dot(normal, lightDirection));
           // calculate diffuse colour for texture and no-texture  
           vec3 Kd = diffuseVal;
-          if (samplerExists == 0) {
+          if (samplerExists == 1) {
               Kd = mix(diffuseVal, textureColor.rgb, 0.3);
               //Kd = diffuseVal * textureColor.rgb;
           }
-          vec3 diffuse = diffuseVal * uLightColours * diff;
+          vec3 diffuse = Kd * uLightColours * diff;
           
           // Specular lighting
           // for better visualization leave the color white (don't mix with specular)
@@ -219,18 +221,21 @@ function main () {
           float HN = abs(dot(halfVector, normal));
           float hnPow = pow(HN, nVal);
           vec3 Ks = specularVal;
-          if (samplerExists == 0) {
+          if (samplerExists == 1) {
             Ks = mix(specularVal, textureColor.rgb, 0.1);
             //Ks = specularVal * textureColor.rgb;
           }
           vec3 specular = Ks * uLightColours * hnPow;
   
-          vec3 lightShading = (ambient + diffuse + specular);
+          vec3 lightShading = (ambient + diffuse);
           
           fragColor = vec4(lightShading, 1.0);
-  
+
+          //fragColor = vec4(textureColor.rgb, 1.0);
 
           //fragColor = vec4(diffuseVal, 1.0);
+          //fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+          //fragColor = vec4(normal, 1.0);
         }
         `
   /**
@@ -257,7 +262,7 @@ function main () {
   state.numLights = state.pointLights.length
 
   // iterate through the level's objects and add them
-  state.loadObjects.map(loadObject => {
+  state.loadObjects.forEach(loadObject => {
     if (loadObject.type === 'mesh') {
       parseOBJFileToJSON(loadObject.model, createMesh, loadObject)
     } else if (loadObject.type === 'cube') {
@@ -273,7 +278,6 @@ function main () {
       tempPlane.setup()
       addObjectToScene(state, tempPlane)
     }
-    return null
   })
 
   state.tickTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
@@ -521,15 +525,15 @@ function drawScene (gl, state) {
     // Object material
     gl.uniform3fv(
       object.programInfo.uniformLocations.diffuseVal,
-      new Float32Array(object.material.diffuse)
+      object.material.diffuse
     )
     gl.uniform3fv(
       object.programInfo.uniformLocations.ambientVal,
-      new Float32Array(object.material.ambient)
+      object.material.ambient
     )
     gl.uniform3fv(
       object.programInfo.uniformLocations.specularVal,
-      new Float32Array(object.material.specular)
+      object.material.specular
     )
     gl.uniform1f(object.programInfo.uniformLocations.nVal, object.material.n)
 
@@ -555,9 +559,6 @@ function drawScene (gl, state) {
       )
     }
 
-    // Bind the buffer we want to draw
-    gl.bindVertexArray(object.buffers.vao)
-
     // check for diffuse texture and apply it
     if (object.model.texture != null) {
       state.samplerExists = 1
@@ -569,7 +570,6 @@ function drawScene (gl, state) {
       gl.uniform1i(object.programInfo.uniformLocations.sampler, 0)
       gl.bindTexture(gl.TEXTURE_2D, object.model.texture)
     } else {
-      gl.activeTexture(gl.TEXTURE0)
       state.samplerExists = 0
       gl.uniform1i(
         object.programInfo.uniformLocations.samplerExists,
@@ -578,23 +578,26 @@ function drawScene (gl, state) {
     }
 
     // check for normal texture and apply it
-    if (object.model.textureNorm != null) {
-      state.samplerNormExists = 1
-      gl.activeTexture(gl.TEXTURE1)
-      // gl.uniform1i(
-      //   object.programInfo.uniformLocations.normalSamplerExists,
-      //   state.samplerNormExists
-      // )
-      // gl.uniform1i(object.programInfo.uniformLocations.normalSampler, 1)
-      gl.bindTexture(gl.TEXTURE_2D, object.model.textureNorm)
-    } else {
-      gl.activeTexture(gl.TEXTURE1)
-      state.samplerNormExists = 0
-      // gl.uniform1i(
-      //   object.programInfo.uniformLocations.normalSamplerExists,
-      //   state.samplerNormExists
-      // )
-    }
+    // if (object.model.textureNorm != null) {
+    //   state.samplerNormExists = 1
+    //   gl.activeTexture(gl.TEXTURE1)
+    //   gl.uniform1i(
+    //     object.programInfo.uniformLocations.normalSamplerExists,
+    //     state.samplerNormExists
+    //   )
+    //   gl.uniform1i(object.programInfo.uniformLocations.normalSampler, 1)
+    //   gl.bindTexture(gl.TEXTURE_2D, object.model.textureNorm)
+    // } else {
+    //   gl.activeTexture(gl.TEXTURE1)
+    //   state.samplerNormExists = 0
+    //   gl.uniform1i(
+    //     object.programInfo.uniformLocations.normalSamplerExists,
+    //     state.samplerNormExists
+    //   )
+    // }
+
+    // Bind the buffer we want to draw
+    gl.bindVertexArray(object.buffers.vao)
 
     // Draw the object
     const offset = 0 // Number of elements to skip before starting
@@ -603,6 +606,7 @@ function drawScene (gl, state) {
     if (object.type === 'mesh' || object.type === 'meshCustom') {
       gl.drawArrays(gl.TRIANGLES, offset, object.buffers.numVertices / 3)
     } else {
+      // gl.drawArrays(gl.TRIANGLES, offset, object.buffers.numVertices / 3)
       gl.drawElements(
         gl.TRIANGLES,
         object.buffers.numVertices,
@@ -611,4 +615,9 @@ function drawScene (gl, state) {
       )
     }
   })
+
+  const glError = gl.getError()
+  if (glError !== gl.NO_ERROR) {
+    console.error('glError: ' + glError.toString())
+  }
 }
