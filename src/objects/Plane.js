@@ -118,9 +118,9 @@ export class Plane {
       // NOTE: it may be wise to check if these calls fail by seeing that the returned location is not -1.
       attribLocations: {
         vertexPosition: this.gl.getAttribLocation(shaderProgram, 'aPosition'),
-        vertexNormal: this.gl.getAttribLocation(shaderProgram, 'aNormal')
-        // vertexUV: this.gl.getAttribLocation(shaderProgram, 'aUV'),
-        // vertexBitangent: this.gl.getAttribLocation(shaderProgram, 'aVertBitang')
+        vertexNormal: this.gl.getAttribLocation(shaderProgram, 'aNormal'),
+        vertexUV: this.gl.getAttribLocation(shaderProgram, 'aUV'),
+        vertexBitangent: this.gl.getAttribLocation(shaderProgram, 'aVertBitang')
       },
       uniformLocations: {
         projection: this.gl.getUniformLocation(
@@ -129,20 +129,38 @@ export class Plane {
         ),
         view: this.gl.getUniformLocation(shaderProgram, 'uViewMatrix'),
         model: this.gl.getUniformLocation(shaderProgram, 'uModelMatrix'),
-        // normalMatrix: this.gl.getUniformLocation(shaderProgram, 'normalMatrix'),
-        diffuseVal: this.gl.getUniformLocation(shaderProgram, 'diffuseVal')
-        // ambientVal: this.gl.getUniformLocation(shaderProgram, 'ambientVal'),
-        // specularVal: this.gl.getUniformLocation(shaderProgram, 'specularVal'),
-        // nVal: this.gl.getUniformLocation(shaderProgram, 'nVal'),
-        // cameraPosition: this.gl.getUniformLocation(shaderProgram, 'uCameraPosition'),
-        // numLights: this.gl.getUniformLocation(shaderProgram, 'numLights'),
-        // lightPositions: this.gl.getUniformLocation(shaderProgram, 'uLightPositions'),
-        // lightColours: this.gl.getUniformLocation(shaderProgram, 'uLightColours'),
-        // lightStrengths: this.gl.getUniformLocation(shaderProgram, 'uLightStrengths'),
-        // samplerExists: this.gl.getUniformLocation(shaderProgram, "samplerExists"),
-        // sampler: this.gl.getUniformLocation(shaderProgram, 'uTexture'),
-        // normalSamplerExists: this.gl.getUniformLocation(shaderProgram, 'uTextureNormExists'),
-        // normalSampler: this.gl.getUniformLocation(shaderProgram, 'uTextureNorm')
+        normalMatrix: this.gl.getUniformLocation(shaderProgram, 'normalMatrix'),
+        diffuseVal: this.gl.getUniformLocation(shaderProgram, 'diffuseVal'),
+        ambientVal: this.gl.getUniformLocation(shaderProgram, 'ambientVal'),
+        specularVal: this.gl.getUniformLocation(shaderProgram, 'specularVal'),
+        nVal: this.gl.getUniformLocation(shaderProgram, 'nVal'),
+        cameraPosition: this.gl.getUniformLocation(
+          shaderProgram,
+          'uCameraPosition'
+        ),
+        numLights: this.gl.getUniformLocation(shaderProgram, 'numLights'),
+        lightPositions: this.gl.getUniformLocation(
+          shaderProgram,
+          'uLightPositions'
+        ),
+        lightColours: this.gl.getUniformLocation(
+          shaderProgram,
+          'uLightColours'
+        ),
+        lightStrengths: this.gl.getUniformLocation(
+          shaderProgram,
+          'uLightStrengths'
+        ),
+        samplerExists: this.gl.getUniformLocation(
+          shaderProgram,
+          'samplerExists'
+        ),
+        sampler: this.gl.getUniformLocation(shaderProgram, 'uTexture'),
+        normalSamplerExists: this.gl.getUniformLocation(
+          shaderProgram,
+          'uTextureNormExists'
+        ),
+        normalSampler: this.gl.getUniformLocation(shaderProgram, 'uTextureNorm')
       }
     }
 

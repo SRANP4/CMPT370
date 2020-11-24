@@ -6,7 +6,6 @@ import { mat4, vec3 } from '../lib/gl-matrix/index.js'
 import { parseOBJFileToJSON, parseSceneFile } from './commonFunctions.js'
 import { gameLoop, startGame } from './myGame.js'
 import { Cube } from './objects/Cube.js'
-import { CustomObject } from './objects/CustomObject.js'
 import { Model } from './objects/Model.js'
 import { Plane } from './objects/Plane.js'
 import { getObject } from './sceneFunctions.js'
@@ -205,12 +204,6 @@ function main () {
       tempPlane.fragShader = fragShaderSample
       tempPlane.setup()
       addObjectToScene(state, tempPlane)
-    } else if (loadObject.type.includes('Custom')) {
-      const tempObject = new CustomObject(gl, loadObject)
-      tempObject.vertShader = vertShaderSample
-      tempObject.fragShader = fragShaderSample
-      tempObject.setup()
-      addObjectToScene(state, tempObject)
     }
     return null
   })
@@ -302,7 +295,7 @@ function simulate (deltaTime) {
 /**
  *
  * @param {import('./types.js').AppState} state object containing scene values
- * @param {Model | Cube | Plane | CustomObject} object the object to be added to the scene
+ * @param {Model | Cube | Plane} object the object to be added to the scene
  * @purpose - Helper function for adding a new object to the scene and refreshing the GUI
  */
 function addObjectToScene (state, object) {
@@ -398,12 +391,12 @@ function drawScene (gl, state) {
         // View Matrix & Camera ....
         const viewMatrix = mat4.create()
         const camFront = vec3.fromValues(0, 0, 0)
-        vec3.add(camFront, state.camera.position, state.camera.front)
+        vec3.add(camFront, new Float32Array(state.camera.position), new Float32Array(state.camera.front))
         mat4.lookAt(
           viewMatrix,
-          state.camera.position,
+          new Float32Array(state.camera.position),
           camFront,
-          state.camera.up
+          new Float32Array(state.camera.up)
         )
         gl.uniformMatrix4fv(
           object.programInfo.uniformLocations.view,
