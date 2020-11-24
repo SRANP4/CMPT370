@@ -1,6 +1,10 @@
 // @ts-check
 'use strict'
 
+/**
+ *
+ * @param {ProgramInfo} programInfo
+ */
 export function shaderValuesErrorCheck (programInfo) {
   const missing = []
   // do attrib check

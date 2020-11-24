@@ -1,6 +1,11 @@
 // @ts-check
 'use strict'
 
+/**
+ *
+ * @param {import("./types").AppState} state
+ * @param {string} name
+ */
 export function getObject (state, name) {
   let objectToFind = null
 
@@ -14,15 +19,28 @@ export function getObject (state, name) {
   return objectToFind
 }
 
+/**
+ *
+ * @param {import("./types").BoundingBox} a
+ * @param {import("./types").BoundingBox} b
+ * @returns {boolean}
+ */
 export function intersect (a, b) {
   return (
     a.xMin <= b.xMax &&
     a.xMax >= b.xMin &&
-    a.yMin <= b.yMax && a.yMax >= b.yMin &&
-    a.zMin <= b.zMax && a.zMax >= b.zMin
+    a.yMin <= b.yMax &&
+    a.yMax >= b.yMin &&
+    a.zMin <= b.zMax &&
+    a.zMax >= b.zMin
   )
 }
 
+/**
+ *
+ * @param {number[][]} vertices array of arrays, vertices numbers
+ * @returns {import("./types").BoundingBox}
+ */
 export function getBoundingBox (vertices) {
   let xMin = 0
   let xMax = 0

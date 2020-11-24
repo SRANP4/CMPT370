@@ -3,10 +3,10 @@ import { vec3 } from '../lib/gl-matrix/index.js'
 import { OBJLoader } from '../lib/three-object-loader.js'
 
 /**
- * @param  {} gl WebGL2 Context
+ * @param  {WebGL2RenderingContext} gl WebGL2 Context
  * @param  {string} vsSource Vertex shader GLSL source code
  * @param  {string} fsSource Fragment shader GLSL source code
- * @returns {} A shader program object. This is `null` on failure
+ * @returns {WebGLProgram} A shader program object. This is `null` on failure
  */
 export function initShaderProgram (gl, vsSource, fsSource) {
   // Use our custom function to load and compile the shader objects
@@ -33,8 +33,8 @@ export function initShaderProgram (gl, vsSource, fsSource) {
 
 /**
  * Loads a shader from source into a shader object. This should later be linked into a program.
- * @param  {} gl WebGL2 context
- * @param  {} type Type of shader. Typically either VERTEX_SHADER or FRAGMENT_SHADER
+ * @param  {WebGL2RenderingContext} gl WebGL2 context
+ * @param  {number} type Type of shader. Typically either VERTEX_SHADER or FRAGMENT_SHADER
  * @param  {string} source GLSL source code
  */
 export function loadShader (gl, type, source) {
@@ -69,8 +69,8 @@ export function loadShader (gl, type, source) {
 
 /**
  *
- * @param {array of x,y,z vertices} vertices
- * @param {=} cb
+ * @param {Array<number>} vertices array of x,y,z vertices (flattened)
+ * @param {=} cb callback function (not passed any params)
  */
 export function calculateCentroid (vertices, cb) {
   const center = vec3.fromValues(0.0, 0.0, 0.0)
@@ -91,6 +91,11 @@ export function calculateCentroid (vertices, cb) {
   }
 }
 
+/**
+ *
+ * @param {number} angle angle in degrees
+ * @returns {number} angle in radians
+ */
 export function toRadians (angle) {
   return angle * (Math.PI / 180)
 }
@@ -322,6 +327,11 @@ export function initIndexBuffer (gl, elementArray) {
   return indexBuffer
 }
 
+/**
+ *
+ * @param {CallableFunction} cb callback, is passed the json data
+ * @param {string} filePath
+ */
 export function loadJSONFile (cb, filePath) {
   window
     .fetch(filePath)
@@ -336,6 +346,11 @@ export function loadJSONFile (cb, filePath) {
     })
 }
 
+/**
+ *
+ * @param {WebGL2RenderingContext} gl
+ * @param {string} imgPath
+ */
 export function getTextures (gl, imgPath) {
   const fullpath = '/materials/' + imgPath
   if (imgPath) {
@@ -369,15 +384,22 @@ export function getTextures (gl, imgPath) {
   }
 }
 
-export function parseOBJFileToJSON (objFileURL, cb, object) {
+/**
+ *
+ * @param {string} objFileURL
+ * @param {CallableFunction} cb
+ * @param {import('./types').StateFileObject} loadObject
+ */
+export function parseOBJFileToJSON (objFileURL, cb, loadObject) {
   window
     .fetch('/models/' + objFileURL)
     .then(data => {
       return data.text()
     })
     .then(text => {
+      /** @type {OBJMesh} */
       const mesh = OBJLoader.prototype.parse(text)
-      cb(mesh, object)
+      cb(mesh, loadObject)
     })
     .catch(err => {
       console.error(err)
@@ -386,7 +408,8 @@ export function parseOBJFileToJSON (objFileURL, cb, object) {
 
 /**
  *
- * @param {hex value of color} hex
+ * @param {string} hex hex value of color (string of 6 characters, valid numbers)
+ * @return {Array<Number>} array of 3 floats representing the colour value
  */
 export function hexToRGB (hex) {
   let r = hex.substring(1, 3)
@@ -398,18 +421,19 @@ export function hexToRGB (hex) {
   return [r / 255, g / 255, b / 255]
 }
 
+/**
+ *
+ * @param {string} file
+ * @param {import('./types').AppState} state
+ */
 export function parseSceneFile (file, state) {
   return new Promise((resolve, reject) => {
-    state.lights = []
-    state.loadObjects = []
-    state.objects = []
-
     window
       .fetch(file)
       .then(data => {
-        return data.json()
+        return /** @type {StateFile} */ (data.json())
       })
-      .then(jData => {
+      .then((jData) /** @type {StateFile} */ => {
         state.loadObjects = jData[0].objects
         state.pointLights = jData[0].pointLights
         state.settings = jData[0].settings

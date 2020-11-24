@@ -379,6 +379,7 @@ export class Cube {
       this.fragShader
     )
     // Collect all the info needed to use the shader program.
+    /** @type {import('../types').ProgramInfo} */
     const programInfo = {
       // The actual shader program
       program: shaderProgram,
