@@ -395,8 +395,8 @@ export class Cube {
       attribLocations: {
         vertexPosition: this.gl.getAttribLocation(shaderProgram, 'aPosition'),
         vertexNormal: this.gl.getAttribLocation(shaderProgram, 'aNormal'),
-        vertexUV: this.gl.getAttribLocation(shaderProgram, 'aUV'),
-        vertexBitangent: this.gl.getAttribLocation(shaderProgram, 'aVertBitang')
+        vertexUV: this.gl.getAttribLocation(shaderProgram, 'aUV')
+        // vertexBitangent: this.gl.getAttribLocation(shaderProgram, 'aVertBitang')
       },
       uniformLocations: {
         projection: this.gl.getUniformLocation(
@@ -414,7 +414,7 @@ export class Cube {
           shaderProgram,
           'uCameraPosition'
         ),
-        numLights: this.gl.getUniformLocation(shaderProgram, 'numLights'),
+        // numLights: this.gl.getUniformLocation(shaderProgram, 'numLights'),
         lightPositions: this.gl.getUniformLocation(
           shaderProgram,
           'uLightPositions'
@@ -431,12 +431,12 @@ export class Cube {
           shaderProgram,
           'samplerExists'
         ),
-        sampler: this.gl.getUniformLocation(shaderProgram, 'uTexture'),
-        normalSamplerExists: this.gl.getUniformLocation(
-          shaderProgram,
-          'uTextureNormExists'
-        ),
-        normalSampler: this.gl.getUniformLocation(shaderProgram, 'uTextureNorm')
+        sampler: this.gl.getUniformLocation(shaderProgram, 'uTexture')
+        // normalSamplerExists: this.gl.getUniformLocation(
+        //   shaderProgram,
+        //   'uTextureNormExists'
+        // ),
+        // normalSampler: this.gl.getUniformLocation(shaderProgram, 'uTextureNorm')
       }
     }
 

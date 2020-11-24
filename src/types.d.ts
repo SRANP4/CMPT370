@@ -158,7 +158,7 @@ declare type ProgramInfo = {
         vertexPosition: number;
         vertexNormal: number;
         vertexUV: number;
-        vertexBitangent: number;
+        // vertexBitangent: number;
     }
     uniformLocations: {
         projection: WebGLUniformLocation;
@@ -170,14 +170,14 @@ declare type ProgramInfo = {
         specularVal: WebGLUniformLocation;
         nVal: WebGLUniformLocation;
         cameraPosition: WebGLUniformLocation;
-        numLights: WebGLUniformLocation;
+        // numLights: WebGLUniformLocation;
         lightPositions: WebGLUniformLocation;
         lightColours: WebGLUniformLocation;
         lightStrengths: WebGLUniformLocation;
         samplerExists: WebGLUniformLocation;
         sampler: WebGLUniformLocation
-        normalSamplerExists: WebGLUniformLocation;
-        normalSampler: WebGLUniformLocation;
+        // normalSamplerExists: WebGLUniformLocation;
+        // normalSampler: WebGLUniformLocation;
     }
 }
 
