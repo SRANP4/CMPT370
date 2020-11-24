@@ -29,8 +29,6 @@ import { printError } from './uiSetup.js'
     - send events for collisions (queue for scripts to pick up)
       - includes collision info (entity id of other collider???)
 
-  TODO document app state
-  TODO migrate old state into new state object
   TODO break state into smaller state objects, monolithic state is hard to keep in my small brain
 
   TODO basic non-transparent (diffuse) rendering (use a state file from Zach's refinery engine)
