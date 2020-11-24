@@ -6,12 +6,20 @@ import {
   getTextures,
   asyncCalcCentroid,
   initPositionAttribute,
-  initNormalAttribute,
-  initShaderProgram
+  initShaderProgram,
+  initTextureCoords,
+  initIndexBuffer,
+  initNormalAttribute
 } from '../commonFunctions.js'
 import { shaderValuesErrorCheck } from '../uiSetup.js'
 
 export class Model {
+  /**
+   *
+   * @param {WebGL2RenderingContext} glContext
+   * @param {import('../types.js').StateFileObject} object
+   * @param {import('../types.js').OBJMesh} meshDetails
+   */
   constructor (glContext, object, meshDetails) {
     this.gl = glContext
     this.vertShader = ''
@@ -26,13 +34,18 @@ export class Model {
       rotation: object.rotation
     }
     this.material = { ...object.material }
+    this.buffers = null
+    this.programInfo = null
     this.model = {
-      normals: meshDetails.normals,
       vertices: meshDetails.vertices,
+      triangles: [], // models don't support triangles atm
+      normals: meshDetails.normals,
       uvs: meshDetails.uvs,
+      bitangents: [], // models don't support bitangents atm, but we need model object data unified
       position: vec3.fromValues(0.0, 0.0, 0.0),
       rotation: mat4.create(),
       scale: vec3.fromValues(1.0, 1.0, 1.0),
+      modelMatrix: mat4.create(),
       diffuseTexture: object.diffuseTexture
         ? object.diffuseTexture
         : 'default.png',
@@ -46,8 +59,6 @@ export class Model {
         ? getTextures(glContext, object.normalTexture)
         : null
     }
-    this.modelMatrix = mat4.create()
-    this.lightingShader = this.lightingShader.bind(this)
   }
 
   rotate (axis, angle) {
@@ -82,37 +93,6 @@ export class Model {
     )
   }
 
-  async setup () {
-    this.centroid = await asyncCalcCentroid(this.model.vertices)
-    this.lightingShader()
-    this.scale(this.initialTransform.scale)
-    this.translate(this.initialTransform.position)
-    this.model.rotation = this.initialTransform.rotation
-    this.initBuffers()
-  }
-
-  initBuffers () {
-    // create vertices, normal and indices arrays
-    const positions = new Float32Array(this.model.vertices)
-    const normals = new Float32Array(this.model.normals)
-    // const textureCoords = new Float32Array(this.model.uvs);
-    const vertexArrayObject = this.gl.createVertexArray()
-    this.gl.bindVertexArray(vertexArrayObject)
-
-    this.buffers = {
-      vao: vertexArrayObject,
-      attributes: {
-        position: initPositionAttribute(this.gl, this.programInfo, positions),
-        normal: initNormalAttribute(this.gl, this.programInfo, normals)
-        // uv: initTextureCoords(this.gl, this.programInfo, textureCoords),
-      },
-      numVertices: positions.length
-    }
-
-    this.loaded = true
-    console.log(this.name + ' loaded successfully!')
-  }
-
   lightingShader () {
     // console.log(this.model.vertices)
 
@@ -122,6 +102,7 @@ export class Model {
       this.fragShader
     )
     // Collect all the info needed to use the shader program.
+    /** @type {import('../types').ProgramInfo} */
     const programInfo = {
       // The actual shader program
       program: shaderProgram,
@@ -129,8 +110,9 @@ export class Model {
       // NOTE: it may be wise to check if these calls fail by seeing that the returned location is not -1.
       attribLocations: {
         vertexPosition: this.gl.getAttribLocation(shaderProgram, 'aPosition'),
-        vertexNormal: this.gl.getAttribLocation(shaderProgram, 'aNormal')
-        // vertexUV: this.gl.getAttribLocation(shaderProgram, 'aUV'),
+        vertexNormal: this.gl.getAttribLocation(shaderProgram, 'aNormal'),
+        vertexUV: this.gl.getAttribLocation(shaderProgram, 'aUV')
+        // vertexBitangent: this.gl.getAttribLocation(shaderProgram, 'aVertBitang')
       },
       uniformLocations: {
         projection: this.gl.getUniformLocation(
@@ -139,21 +121,78 @@ export class Model {
         ),
         view: this.gl.getUniformLocation(shaderProgram, 'uViewMatrix'),
         model: this.gl.getUniformLocation(shaderProgram, 'uModelMatrix'),
-        // normalMatrix: this.gl.getUniformLocation(shaderProgram, 'normalMatrix'),
-        diffuseVal: this.gl.getUniformLocation(shaderProgram, 'diffuseVal')
-        // ambientVal: this.gl.getUniformLocation(shaderProgram, 'ambientVal'),
-        // specularVal: this.gl.getUniformLocation(shaderProgram, 'specularVal'),
-        // nVal: this.gl.getUniformLocation(shaderProgram, 'nVal'),
-        // cameraPosition: this.gl.getUniformLocation(shaderProgram, 'uCameraPosition'),
+        normalMatrix: this.gl.getUniformLocation(shaderProgram, 'normalMatrix'),
+        diffuseVal: this.gl.getUniformLocation(shaderProgram, 'diffuseVal'),
+        ambientVal: this.gl.getUniformLocation(shaderProgram, 'ambientVal'),
+        specularVal: this.gl.getUniformLocation(shaderProgram, 'specularVal'),
+        nVal: this.gl.getUniformLocation(shaderProgram, 'nVal'),
+        cameraPosition: this.gl.getUniformLocation(
+          shaderProgram,
+          'uCameraPosition'
+        ),
         // numLights: this.gl.getUniformLocation(shaderProgram, 'numLights'),
-        // lightPositions: this.gl.getUniformLocation(shaderProgram, 'uLightPositions'),
-        // lightColours: this.gl.getUniformLocation(shaderProgram, 'uLightColours'),
-        // lightStrengths: this.gl.getUniformLocation(shaderProgram, 'uLightStrengths'),
-        // sampler: this.gl.getUniformLocation(shaderProgram, 'uTexture'),
-        // samplerExists: this.gl.getUniformLocation(shaderProgram, "samplerExists")
+        lightPositions: this.gl.getUniformLocation(
+          shaderProgram,
+          'uLightPositions'
+        ),
+        lightColours: this.gl.getUniformLocation(
+          shaderProgram,
+          'uLightColours'
+        ),
+        lightStrengths: this.gl.getUniformLocation(
+          shaderProgram,
+          'uLightStrengths'
+        ),
+        sampler: this.gl.getUniformLocation(shaderProgram, 'uTexture'),
+        samplerExists: this.gl.getUniformLocation(
+          shaderProgram,
+          'samplerExists'
+        )
+        // normalSamplerExists: this.gl.getUniformLocation(
+        //   shaderProgram,
+        //   'uTextureNormExists'
+        // ),
+        // normalSampler: this.gl.getUniformLocation(shaderProgram, 'uTextureNorm')
       }
     }
     shaderValuesErrorCheck(programInfo)
     this.programInfo = programInfo
+  }
+
+  initBuffers () {
+    // create vertices, normal and indices arrays
+    const positions = new Float32Array(this.model.vertices.flat())
+    const normals = new Float32Array(this.model.normals.flat())
+    const indices = new Uint16Array(this.model.triangles.flat())
+    const textureCoords = new Float32Array(this.model.uvs.flat())
+    // const bitangents = new Float32Array(this.model.bitangents.flat())
+
+    const vertexArrayObject = this.gl.createVertexArray()
+    this.gl.bindVertexArray(vertexArrayObject)
+
+    /** @type {import('../types.js').GlBuffers} */
+    this.buffers = {
+      vao: vertexArrayObject,
+      attributes: {
+        position: initPositionAttribute(this.gl, this.programInfo, positions),
+        normal: initNormalAttribute(this.gl, this.programInfo, normals),
+        uv: initTextureCoords(this.gl, this.programInfo, textureCoords)
+        // bitangents: initBitangentBuffer(this.gl, this.programInfo, bitangents)
+      },
+      indices: initIndexBuffer(this.gl, indices),
+      numVertices: positions.length
+    }
+
+    this.loaded = true
+    console.log(this.name + ' loaded successfully!')
+  }
+
+  async setup () {
+    this.centroid = await asyncCalcCentroid(this.model.vertices)
+    this.lightingShader()
+    this.scale(this.initialTransform.scale)
+    this.translate(this.initialTransform.position)
+    this.model.rotation = new Float32Array(this.initialTransform.rotation)
+    this.initBuffers()
   }
 }

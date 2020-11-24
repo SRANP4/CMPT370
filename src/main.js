@@ -1,11 +1,11 @@
 // @ts-check
+
 'use strict'
 
 import { mat4, vec3 } from '../lib/gl-matrix/index.js'
 import { parseOBJFileToJSON, parseSceneFile } from './commonFunctions.js'
 import { gameLoop, startGame } from './myGame.js'
 import { Cube } from './objects/Cube.js'
-import { CustomObject } from './objects/CustomObject.js'
 import { Model } from './objects/Model.js'
 import { Plane } from './objects/Plane.js'
 import { getObject } from './sceneFunctions.js'
@@ -22,40 +22,45 @@ import { printError } from './uiSetup.js'
 */
 
 /*
-  main loop
-
   update physics
     - update velocity and gravity
     - check for collisions
     - send events for collisions (queue for scripts to pick up)
       - includes collision info (entity id of other collider???)
-  update system components
-  poll inputs
-  update 'scripts'
 
-  TODO add frame timer for rendering
+  TODO break state into smaller state objects, monolithic state is hard to keep in my small brain
 
-  TODO basic non-transparent rendering (use a state file from Zach's refinery engine)
-  TODO transparent rendering as a layer on top of opaque rendering pass (basically just for water)
-  TODO camera controls
+  TODO basic non-transparent (diffuse) rendering (use a state file from Zach's refinery engine)
   TODO correct rendering with rotation and position
-  TODO collision checking for AABB and Sphere
+
+  TODO enemy ship that moves back and forth, rotates in direction it is moving
+
+  TODO collision checking for spheres (use spheres for ships and cannonball)
   TODO physics loop, send collision events to callback functions
-  TODO load shaders from glsl files, per object shaders
+
+  TODO add fire cannonball mechanic, log when collision detected with ship
+
+  =================================================================================================
+
   TODO write basic blinn-phong shader and basic fragment shader
+  TODO transparent rendering as a layer on top of opaque rendering pass (basically just for water)
+  TODO camera / aim controls
+
+  TODO collision checking for AABB
+
+  TODO load shaders from glsl files, per object shaders
+
+  TODO sound effects for cannon fire, cannon ball in air, cannon ball impact, ship sink
+  TODO cannonball fire visual effect, cannonball impact visual effect
 
   TODO game mechanics lul
 */
 
+/** @type { import('./types').AppState } */
+// @ts-ignore
 let state = {}
 
 const TICK_RATE_MS = 16
-
-const OLDappState = {
-  tickTimeTextElement: undefined,
-  renderTimeTextElement: undefined,
-  tickDeltaTimeTextElement: undefined
-}
 
 // previousTicks is a circular array
 // initial second of data will be bunk due to a lot of 0s in the array
@@ -86,12 +91,12 @@ window.onload = async () => {
 
 /**
  *
- * @param {any} mesh contains vertex, normal, uv information for the mesh to be made
- * @param {any} object the game object that will use the mesh information
+ * @param {import('./types').OBJMesh} mesh contains vertex, normal, uv information for the mesh to be made
+ * @param {import('./types').StateFileObject} loadObject the game object that will use the mesh information
  * @purpose - Helper function called as a callback function when the mesh is done loading for the object
  */
-function createMesh (mesh, object) {
-  const testModel = new Model(state.gl, object, mesh)
+function createMesh (mesh, loadObject) {
+  const testModel = new Model(state.gl, loadObject, mesh)
   testModel.vertShader = state.vertShaderSample
   testModel.fragShader = state.fragShaderSample
   testModel.setup()
@@ -128,21 +133,30 @@ function main () {
   const vertShaderSample = `#version 300 es
         in vec3 aPosition;
         in vec3 aNormal;
-
+        in vec2 aUV;
+        
         uniform mat4 uProjectionMatrix;
         uniform mat4 uViewMatrix;
         uniform mat4 uModelMatrix;
         uniform mat4 normalMatrix;
+        uniform vec3 uCameraPosition;
+
         out vec3 oFragPosition;
         out vec3 oCameraPosition;
         out vec3 oNormal;
+        out vec2 oUV;
+        out vec3 normalInterp;
 
         void main() {
             // Position of the fragment in world space
             gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0);
 
             oFragPosition = (uModelMatrix * vec4(aPosition, 1.0)).xyz;
+
             oNormal = normalize((uModelMatrix * vec4(aNormal, 1.0)).xyz);
+            normalInterp = vec3(normalMatrix * vec4(aNormal, 0.0));
+            oCameraPosition = uCameraPosition;
+            oUV = aUV;
         }
         `
 
@@ -150,16 +164,80 @@ function main () {
         #define MAX_LIGHTS 20
         precision highp float;
 
+        in vec3 oNormal;
+        in vec3 oFragPosition;
+        in vec3 oCameraPosition;
+        in vec2 oUV;
+        in vec3 normalInterp;
+
+        uniform vec3 uLightColours;
+        uniform vec3 uLightPositions;
+        uniform float uLightStrengths;
+
         uniform vec3 diffuseVal;
         uniform vec3 ambientVal;
         uniform vec3 specularVal;
+        uniform sampler2D uTexture;
+        uniform float nVal;
+        uniform int samplerExists;
 
         out vec4 fragColor;
         void main() {
-            fragColor = vec4(diffuseVal, 1.0);
+          vec3 normal = normalize(normalInterp);
+
+          // Get the direction of the light relative to the object
+          //float attenuation = light.strength / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+          float scaledLightStrength = uLightStrengths / 2.0;
+          vec3 lightDirection = normalize(uLightPositions - oFragPosition);
+          vec3 cameraDirection = normalize(oCameraPosition - oFragPosition);
+
+          vec4 textureColor = texture(uTexture, oUV); // NOTE: This is where the texture is accessed
+
+          // calculate ambient term Ka * La * LightStrength
+          vec3 Ka = ambientVal;
+          if (samplerExists == 1) {
+            //Ka = mix(ambientVal, textureColor.rgb, 0.1);
+            Ka = ambientVal * textureColor.rgb;
+            //Ka = ambientVal;
+          }
+          vec3 ambient = Ka * uLightColours * scaledLightStrength;
+  
+          // Diffuse term : Ld * (N dot L)
+          // We don't multiply Kd for now as it changes with texture 
+          // calculate diffuse term Kd*Ld*dot(N,L)
+          float diff = abs(dot(normal, lightDirection));
+          // calculate diffuse colour for texture and no-texture  
+          vec3 Kd = diffuseVal;
+          if (samplerExists == 1) {
+              Kd = mix(diffuseVal, textureColor.rgb, 0.3);
+              //Kd = diffuseVal * textureColor.rgb;
+          }
+          vec3 diffuse = Kd * uLightColours * diff;
+          
+          // Specular lighting
+          // for better visualization leave the color white (don't mix with specular)
+          // calculate specular term Ks*Ls*(H,N)^n
+          vec3 halfVector = normalize(cameraDirection + lightDirection);
+          float HN = abs(dot(halfVector, normal));
+          float hnPow = pow(HN, nVal);
+          vec3 Ks = specularVal;
+          if (samplerExists == 1) {
+            Ks = mix(specularVal, textureColor.rgb, 0.1);
+            //Ks = specularVal * textureColor.rgb;
+          }
+          vec3 specular = Ks * uLightColours * hnPow;
+  
+          vec3 lightShading = (ambient + diffuse);
+          
+          fragColor = vec4(lightShading, 1.0);
+
+          //fragColor = vec4(textureColor.rgb, 1.0);
+
+          //fragColor = vec4(diffuseVal, 1.0);
+          //fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+          //fragColor = vec4(normal, 1.0);
         }
         `
-
   /**
    * Initialize state with new values (some of these you can replace/change)
    */
@@ -176,55 +254,50 @@ function main () {
     gameStarted: false,
     samplerExists: 0,
     samplerNormExists: 0,
-    constVal: 1
+    constVal: 1,
+    lights: [],
+    objects: []
   }
 
   state.numLights = state.pointLights.length
 
   // iterate through the level's objects and add them
-  state.loadObjects.map(object => {
-    if (object.type === 'mesh') {
-      parseOBJFileToJSON(object.model, createMesh, object)
-    } else if (object.type === 'cube') {
-      const tempCube = new Cube(gl, object)
+  state.loadObjects.forEach(loadObject => {
+    if (loadObject.type === 'mesh') {
+      parseOBJFileToJSON(loadObject.model, createMesh, loadObject)
+    } else if (loadObject.type === 'cube') {
+      const tempCube = new Cube(gl, loadObject)
       tempCube.vertShader = vertShaderSample
       tempCube.fragShader = fragShaderSample
       tempCube.setup()
       addObjectToScene(state, tempCube)
-    } else if (object.type === 'plane') {
-      const tempPlane = new Plane(gl, object)
+    } else if (loadObject.type === 'plane') {
+      const tempPlane = new Plane(gl, loadObject)
       tempPlane.vertShader = vertShaderSample
       tempPlane.fragShader = fragShaderSample
       tempPlane.setup()
       addObjectToScene(state, tempPlane)
-    } else if (object.type.includes('Custom')) {
-      const tempObject = new CustomObject(gl, object)
-      tempObject.vertShader = vertShaderSample
-      tempObject.fragShader = fragShaderSample
-      tempObject.setup()
-      addObjectToScene(state, tempObject)
     }
-    return null
   })
 
-  OLDappState.tickTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
+  state.tickTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
     '#tick_time'
   ))
-  OLDappState.tickTimeTextElement.innerText = 'TICK TIME'
+  state.tickTimeTextElement.innerText = 'TICK TIME'
 
-  OLDappState.renderTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
+  state.renderTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
     '#render_time'
   ))
-  OLDappState.renderTimeTextElement.innerText = 'RENDER TIME'
+  state.renderTimeTextElement.innerText = 'RENDER TIME'
 
-  OLDappState.tickDeltaTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
+  state.tickDeltaTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
     '#tick_delta_time'
   ))
-  OLDappState.tickDeltaTimeTextElement.innerText = 'TICK DELTA TIME'
+  state.tickDeltaTimeTextElement.innerText = 'TICK DELTA TIME'
 
   initializeTimeStats()
-  startGame(OLDappState)
-  runSimulationLoop(0)
+  startGame(state)
+  runSimulationLoop(0, 0)
 
   startRendering(gl, state) // now that scene is setup, start rendering it
 }
@@ -251,14 +324,14 @@ function runSimulationLoop (lastTickTime, lastTickEndTime) {
   const start = window.performance.now()
   updateTimeStats(tickTimeStats, lastTickTime)
   // update the overlay
-  OLDappState.tickTimeTextElement.innerText =
+  state.tickTimeTextElement.innerText =
     'Average tick time: ' +
     tickTimeStats.averageTime.toFixed(6).toString() +
     'ms'
 
   const deltaTime = window.performance.now() - lastTickEndTime
   state.deltaTime = deltaTime
-  OLDappState.tickDeltaTimeTextElement.innerText =
+  state.tickDeltaTimeTextElement.innerText =
     'Tick delta time: ' + deltaTime.toFixed(6).toString() + 'ms'
 
   // don't hog cpu if the page isn't visible (effectively pauses the game when it
@@ -283,14 +356,18 @@ function runSimulationLoop (lastTickTime, lastTickEndTime) {
   )
 }
 
+/**
+ *
+ * @param {number} deltaTime
+ */
 function simulate (deltaTime) {
-  gameLoop(OLDappState, deltaTime) // constantly call our game loop
+  gameLoop(state, deltaTime) // constantly call our game loop
 }
 
 /**
  *
- * @param {any} state object containing scene values
- * @param {any} object the object to be added to the scene
+ * @param {import('./types.js').AppState} state object containing scene values
+ * @param {Model | Cube | Plane} object the object to be added to the scene
  * @purpose - Helper function for adding a new object to the scene and refreshing the GUI
  */
 function addObjectToScene (state, object) {
@@ -301,7 +378,7 @@ function addObjectToScene (state, object) {
 /**
  *
  * @param {WebGL2RenderingContext} gl
- * @param {any} state object containing scene values
+ * @param {import('./types.js').AppState} state object containing scene values
  * @purpose - Calls the drawscene per frame
  */
 function startRendering (gl, state) {
@@ -313,7 +390,7 @@ function startRendering (gl, state) {
   function render () {
     const start = window.performance.now()
     updateTimeStats(frameTimeStats, lastFrameElapsed)
-    OLDappState.renderTimeTextElement.innerText =
+    state.renderTimeTextElement.innerText =
       'Average frame time: ' +
       frameTimeStats.averageTime.toFixed(6).toString() +
       'ms'
@@ -332,7 +409,7 @@ function startRendering (gl, state) {
 /**
  *
  * @param {WebGL2RenderingContext} gl
- * @param {any} state contains the state for the scene
+ * @param {import('./types').AppState} state contains the state for the scene
  * @purpose Iterate through game objects and render the objects as well as update uniforms
  */
 function drawScene (gl, state) {
@@ -364,182 +441,183 @@ function drawScene (gl, state) {
   })
 
   // iterate over each object and render them
-  state.objects.map(object => {
-    if (object.loaded) {
-      gl.useProgram(object.programInfo.program)
-      {
-        // Projection Matrix ....
-        const projectionMatrix = mat4.create()
-        const fovy = (60.0 * Math.PI) / 180.0 // Vertical field of view in radians
-        const aspect = state.canvas.clientWidth / state.canvas.clientHeight // Aspect ratio of the canvas
-        const near = 0.1 // Near clipping plane
-        const far = 1000000.0 // Far clipping plane
+  state.objects.forEach(object => {
+    if (!object.loaded) {
+      return // equivalent of a continue in this loop
+    }
 
-        mat4.perspective(projectionMatrix, fovy, aspect, near, far)
-        gl.uniformMatrix4fv(
-          object.programInfo.uniformLocations.projection,
-          false,
-          projectionMatrix
-        )
-        state.projectionMatrix = projectionMatrix
+    gl.useProgram(object.programInfo.program)
 
-        // View Matrix & Camera ....
-        const viewMatrix = mat4.create()
-        const camFront = vec3.fromValues(0, 0, 0)
-        vec3.add(camFront, state.camera.position, state.camera.front)
-        mat4.lookAt(
-          viewMatrix,
-          state.camera.position,
-          camFront,
-          state.camera.up
-        )
-        gl.uniformMatrix4fv(
-          object.programInfo.uniformLocations.view,
-          false,
-          viewMatrix
-        )
-        gl.uniform3fv(
-          object.programInfo.uniformLocations.cameraPosition,
-          state.camera.position
-        )
-        state.viewMatrix = viewMatrix
+    // Projection Matrix ....
+    const projectionMatrix = mat4.create()
+    const fovy = (60.0 * Math.PI) / 180.0 // Vertical field of view in radians
+    const aspect = state.canvas.clientWidth / state.canvas.clientHeight // Aspect ratio of the canvas
+    const near = 0.1 // Near clipping plane
+    const far = 1000000.0 // Far clipping plane
 
-        // Model Matrix ....
-        const modelMatrix = mat4.create()
-        const negCentroid = vec3.fromValues(0.0, 0.0, 0.0)
-        vec3.negate(negCentroid, object.centroid)
-        mat4.translate(modelMatrix, modelMatrix, object.model.position)
-        mat4.translate(modelMatrix, modelMatrix, object.centroid)
-        mat4.mul(modelMatrix, modelMatrix, object.model.rotation)
-        mat4.scale(modelMatrix, modelMatrix, object.model.scale)
-        mat4.translate(modelMatrix, modelMatrix, negCentroid)
+    mat4.perspective(projectionMatrix, fovy, aspect, near, far)
+    gl.uniformMatrix4fv(
+      object.programInfo.uniformLocations.projection,
+      false,
+      projectionMatrix
+    )
+    state.projectionMatrix = projectionMatrix
 
-        if (object.parent) {
-          const parent = getObject(state, object.parent)
-          if (parent.model && parent.model.modelMatrix) {
-            mat4.multiply(modelMatrix, parent.model.modelMatrix, modelMatrix)
-          }
-        }
+    // View Matrix & Camera ....
+    const viewMatrix = mat4.create()
+    const camFront = vec3.fromValues(0, 0, 0)
+    vec3.add(
+      camFront,
+      new Float32Array(state.camera.position),
+      new Float32Array(state.camera.front)
+    )
+    mat4.lookAt(
+      viewMatrix,
+      new Float32Array(state.camera.position),
+      camFront,
+      new Float32Array(state.camera.up)
+    )
+    gl.uniformMatrix4fv(
+      object.programInfo.uniformLocations.view,
+      false,
+      viewMatrix
+    )
+    gl.uniform3fv(
+      object.programInfo.uniformLocations.cameraPosition,
+      state.camera.position
+    )
+    state.viewMatrix = viewMatrix
 
-        object.model.modelMatrix = modelMatrix
-        gl.uniformMatrix4fv(
-          object.programInfo.uniformLocations.model,
-          false,
-          modelMatrix
-        )
+    // Model Matrix ....
+    const modelMatrix = mat4.create()
+    const negCentroid = vec3.fromValues(0.0, 0.0, 0.0)
+    vec3.negate(negCentroid, object.centroid)
+    mat4.translate(modelMatrix, modelMatrix, object.model.position)
+    mat4.translate(modelMatrix, modelMatrix, object.centroid)
+    mat4.mul(modelMatrix, modelMatrix, object.model.rotation)
+    mat4.scale(modelMatrix, modelMatrix, object.model.scale)
+    mat4.translate(modelMatrix, modelMatrix, negCentroid)
 
-        // Normal Matrix ....
-        const normalMatrix = mat4.create()
-        mat4.invert(normalMatrix, modelMatrix)
-        mat4.transpose(normalMatrix, normalMatrix)
-        gl.uniformMatrix4fv(
-          object.programInfo.uniformLocations.normalMatrix,
-          false,
-          normalMatrix
-        )
-
-        // Object material
-        gl.uniform3fv(
-          object.programInfo.uniformLocations.diffuseVal,
-          object.material.diffuse
-        )
-        gl.uniform3fv(
-          object.programInfo.uniformLocations.ambientVal,
-          object.material.ambient
-        )
-        gl.uniform3fv(
-          object.programInfo.uniformLocations.specularVal,
-          object.material.specular
-        )
-        gl.uniform1f(
-          object.programInfo.uniformLocations.nVal,
-          object.material.n
-        )
-
-        gl.uniform1i(
-          object.programInfo.uniformLocations.numLights,
-          state.numLights
-        )
-        if (
-          lightColourArray.length > 0 &&
-          lightPositionArray.length > 0 &&
-          lightStrengthArray.length > 0
-        ) {
-          // this currently only sends the first light to the shader, how might we do multiple? :)
-          gl.uniform3fv(
-            object.programInfo.uniformLocations.lightPositions,
-            lightPositionArray
-          )
-          gl.uniform3fv(
-            object.programInfo.uniformLocations.lightColours,
-            lightColourArray
-          )
-          gl.uniform1fv(
-            object.programInfo.uniformLocations.lightStrengths,
-            lightStrengthArray
-          )
-        }
-
-        {
-          // Bind the buffer we want to draw
-          gl.bindVertexArray(object.buffers.vao)
-
-          // check for diffuse texture and apply it
-          if (object.model.texture != null) {
-            state.samplerExists = 1
-            gl.activeTexture(gl.TEXTURE0)
-            gl.uniform1i(
-              object.programInfo.uniformLocations.samplerExists,
-              state.samplerExists
-            )
-            gl.uniform1i(object.programInfo.uniformLocations.sampler, 0)
-            gl.bindTexture(gl.TEXTURE_2D, object.model.texture)
-          } else {
-            gl.activeTexture(gl.TEXTURE0)
-            state.samplerExists = 0
-            gl.uniform1i(
-              object.programInfo.uniformLocations.samplerExists,
-              state.samplerExists
-            )
-          }
-
-          // check for normal texture and apply it
-          if (object.model.textureNorm != null) {
-            state.samplerNormExists = 1
-            gl.activeTexture(gl.TEXTURE1)
-            gl.uniform1i(
-              object.programInfo.uniformLocations.normalSamplerExists,
-              state.samplerNormExists
-            )
-            gl.uniform1i(object.programInfo.uniformLocations.normalSampler, 1)
-            gl.bindTexture(gl.TEXTURE_2D, object.model.textureNorm)
-          } else {
-            gl.activeTexture(gl.TEXTURE1)
-            state.samplerNormExists = 0
-            gl.uniform1i(
-              object.programInfo.uniformLocations.normalSamplerExists,
-              state.samplerNormExists
-            )
-          }
-
-          // Draw the object
-          const offset = 0 // Number of elements to skip before starting
-
-          // if its a mesh then we don't use an index buffer and use drawArrays instead of drawElements
-          if (object.type === 'mesh' || object.type === 'meshCustom') {
-            gl.drawArrays(gl.TRIANGLES, offset, object.buffers.numVertices / 3)
-          } else {
-            gl.drawElements(
-              gl.TRIANGLES,
-              object.buffers.numVertices,
-              gl.UNSIGNED_SHORT,
-              offset
-            )
-          }
-        }
+    if (object.parent) {
+      const parent = getObject(state, object.parent)
+      if (parent.model && parent.model.modelMatrix) {
+        mat4.multiply(modelMatrix, parent.model.modelMatrix, modelMatrix)
       }
     }
 
-    return null
+    object.model.modelMatrix = modelMatrix
+    gl.uniformMatrix4fv(
+      object.programInfo.uniformLocations.model,
+      false,
+      modelMatrix
+    )
+
+    // Normal Matrix ....
+    const normalMatrix = mat4.create()
+    mat4.invert(normalMatrix, modelMatrix)
+    mat4.transpose(normalMatrix, normalMatrix)
+    gl.uniformMatrix4fv(
+      object.programInfo.uniformLocations.normalMatrix,
+      false,
+      normalMatrix
+    )
+
+    // Object material
+    gl.uniform3fv(
+      object.programInfo.uniformLocations.diffuseVal,
+      object.material.diffuse
+    )
+    gl.uniform3fv(
+      object.programInfo.uniformLocations.ambientVal,
+      object.material.ambient
+    )
+    gl.uniform3fv(
+      object.programInfo.uniformLocations.specularVal,
+      object.material.specular
+    )
+    gl.uniform1f(object.programInfo.uniformLocations.nVal, object.material.n)
+
+    // gl.uniform1i(object.programInfo.uniformLocations.numLights, state.numLights)
+
+    if (
+      lightColourArray.length > 0 &&
+      lightPositionArray.length > 0 &&
+      lightStrengthArray.length > 0
+    ) {
+      // this currently only sends the first light to the shader, how might we do multiple? :)
+      gl.uniform3fv(
+        object.programInfo.uniformLocations.lightPositions,
+        lightPositionArray
+      )
+      gl.uniform3fv(
+        object.programInfo.uniformLocations.lightColours,
+        lightColourArray
+      )
+      gl.uniform1fv(
+        object.programInfo.uniformLocations.lightStrengths,
+        lightStrengthArray
+      )
+    }
+
+    // check for diffuse texture and apply it
+    if (object.model.texture != null) {
+      state.samplerExists = 1
+      gl.activeTexture(gl.TEXTURE0)
+      gl.uniform1i(
+        object.programInfo.uniformLocations.samplerExists,
+        state.samplerExists
+      )
+      gl.uniform1i(object.programInfo.uniformLocations.sampler, 0)
+      gl.bindTexture(gl.TEXTURE_2D, object.model.texture)
+    } else {
+      state.samplerExists = 0
+      gl.uniform1i(
+        object.programInfo.uniformLocations.samplerExists,
+        state.samplerExists
+      )
+    }
+
+    // check for normal texture and apply it
+    // if (object.model.textureNorm != null) {
+    //   state.samplerNormExists = 1
+    //   gl.activeTexture(gl.TEXTURE1)
+    //   gl.uniform1i(
+    //     object.programInfo.uniformLocations.normalSamplerExists,
+    //     state.samplerNormExists
+    //   )
+    //   gl.uniform1i(object.programInfo.uniformLocations.normalSampler, 1)
+    //   gl.bindTexture(gl.TEXTURE_2D, object.model.textureNorm)
+    // } else {
+    //   gl.activeTexture(gl.TEXTURE1)
+    //   state.samplerNormExists = 0
+    //   gl.uniform1i(
+    //     object.programInfo.uniformLocations.normalSamplerExists,
+    //     state.samplerNormExists
+    //   )
+    // }
+
+    // Bind the buffer we want to draw
+    gl.bindVertexArray(object.buffers.vao)
+
+    // Draw the object
+    const offset = 0 // Number of elements to skip before starting
+
+    // if its a mesh then we don't use an index buffer and use drawArrays instead of drawElements
+    if (object.type === 'mesh' || object.type === 'meshCustom') {
+      gl.drawArrays(gl.TRIANGLES, offset, object.buffers.numVertices / 3)
+    } else {
+      // gl.drawArrays(gl.TRIANGLES, offset, object.buffers.numVertices / 3)
+      gl.drawElements(
+        gl.TRIANGLES,
+        object.buffers.numVertices,
+        gl.UNSIGNED_SHORT,
+        offset
+      )
+    }
   })
+
+  const glError = gl.getError()
+  if (glError !== gl.NO_ERROR) {
+    console.error('glError: ' + glError.toString())
+  }
 }

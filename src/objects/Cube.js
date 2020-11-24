@@ -5,16 +5,22 @@ import { mat4, vec3 } from '../../lib/gl-matrix/index.js'
 import {
   getTextures,
   initPositionAttribute,
-  initNormalAttribute,
   initShaderProgram,
   initIndexBuffer,
-  calculateCentroid
+  calculateCentroid,
+  initTextureCoords,
+  initNormalAttribute
 } from '../commonFunctions.js'
 import { shaderValuesErrorCheck } from '../uiSetup.js'
 
 export class Cube {
+  /**
+   *
+   * @param {WebGL2RenderingContext} glContext
+   * @param {import('../types.js').StateFileObject} object
+   */
   constructor (glContext, object) {
-    this.state = {}
+    // this.state = {}
     this.gl = glContext
     this.vertShader = ''
     this.fragShader = ''
@@ -28,6 +34,8 @@ export class Cube {
       rotation: object.rotation
     }
     this.material = { ...object.material }
+    this.buffers = null
+    this.programInfo = null
     this.model = {
       vertices: [
         [0.0, 0.0, 0.0],
@@ -317,6 +325,10 @@ export class Cube {
         0,
         -1 // Bot
       ],
+      position: vec3.fromValues(0.0, 0.0, 0.0),
+      rotation: mat4.create(),
+      scale: vec3.fromValues(1.0, 1.0, 1.0),
+      modelMatrix: mat4.create(),
       diffuseTexture: object.diffuseTexture
         ? object.diffuseTexture
         : 'default.png',
@@ -328,15 +340,7 @@ export class Cube {
         : null,
       textureNorm: object.normalTexture
         ? getTextures(glContext, object.normalTexture)
-        : null,
-      buffers: null,
-      modelMatrix: mat4.create(),
-      position: vec3.fromValues(0.0, 0.0, 0.0),
-      rotation: mat4.create(),
-      scale: vec3.fromValues(1.0, 1.0, 1.0),
-      programInfo: null,
-      fragShader: '',
-      vertShader: ''
+        : null
     }
   }
 
@@ -379,6 +383,7 @@ export class Cube {
       this.fragShader
     )
     // Collect all the info needed to use the shader program.
+    /** @type {import('../types').ProgramInfo} */
     const programInfo = {
       // The actual shader program
       program: shaderProgram,
@@ -386,8 +391,8 @@ export class Cube {
       // NOTE: it may be wise to check if these calls fail by seeing that the returned location is not -1.
       attribLocations: {
         vertexPosition: this.gl.getAttribLocation(shaderProgram, 'aPosition'),
-        vertexNormal: this.gl.getAttribLocation(shaderProgram, 'aNormal')
-        // vertexUV: this.gl.getAttribLocation(shaderProgram, 'aUV'),
+        vertexNormal: this.gl.getAttribLocation(shaderProgram, 'aNormal'),
+        vertexUV: this.gl.getAttribLocation(shaderProgram, 'aUV')
         // vertexBitangent: this.gl.getAttribLocation(shaderProgram, 'aVertBitang')
       },
       uniformLocations: {
@@ -397,19 +402,37 @@ export class Cube {
         ),
         view: this.gl.getUniformLocation(shaderProgram, 'uViewMatrix'),
         model: this.gl.getUniformLocation(shaderProgram, 'uModelMatrix'),
-        // normalMatrix: this.gl.getUniformLocation(shaderProgram, 'normalMatrix'),
-        diffuseVal: this.gl.getUniformLocation(shaderProgram, 'diffuseVal')
-        // ambientVal: this.gl.getUniformLocation(shaderProgram, 'ambientVal'),
-        // specularVal: this.gl.getUniformLocation(shaderProgram, 'specularVal'),
-        // nVal: this.gl.getUniformLocation(shaderProgram, 'nVal'),
-        // cameraPosition: this.gl.getUniformLocation(shaderProgram, 'uCameraPosition'),
+        normalMatrix: this.gl.getUniformLocation(shaderProgram, 'normalMatrix'),
+        diffuseVal: this.gl.getUniformLocation(shaderProgram, 'diffuseVal'),
+        ambientVal: this.gl.getUniformLocation(shaderProgram, 'ambientVal'),
+        specularVal: this.gl.getUniformLocation(shaderProgram, 'specularVal'),
+        nVal: this.gl.getUniformLocation(shaderProgram, 'nVal'),
+        cameraPosition: this.gl.getUniformLocation(
+          shaderProgram,
+          'uCameraPosition'
+        ),
         // numLights: this.gl.getUniformLocation(shaderProgram, 'numLights'),
-        // lightPositions: this.gl.getUniformLocation(shaderProgram, 'uLightPositions'),
-        // lightColours: this.gl.getUniformLocation(shaderProgram, 'uLightColours'),
-        // lightStrengths: this.gl.getUniformLocation(shaderProgram, 'uLightStrengths'),
-        // samplerExists: this.gl.getUniformLocation(shaderProgram, "samplerExists"),
-        // sampler: this.gl.getUniformLocation(shaderProgram, 'uTexture'),
-        // normalSamplerExists: this.gl.getUniformLocation(shaderProgram, 'uTextureNormExists'),
+        lightPositions: this.gl.getUniformLocation(
+          shaderProgram,
+          'uLightPositions'
+        ),
+        lightColours: this.gl.getUniformLocation(
+          shaderProgram,
+          'uLightColours'
+        ),
+        lightStrengths: this.gl.getUniformLocation(
+          shaderProgram,
+          'uLightStrengths'
+        ),
+        sampler: this.gl.getUniformLocation(shaderProgram, 'uTexture'),
+        samplerExists: this.gl.getUniformLocation(
+          shaderProgram,
+          'samplerExists'
+        )
+        // normalSamplerExists: this.gl.getUniformLocation(
+        //   shaderProgram,
+        //   'uTextureNormExists'
+        // ),
         // normalSampler: this.gl.getUniformLocation(shaderProgram, 'uTextureNorm')
       }
     }
@@ -422,20 +445,20 @@ export class Cube {
     // create vertices, normal and indices arrays
     const positions = new Float32Array(this.model.vertices.flat())
     const normals = new Float32Array(this.model.normals.flat())
-    const indices = new Uint16Array(this.model.triangles)
-    // const textureCoords = new Float32Array(this.model.uvs);
-    // const bitangents = new Float32Array(this.model.bitangents);
+    const indices = new Uint16Array(this.model.triangles.flat())
+    const textureCoords = new Float32Array(this.model.uvs.flat())
+    // const bitangents = new Float32Array(this.model.bitangents.flat())
 
     const vertexArrayObject = this.gl.createVertexArray()
-
     this.gl.bindVertexArray(vertexArrayObject)
 
+    /** @type {import('../types.js').GlBuffers} */
     this.buffers = {
       vao: vertexArrayObject,
       attributes: {
         position: initPositionAttribute(this.gl, this.programInfo, positions),
-        normal: initNormalAttribute(this.gl, this.programInfo, normals)
-        // uv: initTextureCoords(this.gl, this.programInfo, textureCoords),
+        normal: initNormalAttribute(this.gl, this.programInfo, normals),
+        uv: initTextureCoords(this.gl, this.programInfo, textureCoords)
         // bitangents: initBitangentBuffer(this.gl, this.programInfo, bitangents)
       },
       indices: initIndexBuffer(this.gl, indices),
@@ -450,7 +473,7 @@ export class Cube {
     this.lightingShader()
     this.scale(this.initialTransform.scale)
     this.translate(this.initialTransform.position)
-    this.model.rotation = this.initialTransform.rotation
+    this.model.rotation = new Float32Array(this.initialTransform.rotation)
     this.initBuffers()
   }
 }

@@ -1,0 +1,55 @@
+1. state object created as empty object in main.js (line 62)
+
+2. onload main.js -> parseSceneFile() commonFunctions.js takes the empty state object, adds:
+    state.loadObjects 
+    state.pointLights 
+    state.settings 
+    state.camera 
+    state.numberOfObjectsToLoad
+
+3. main() main.js (line 178) adds:
+    gl,
+    vertShaderSample,
+    fragShaderSample,
+    canvas: canvas,
+    objectCount: 0,
+    lightIndices: [],
+    keyboard: {},
+    mouse: { sensitivity: 0.2 },
+    gameStarted: false,
+    samplerExists: 0,
+    samplerNormExists: 0,
+    constVal: 1,
+    lights: [],
+    objects: []
+
+4. main() main.js (line 194) adds:
+    numLights
+
+5. main() main.js (line 197) loops through loadObjects and based on type string
+   creates objects. Added via addObjectToScene, main.js
+   
+   adds Model | Cube | Plane | CustomObject to objects[]
+
+
+6. main(), main.js adds (line226):
+    tickTimeTextElement
+    renderTimeTextElement
+    tickDeltaTimeTextElement
+
+7. startGame happens (currently no mutations but there likely will be)
+
+8. runSimulationLoop(), main.js adds:
+    deltaTime (and updates it continuously)
+    also updates tickDeltaTimeTextElement
+
+9. gameLoop happens (currently no mutations but there likely will be)
+
+10. render(), startRendering(), main.js
+    updates renderTimeTextElement
+
+11. drawScene(), main.js happens, lots of data read. adds and updates:
+    projectionMatrix
+    viewMatrix
+    samplerExists
+    samplerNormExists
