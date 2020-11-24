@@ -99,7 +99,13 @@ export function calculateCentroid (vertices, cb) {
 export function toRadians (angle) {
   return angle * (Math.PI / 180)
 }
-
+/**
+ *
+ * @param {vec3} center
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ */
 export function doAsyncCalc (center, x, y, z) {
   return new Promise((resolve, reject) => {
     vec3.add(center, center, vec3.fromValues(x, y, z))
@@ -107,6 +113,11 @@ export function doAsyncCalc (center, x, y, z) {
   })
 }
 
+/**
+ *
+ * @param {number[]} vertices
+ * @return {Promise<vec3>}
+ */
 export function asyncCalcCentroid (vertices) {
   return new Promise((resolve, reject) => {
     const center = vec3.fromValues(0.0, 0.0, 0.0)

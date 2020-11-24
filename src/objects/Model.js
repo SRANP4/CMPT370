@@ -7,11 +7,19 @@ import {
   asyncCalcCentroid,
   initPositionAttribute,
   initNormalAttribute,
-  initShaderProgram
+  initShaderProgram,
+  initTextureCoords,
+  initBitangentBuffer
 } from '../commonFunctions.js'
 import { shaderValuesErrorCheck } from '../uiSetup.js'
 
 export class Model {
+  /**
+   *
+   * @param {WebGL2RenderingContext} glContext
+   * @param {import('../types.js').StateFileObject} object
+   * @param {import('../types.js').OBJMesh} meshDetails
+   */
   constructor (glContext, object, meshDetails) {
     this.gl = glContext
     this.vertShader = ''
@@ -30,9 +38,11 @@ export class Model {
       normals: meshDetails.normals,
       vertices: meshDetails.vertices,
       uvs: meshDetails.uvs,
+      bitangents: [], // models don't support bitangents atm, but we need model object data unified
       position: vec3.fromValues(0.0, 0.0, 0.0),
       rotation: mat4.create(),
       scale: vec3.fromValues(1.0, 1.0, 1.0),
+      modelMatrix: mat4.create(),
       diffuseTexture: object.diffuseTexture
         ? object.diffuseTexture
         : 'default.png',
@@ -46,8 +56,6 @@ export class Model {
         ? getTextures(glContext, object.normalTexture)
         : null
     }
-    this.modelMatrix = mat4.create()
-    this.lightingShader = this.lightingShader.bind(this)
   }
 
   rotate (axis, angle) {
@@ -87,7 +95,7 @@ export class Model {
     this.lightingShader()
     this.scale(this.initialTransform.scale)
     this.translate(this.initialTransform.position)
-    this.model.rotation = this.initialTransform.rotation
+    this.model.rotation = new Float32Array(this.initialTransform.rotation)
     this.initBuffers()
   }
 
@@ -95,7 +103,8 @@ export class Model {
     // create vertices, normal and indices arrays
     const positions = new Float32Array(this.model.vertices)
     const normals = new Float32Array(this.model.normals)
-    // const textureCoords = new Float32Array(this.model.uvs);
+    const textureCoords = new Float32Array(this.model.uvs)
+    const bitangents = new Float32Array(this.model.bitangents)
     const vertexArrayObject = this.gl.createVertexArray()
     this.gl.bindVertexArray(vertexArrayObject)
 
@@ -103,8 +112,9 @@ export class Model {
       vao: vertexArrayObject,
       attributes: {
         position: initPositionAttribute(this.gl, this.programInfo, positions),
-        normal: initNormalAttribute(this.gl, this.programInfo, normals)
-        // uv: initTextureCoords(this.gl, this.programInfo, textureCoords),
+        normal: initNormalAttribute(this.gl, this.programInfo, normals),
+        uv: initTextureCoords(this.gl, this.programInfo, textureCoords),
+        bitangents: initBitangentBuffer(this.gl, this.programInfo, bitangents)
       },
       numVertices: positions.length
     }

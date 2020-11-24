@@ -8,11 +8,18 @@ import {
   initNormalAttribute,
   initShaderProgram,
   initIndexBuffer,
-  calculateCentroid
+  calculateCentroid,
+  initTextureCoords,
+  initBitangentBuffer
 } from '../commonFunctions.js'
 import { shaderValuesErrorCheck } from '../uiSetup.js'
 
 export class Plane {
+  /**
+   *
+   * @param {WebGL2RenderingContext} glContext
+   * @param {import('../types.js').StateFileObject} object
+   */
   constructor (glContext, object) {
     this.state = {}
     this.gl = glContext
@@ -173,8 +180,8 @@ export class Plane {
     const positions = new Float32Array(this.model.vertices.flat())
     const normals = new Float32Array(this.model.normals.flat())
     const indices = new Uint16Array(this.model.triangles)
-    // const textureCoords = new Float32Array(this.model.uvs);
-    // const bitangents = new Float32Array(this.model.bitangents);
+    const textureCoords = new Float32Array(this.model.uvs)
+    const bitangents = new Float32Array(this.model.bitangents)
 
     const vertexArrayObject = this.gl.createVertexArray()
 
@@ -184,9 +191,9 @@ export class Plane {
       vao: vertexArrayObject,
       attributes: {
         position: initPositionAttribute(this.gl, this.programInfo, positions),
-        normal: initNormalAttribute(this.gl, this.programInfo, normals)
-        // uv: initTextureCoords(this.gl, this.programInfo, textureCoords),
-        // bitangents: initBitangentBuffer(this.gl, this.programInfo, bitangents)
+        normal: initNormalAttribute(this.gl, this.programInfo, normals),
+        uv: initTextureCoords(this.gl, this.programInfo, textureCoords),
+        bitangents: initBitangentBuffer(this.gl, this.programInfo, bitangents)
       },
       indices: initIndexBuffer(this.gl, indices),
       numVertices: indices.length
@@ -200,7 +207,7 @@ export class Plane {
     this.lightingShader()
     this.scale(this.initialTransform.scale)
     this.translate(this.initialTransform.position)
-    this.model.rotation = this.initialTransform.rotation
+    this.model.rotation = new Float32Array(this.initialTransform.rotation)
     this.initBuffers()
   }
 }

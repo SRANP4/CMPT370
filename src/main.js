@@ -369,182 +369,178 @@ function drawScene (gl, state) {
   })
 
   // iterate over each object and render them
-  state.objects.map(object => {
-    if (object.loaded) {
-      gl.useProgram(object.programInfo.program)
-      {
-        // Projection Matrix ....
-        const projectionMatrix = mat4.create()
-        const fovy = (60.0 * Math.PI) / 180.0 // Vertical field of view in radians
-        const aspect = state.canvas.clientWidth / state.canvas.clientHeight // Aspect ratio of the canvas
-        const near = 0.1 // Near clipping plane
-        const far = 1000000.0 // Far clipping plane
+  state.objects.forEach(object => {
+    if (!object.loaded) {
+      return // equivalent of a continue in this loop
+    }
 
-        mat4.perspective(projectionMatrix, fovy, aspect, near, far)
-        gl.uniformMatrix4fv(
-          object.programInfo.uniformLocations.projection,
-          false,
-          projectionMatrix
-        )
-        state.projectionMatrix = projectionMatrix
+    gl.useProgram(object.programInfo.program)
 
-        // View Matrix & Camera ....
-        const viewMatrix = mat4.create()
-        const camFront = vec3.fromValues(0, 0, 0)
-        vec3.add(camFront, new Float32Array(state.camera.position), new Float32Array(state.camera.front))
-        mat4.lookAt(
-          viewMatrix,
-          new Float32Array(state.camera.position),
-          camFront,
-          new Float32Array(state.camera.up)
-        )
-        gl.uniformMatrix4fv(
-          object.programInfo.uniformLocations.view,
-          false,
-          viewMatrix
-        )
-        gl.uniform3fv(
-          object.programInfo.uniformLocations.cameraPosition,
-          state.camera.position
-        )
-        state.viewMatrix = viewMatrix
+    // Projection Matrix ....
+    const projectionMatrix = mat4.create()
+    const fovy = (60.0 * Math.PI) / 180.0 // Vertical field of view in radians
+    const aspect = state.canvas.clientWidth / state.canvas.clientHeight // Aspect ratio of the canvas
+    const near = 0.1 // Near clipping plane
+    const far = 1000000.0 // Far clipping plane
 
-        // Model Matrix ....
-        const modelMatrix = mat4.create()
-        const negCentroid = vec3.fromValues(0.0, 0.0, 0.0)
-        vec3.negate(negCentroid, object.centroid)
-        mat4.translate(modelMatrix, modelMatrix, object.model.position)
-        mat4.translate(modelMatrix, modelMatrix, object.centroid)
-        mat4.mul(modelMatrix, modelMatrix, object.model.rotation)
-        mat4.scale(modelMatrix, modelMatrix, object.model.scale)
-        mat4.translate(modelMatrix, modelMatrix, negCentroid)
+    mat4.perspective(projectionMatrix, fovy, aspect, near, far)
+    gl.uniformMatrix4fv(
+      object.programInfo.uniformLocations.projection,
+      false,
+      projectionMatrix
+    )
+    state.projectionMatrix = projectionMatrix
 
-        if (object.parent) {
-          const parent = getObject(state, object.parent)
-          if (parent.model && parent.model.modelMatrix) {
-            mat4.multiply(modelMatrix, parent.model.modelMatrix, modelMatrix)
-          }
-        }
+    // View Matrix & Camera ....
+    const viewMatrix = mat4.create()
+    const camFront = vec3.fromValues(0, 0, 0)
+    vec3.add(
+      camFront,
+      new Float32Array(state.camera.position),
+      new Float32Array(state.camera.front)
+    )
+    mat4.lookAt(
+      viewMatrix,
+      new Float32Array(state.camera.position),
+      camFront,
+      new Float32Array(state.camera.up)
+    )
+    gl.uniformMatrix4fv(
+      object.programInfo.uniformLocations.view,
+      false,
+      viewMatrix
+    )
+    gl.uniform3fv(
+      object.programInfo.uniformLocations.cameraPosition,
+      state.camera.position
+    )
+    state.viewMatrix = viewMatrix
 
-        object.model.modelMatrix = modelMatrix
-        gl.uniformMatrix4fv(
-          object.programInfo.uniformLocations.model,
-          false,
-          modelMatrix
-        )
+    // Model Matrix ....
+    const modelMatrix = mat4.create()
+    const negCentroid = vec3.fromValues(0.0, 0.0, 0.0)
+    vec3.negate(negCentroid, object.centroid)
+    mat4.translate(modelMatrix, modelMatrix, object.model.position)
+    mat4.translate(modelMatrix, modelMatrix, object.centroid)
+    mat4.mul(modelMatrix, modelMatrix, object.model.rotation)
+    mat4.scale(modelMatrix, modelMatrix, object.model.scale)
+    mat4.translate(modelMatrix, modelMatrix, negCentroid)
 
-        // Normal Matrix ....
-        const normalMatrix = mat4.create()
-        mat4.invert(normalMatrix, modelMatrix)
-        mat4.transpose(normalMatrix, normalMatrix)
-        gl.uniformMatrix4fv(
-          object.programInfo.uniformLocations.normalMatrix,
-          false,
-          normalMatrix
-        )
-
-        // Object material
-        gl.uniform3fv(
-          object.programInfo.uniformLocations.diffuseVal,
-          object.material.diffuse
-        )
-        gl.uniform3fv(
-          object.programInfo.uniformLocations.ambientVal,
-          object.material.ambient
-        )
-        gl.uniform3fv(
-          object.programInfo.uniformLocations.specularVal,
-          object.material.specular
-        )
-        gl.uniform1f(
-          object.programInfo.uniformLocations.nVal,
-          object.material.n
-        )
-
-        gl.uniform1i(
-          object.programInfo.uniformLocations.numLights,
-          state.numLights
-        )
-        if (
-          lightColourArray.length > 0 &&
-          lightPositionArray.length > 0 &&
-          lightStrengthArray.length > 0
-        ) {
-          // this currently only sends the first light to the shader, how might we do multiple? :)
-          gl.uniform3fv(
-            object.programInfo.uniformLocations.lightPositions,
-            lightPositionArray
-          )
-          gl.uniform3fv(
-            object.programInfo.uniformLocations.lightColours,
-            lightColourArray
-          )
-          gl.uniform1fv(
-            object.programInfo.uniformLocations.lightStrengths,
-            lightStrengthArray
-          )
-        }
-
-        {
-          // Bind the buffer we want to draw
-          gl.bindVertexArray(object.buffers.vao)
-
-          // check for diffuse texture and apply it
-          if (object.model.texture != null) {
-            state.samplerExists = 1
-            gl.activeTexture(gl.TEXTURE0)
-            gl.uniform1i(
-              object.programInfo.uniformLocations.samplerExists,
-              state.samplerExists
-            )
-            gl.uniform1i(object.programInfo.uniformLocations.sampler, 0)
-            gl.bindTexture(gl.TEXTURE_2D, object.model.texture)
-          } else {
-            gl.activeTexture(gl.TEXTURE0)
-            state.samplerExists = 0
-            gl.uniform1i(
-              object.programInfo.uniformLocations.samplerExists,
-              state.samplerExists
-            )
-          }
-
-          // check for normal texture and apply it
-          if (object.model.textureNorm != null) {
-            state.samplerNormExists = 1
-            gl.activeTexture(gl.TEXTURE1)
-            gl.uniform1i(
-              object.programInfo.uniformLocations.normalSamplerExists,
-              state.samplerNormExists
-            )
-            gl.uniform1i(object.programInfo.uniformLocations.normalSampler, 1)
-            gl.bindTexture(gl.TEXTURE_2D, object.model.textureNorm)
-          } else {
-            gl.activeTexture(gl.TEXTURE1)
-            state.samplerNormExists = 0
-            gl.uniform1i(
-              object.programInfo.uniformLocations.normalSamplerExists,
-              state.samplerNormExists
-            )
-          }
-
-          // Draw the object
-          const offset = 0 // Number of elements to skip before starting
-
-          // if its a mesh then we don't use an index buffer and use drawArrays instead of drawElements
-          if (object.type === 'mesh' || object.type === 'meshCustom') {
-            gl.drawArrays(gl.TRIANGLES, offset, object.buffers.numVertices / 3)
-          } else {
-            gl.drawElements(
-              gl.TRIANGLES,
-              object.buffers.numVertices,
-              gl.UNSIGNED_SHORT,
-              offset
-            )
-          }
-        }
+    if (object.parent) {
+      const parent = getObject(state, object.parent)
+      if (parent.model && parent.model.modelMatrix) {
+        mat4.multiply(modelMatrix, parent.model.modelMatrix, modelMatrix)
       }
     }
 
-    return null
+    object.model.modelMatrix = modelMatrix
+    gl.uniformMatrix4fv(
+      object.programInfo.uniformLocations.model,
+      false,
+      modelMatrix
+    )
+
+    // Normal Matrix ....
+    const normalMatrix = mat4.create()
+    mat4.invert(normalMatrix, modelMatrix)
+    mat4.transpose(normalMatrix, normalMatrix)
+    gl.uniformMatrix4fv(
+      object.programInfo.uniformLocations.normalMatrix,
+      false,
+      normalMatrix
+    )
+
+    // Object material
+    gl.uniform3fv(
+      object.programInfo.uniformLocations.diffuseVal,
+      object.material.diffuse
+    )
+    gl.uniform3fv(
+      object.programInfo.uniformLocations.ambientVal,
+      object.material.ambient
+    )
+    gl.uniform3fv(
+      object.programInfo.uniformLocations.specularVal,
+      object.material.specular
+    )
+    gl.uniform1f(object.programInfo.uniformLocations.nVal, object.material.n)
+
+    gl.uniform1i(object.programInfo.uniformLocations.numLights, state.numLights)
+
+    if (
+      lightColourArray.length > 0 &&
+      lightPositionArray.length > 0 &&
+      lightStrengthArray.length > 0
+    ) {
+      // this currently only sends the first light to the shader, how might we do multiple? :)
+      gl.uniform3fv(
+        object.programInfo.uniformLocations.lightPositions,
+        lightPositionArray
+      )
+      gl.uniform3fv(
+        object.programInfo.uniformLocations.lightColours,
+        lightColourArray
+      )
+      gl.uniform1fv(
+        object.programInfo.uniformLocations.lightStrengths,
+        lightStrengthArray
+      )
+    }
+
+    // Bind the buffer we want to draw
+    gl.bindVertexArray(object.buffers.vao)
+
+    // check for diffuse texture and apply it
+    if (object.model.texture != null) {
+      state.samplerExists = 1
+      gl.activeTexture(gl.TEXTURE0)
+      gl.uniform1i(
+        object.programInfo.uniformLocations.samplerExists,
+        state.samplerExists
+      )
+      gl.uniform1i(object.programInfo.uniformLocations.sampler, 0)
+      gl.bindTexture(gl.TEXTURE_2D, object.model.texture)
+    } else {
+      gl.activeTexture(gl.TEXTURE0)
+      state.samplerExists = 0
+      gl.uniform1i(
+        object.programInfo.uniformLocations.samplerExists,
+        state.samplerExists
+      )
+    }
+
+    // check for normal texture and apply it
+    if (object.model.textureNorm != null) {
+      state.samplerNormExists = 1
+      gl.activeTexture(gl.TEXTURE1)
+      gl.uniform1i(
+        object.programInfo.uniformLocations.normalSamplerExists,
+        state.samplerNormExists
+      )
+      gl.uniform1i(object.programInfo.uniformLocations.normalSampler, 1)
+      gl.bindTexture(gl.TEXTURE_2D, object.model.textureNorm)
+    } else {
+      gl.activeTexture(gl.TEXTURE1)
+      state.samplerNormExists = 0
+      gl.uniform1i(
+        object.programInfo.uniformLocations.normalSamplerExists,
+        state.samplerNormExists
+      )
+    }
+
+    // Draw the object
+    const offset = 0 // Number of elements to skip before starting
+
+    // if its a mesh then we don't use an index buffer and use drawArrays instead of drawElements
+    if (object.type === 'mesh' || object.type === 'meshCustom') {
+      gl.drawArrays(gl.TRIANGLES, offset, object.buffers.numVertices / 3)
+    } else {
+      gl.drawElements(
+        gl.TRIANGLES,
+        object.buffers.numVertices,
+        gl.UNSIGNED_SHORT,
+        offset
+      )
+    }
   })
 }

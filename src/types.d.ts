@@ -29,7 +29,7 @@ declare type AppState = {
     samplerNormExists: number;
     constVal: number;
     lights: Array<any>; //appears to not be used
-    objects: Array<Model | Cube | Plane | CustomObject>;
+    objects: Array<Model | Cube | Plane>;
 
     numLights: number;
 
