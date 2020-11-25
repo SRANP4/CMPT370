@@ -10,6 +10,9 @@ declare type AppState = {
     renderTimeTextElement: HTMLElement;
     tickDeltaTimeTextElement: HTMLElement;
     updateTimeTextElement: HTMLElement;
+    camPosTextElement: HTMLElement;
+    objInfoTextElement: HTMLElement;
+
 
     loadObjects: Array<StateFileObject>;
     pointLights: Array<StateFileLight>;
@@ -58,6 +61,13 @@ declare type MouseConfiguration = {
 
 declare type KeyboardState = {
 
+}
+
+declare type TimeStats = {
+    totalElements: number
+    previousTime: Float32Array
+    previousElementIndex: number
+    averageTime: number
 }
 
 declare type StateFile = Array<StateFileScene>;

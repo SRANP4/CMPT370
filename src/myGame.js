@@ -50,6 +50,7 @@ export function fixedUpdate (state, deltaTime) {
   // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
 
   updateFlyCam(state)
+  updateDebugStats(state)
 }
 
 /**
@@ -71,6 +72,7 @@ function updateFlyCam (state) {
     state.camera.pitch -= mouseYDelta / 200
     if (state.camera.pitch > pitchLookLimit) state.camera.pitch = pitchLookLimit
     if (state.camera.pitch < -pitchLookLimit) state.camera.pitch = -pitchLookLimit
+    state.camera.yaw = state.camera.yaw % (Math.PI * 2)
 
     updateCameraEulerLookDir(state.camera)
 
@@ -125,6 +127,28 @@ function updateFlyCam (state) {
       state.camera.center[1] -= moveSpeed
     }
   }
+}
+
+/**
+ *
+ * @param {import('./types.js').AppState} state
+ */
+function updateDebugStats (state) {
+  const pos = state.camera.position
+  const pitch = state.camera.pitch
+  const yaw = state.camera.yaw
+
+  state.camPosTextElement.innerText =
+    'X: ' +
+    pos[0].toFixed(2).toString() +
+    ' Y: ' +
+    pos[1].toFixed(2).toString() +
+    ' Z: ' +
+    pos[2].toFixed(2).toString() +
+    '\nPitch: ' +
+    pitch.toFixed(2).toString() +
+    ' Yaw: ' +
+    yaw.toFixed(2).toString()
 }
 
 /**

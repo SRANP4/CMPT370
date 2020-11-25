@@ -64,6 +64,7 @@ const TICK_RATE_MS = 16
 
 // previousTicks is a circular array
 // initial second of data will be bunk due to a lot of 0s in the array
+/** @type { import('./types.js').TimeStats } */
 const fixedUpdateTimeStats = {
   totalElements: 120, // this is configurable (120 is 2 seconds worth of ticks)
   previousTime: undefined, // this is initialized in initializeTickTimeStats as Float32Array
@@ -71,6 +72,7 @@ const fixedUpdateTimeStats = {
   averageTime: 0
 }
 
+/** @type { import('./types.js').TimeStats } */
 const updateTimeStats = {
   totalElements: 120, // this is configurable (120 is 2 seconds worth of ticks)
   previousTime: undefined, // this is initialized in initializeTickTimeStats as Float32Array
@@ -78,6 +80,7 @@ const updateTimeStats = {
   averageTime: 0
 }
 
+/** @type { import('./types.js').TimeStats } */
 const frameTimeStats = {
   totalElements: 120, // this is configurable (120 is 2 seconds worth of ticks)
   previousTime: undefined, // this is initialized in initializeTickTimeStats as Float32Array
@@ -88,7 +91,7 @@ const frameTimeStats = {
 // This function loads on window load, uses async functions to load the scene then try to render it
 window.onload = async () => {
   try {
-    await parseSceneFile('./statefiles/scene.json', state)
+    await parseSceneFile('./statefiles/def_scene.json', state)
     main()
   } catch (err) {
     console.error(err)
@@ -307,6 +310,16 @@ function main () {
   ))
   state.updateTimeTextElement.innerText = 'UPDATE TIME'
 
+  state.camPosTextElement = /** @type {HTMLElement} */ (document.querySelector(
+    '#camera_position'
+  ))
+  state.camPosTextElement.innerText = 'CAM POS'
+
+  state.objInfoTextElement = /** @type {HTMLElement} */ (document.querySelector(
+    '#object_info'
+  ))
+  state.objInfoTextElement.innerText = 'OBJ INFO'
+
   initializeTimeStats()
   startGame(state)
   runFixedUpdateLoop(0, 0)
@@ -315,6 +328,9 @@ function main () {
   startRendering(gl, state) // now that scene is setup, start rendering it
 }
 
+/**
+ *
+ */
 function initializeTimeStats () {
   fixedUpdateTimeStats.previousTime = new Float32Array(
     fixedUpdateTimeStats.totalElements
@@ -323,6 +339,11 @@ function initializeTimeStats () {
   frameTimeStats.previousTime = new Float32Array(frameTimeStats.totalElements)
 }
 
+/**
+ *
+ * @param {import('./types.js').TimeStats } statObj
+ * @param {number} lastTickTime
+ */
 function calcTimeStats (statObj, lastTickTime) {
   statObj.previousTime[statObj.previousElementIndex] = lastTickTime
   statObj.previousElementIndex =
@@ -336,6 +357,11 @@ function calcTimeStats (statObj, lastTickTime) {
   statObj.averageTime = sum / statObj.totalElements
 }
 
+/**
+ *
+ * @param {number} lastTickTime
+ * @param {number} lastTickEndTime
+ */
 function runFixedUpdateLoop (lastTickTime, lastTickEndTime) {
   const start = window.performance.now()
   calcTimeStats(fixedUpdateTimeStats, lastTickTime)
@@ -372,6 +398,10 @@ function runFixedUpdateLoop (lastTickTime, lastTickEndTime) {
   )
 }
 
+/**
+ *
+ * @param {number} lastTickTime
+ */
 function runUpdateLoop (lastTickTime) {
   const start = window.performance.now()
   calcTimeStats(updateTimeStats, lastTickTime)
