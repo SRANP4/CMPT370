@@ -212,7 +212,7 @@ function main () {
           // Diffuse term : Ld * (N dot L)
           // We don't multiply Kd for now as it changes with texture 
           // calculate diffuse term Kd*Ld*dot(N,L)
-          float diff = abs(dot(normal, lightDirection));
+          float diff = max(dot(normal, lightDirection), 0.0);
           // calculate diffuse colour for texture and no-texture  
           vec3 Kd = diffuseVal;
           if (samplerExists == 1) {
