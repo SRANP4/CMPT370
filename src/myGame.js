@@ -1,11 +1,8 @@
 // @ts-check
 'use strict'
 
-import {
-  adjustCameraPitch,
-  adjustCameraYaw,
-  updateCameraEulerLookDir
-} from './cameraFunctions.js'
+import { vec3 } from '../lib/gl-matrix/index.js'
+import { updateCameraEulerLookDir } from './cameraFunctions.js'
 import {
   keysDown,
   keysPressed,
@@ -67,32 +64,55 @@ function updateFlyCam (state) {
 
   if (flyCamEnabled) {
     const moveSpeed = 0.05
+    const pitchLookLimit = 1.57 // pi / 2, but a bit less
 
-    // adjustCameraYaw(state.camera, mouseXDelta / 200)
-    // adjustCameraPitch(state.camera, -mouseYDelta / 200)
+    // mouse look
     state.camera.yaw += mouseXDelta / 200
     state.camera.pitch -= mouseYDelta / 200
+    if (state.camera.pitch > pitchLookLimit) state.camera.pitch = pitchLookLimit
+    if (state.camera.pitch < -pitchLookLimit) state.camera.pitch = -pitchLookLimit
+
     updateCameraEulerLookDir(state.camera)
 
+    // move relative to current look direction
     if (keysDown.get('a')) {
-      // rotateCameraAroundYAxis(state.camera, -0.16)
-      state.camera.position[0] += moveSpeed
-      state.camera.center[0] += moveSpeed
+      const positionTranslate = vec3.create()
+      vec3.scale(positionTranslate, state.camera.right, -moveSpeed)
+      vec3.add(state.camera.position, state.camera.position, positionTranslate)
+
+      const centerTranslate = vec3.create()
+      vec3.scale(centerTranslate, state.camera.right, -moveSpeed)
+      vec3.add(state.camera.center, state.camera.center, centerTranslate)
     }
 
     if (keysDown.get('d')) {
-      state.camera.position[0] -= moveSpeed
-      state.camera.center[0] -= moveSpeed
+      const positionTranslate = vec3.create()
+      vec3.scale(positionTranslate, state.camera.right, moveSpeed)
+      vec3.add(state.camera.position, state.camera.position, positionTranslate)
+
+      const centerTranslate = vec3.create()
+      vec3.scale(centerTranslate, state.camera.right, moveSpeed)
+      vec3.add(state.camera.center, state.camera.center, centerTranslate)
     }
 
     if (keysDown.get('w')) {
-      state.camera.position[2] += moveSpeed
-      state.camera.center[2] += moveSpeed
+      const positionTranslate = vec3.create()
+      vec3.scale(positionTranslate, state.camera.at, moveSpeed)
+      vec3.add(state.camera.position, state.camera.position, positionTranslate)
+
+      const centerTranslate = vec3.create()
+      vec3.scale(centerTranslate, state.camera.at, moveSpeed)
+      vec3.add(state.camera.center, state.camera.center, centerTranslate)
     }
 
     if (keysDown.get('s')) {
-      state.camera.position[2] -= moveSpeed
-      state.camera.center[2] -= moveSpeed
+      const positionTranslate = vec3.create()
+      vec3.scale(positionTranslate, state.camera.at, -moveSpeed)
+      vec3.add(state.camera.position, state.camera.position, positionTranslate)
+
+      const centerTranslate = vec3.create()
+      vec3.scale(centerTranslate, state.camera.at, -moveSpeed)
+      vec3.add(state.camera.center, state.camera.center, centerTranslate)
     }
 
     if (keysDown.get(' ')) {
@@ -100,7 +120,7 @@ function updateFlyCam (state) {
       state.camera.center[1] += moveSpeed
     }
 
-    if (keysDown.get('Shift')) {
+    if (keysDown.get('shift')) {
       state.camera.position[1] -= moveSpeed
       state.camera.center[1] -= moveSpeed
     }

@@ -6,10 +6,6 @@
 import { vec3 } from '../lib/gl-matrix/index.js'
 import { toRadians } from './commonFunctions.js'
 
-const xAxis = vec3.fromValues(1, 0, 0)
-const yAxis = vec3.fromValues(0, 1, 0)
-const zAxis = vec3.fromValues(0, 0, 1)
-
 /**
  * "true" rotation, but probably not what you want
  * @param {import('./types').Camera} cam
@@ -51,6 +47,7 @@ export function updateCameraEulerLookDir (cam) {
   vec3.normalize(cam.at, cam.at)
 
   cam.center = vec3.add(cam.center, cam.position, cam.at)
+  updateCameraRightVec(cam)
 }
 
 /**

@@ -35,11 +35,15 @@ export function setupEvents (canvas) {
   // button / key press events
 
   window.addEventListener('keydown', event => {
-    keysDown.set(event.key, true)
+    // we need to put it in lower case as depending on if you're holding shift or not
+    // the key string will be different, which causes problems as we don't always
+    // get a keyup event for capital W only lower case W if the user releases shift before W
+    // for example
+    keysDown.set(event.key.toLowerCase(), true)
   })
 
   window.addEventListener('keyup', event => {
-    keysDown.set(event.key, false)
+    keysDown.set(event.key.toLowerCase(), false)
   })
 
   window.addEventListener('mousedown', event => {
@@ -52,7 +56,7 @@ export function setupEvents (canvas) {
 
   // pointer lock events
   canvas.onclick = function () {
-    canvas.requestPointerLock()
+    if (!hasMouseLock) canvas.requestPointerLock()
   }
 
   document.addEventListener('pointerlockchange', event => {
@@ -66,6 +70,14 @@ export function setupEvents (canvas) {
     } else {
       console.log('The pointer lock status is now unlocked')
       document.removeEventListener('mousemove', gatherMouseMovement, false)
+
+      // browser seems to leave a large jump if you hit esc
+      // possibly because it repositions the cursor first and this gets sent
+      // as a final movement event
+      // however this creates a jarring movement in game and it's undesirable so
+      // we clear it out here
+      gatheredMouseXMovement = 0
+      gatheredMouseYMovement = 0
       hasMouseLock = false
     }
   })
