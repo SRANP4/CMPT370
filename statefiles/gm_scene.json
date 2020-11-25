@@ -57,7 +57,11 @@
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
         "model": "pirate_ship_fixed.obj",
-        "preCalcCentroid": [0.011951647698879242, 0.004606542177498341, -0.00013292062794789672]
+        "preCalcCentroid": [
+          0.011951647698879242,
+          0.004606542177498341,
+          -0.00013292062794789672
+        ]
       },
       {
         "name": "tempMesh",
@@ -77,45 +81,47 @@
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
         "model": "bunny.obj",
-        "preCalcCentroid": [-0.2530944049358368, 0.6549662947654724, 0.17283309996128082]
+        "preCalcCentroid": [
+          -0.2530944049358368,
+          0.6549662947654724,
+          0.17283309996128082
+        ]
       },
       {
-        "ignore": {
-          "name": "Cannon",
-          "material": {
-            "diffuse": [0.5882, 0.5882, 0.5882],
-            "ambient": [0.3, 0.3, 0.3],
-            "specular": [0.5, 0.5, 0.5],
-            "n": 10.000002,
-            "shaderType": 1,
-            "alpha": 1
-          },
-          "type": "mesh",
-          "position": [-4, 0.5, -2],
-          "scale": [0.015625, 0.015625, 0.015625],
-          "diffuseTexture": "default.jpg",
-          "normalTexture": "defaultNorm.jpg",
-          "rotation": [
-            0.25882095098495483,
-            0,
-            -0.9659253358840942,
-            0,
-            0,
-            1,
-            0,
-            0,
-            0.9659253358840942,
-            0,
-            0.25882095098495483,
-            0,
-            0,
-            0,
-            0,
-            1
-          ],
-          "parent": null,
-          "model": "artillery_cannon.obj"
-        }
+        "name": "Cannon",
+        "material": {
+          "diffuse": [0.5882, 0.5882, 0.5882],
+          "ambient": [0.3, 0.3, 0.3],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 10.000002,
+          "shaderType": 1,
+          "alpha": 1
+        },
+        "type": "mesh",
+        "position": [-4, 0.5, -2],
+        "scale": [1, 1, 1],
+        "diffuseTexture": "default.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [
+          0.25882095098495483,
+          0,
+          -0.9659253358840942,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0.9659253358840942,
+          0,
+          0.25882095098495483,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "parent": null,
+        "model": "artillery_cannon_fixed.obj"
       }
     ],
     "pointLights": [
