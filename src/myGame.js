@@ -13,7 +13,6 @@ import {
 } from './inputHelper.js'
 
 /*
-  TODO add fly cam
   TODO add debug object markers
   TODO add debug grid
 */
@@ -187,7 +186,8 @@ function updateDebugStats (state) {
     '\nTriangle count: ' + obj.model.triangles.length.toString() +
     '\nUV count: ' + obj.model.uvs.length.toString() +
     '\nNormal count: ' + obj.model.normals.length.toString() +
-    '\nBitangent count: ' + obj.model.bitangents.length.toString()
+    '\nBitangent count: ' + obj.model.bitangents.length.toString() +
+    '\nCentroid: ' + obj.centroid.toString()
 }
 
 /**

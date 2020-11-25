@@ -93,6 +93,7 @@ declare type StateFileObject = {
     parent?: string;
     model?: string;
     meshType?: string
+    preCalcCentroid?: Array<number> //vec3
 }
 
 declare type SceneSettings = {
