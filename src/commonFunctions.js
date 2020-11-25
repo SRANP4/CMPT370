@@ -1,6 +1,10 @@
+// @ts-check
+'use strict'
+
 import { printError } from './uiSetup.js'
 import { vec3 } from '../lib/gl-matrix/index.js'
 import { OBJLoader } from '../lib/three-object-loader.js'
+import { initCameraFromStatefile } from './cameraFunctions.js'
 
 /**
  * @param  {WebGL2RenderingContext} gl WebGL2 Context
@@ -472,13 +476,13 @@ export function parseSceneFile (file, state) {
     window
       .fetch(file)
       .then(data => {
-        return /** @type {StateFile} */ (data.json())
+        return /** @type {Promise<import('./types.js').StateFile>} */ (data.json())
       })
       .then((jData) /** @type {StateFile} */ => {
         state.loadObjects = jData[0].objects
         state.pointLights = jData[0].pointLights
         state.settings = jData[0].settings
-        state.camera = state.settings.camera
+        state.camera = initCameraFromStatefile(state.settings.camera)
         state.numberOfObjectsToLoad = jData[0].objects.length
         resolve()
       })

@@ -14,7 +14,7 @@ declare type AppState = {
     loadObjects: Array<StateFileObject>;
     pointLights: Array<StateFileLight>;
     settings: SceneSettings;
-    camera: StateFileCamera;
+    camera: Camera;
     numberOfObjectsToLoad: number;
 
     gl: WebGL2RenderingContext;
@@ -40,6 +40,14 @@ declare type AppState = {
     viewMatrix: mat4;
     samplerExists: number;
     samplerNormExists: number;
+}
+
+declare type Camera = {
+    position: vec3;
+    center: vec3;
+    up: vec3;
+    right: vec3;
+    at: vec3;
 }
 
 declare type MouseConfiguration = {

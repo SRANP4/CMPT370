@@ -1,7 +1,16 @@
 // @ts-check
 'use strict'
 
+import { vec3 } from '../lib/gl-matrix/index.js'
+
+/*
+  TODO add fly cam
+  TODO add debug object markers
+  TODO add debug grid
+*/
+
 // If you want to use globals here you can. Initialize them in startGame then update/change them in gameLoop
+const flyCamEnabled = false
 
 /**
  *
@@ -28,9 +37,14 @@ export function startGame (state) {
  */
 export function fixedUpdate (state, deltaTime) {
   // handle physics here
-  // TODO - Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
+  // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
 }
 
+/**
+ *
+ * @param {import("./types").AppState} state
+ */
 export function update (state) {
   // handle inputs here
+  // state.camera.
 }

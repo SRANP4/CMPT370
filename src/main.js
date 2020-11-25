@@ -316,7 +316,9 @@ function main () {
 }
 
 function initializeTimeStats () {
-  fixedUpdateTimeStats.previousTime = new Float32Array(fixedUpdateTimeStats.totalElements)
+  fixedUpdateTimeStats.previousTime = new Float32Array(
+    fixedUpdateTimeStats.totalElements
+  )
   updateTimeStats.previousTime = new Float32Array(updateTimeStats.totalElements)
   frameTimeStats.previousTime = new Float32Array(frameTimeStats.totalElements)
 }
@@ -384,11 +386,7 @@ function runUpdateLoop (lastTickTime) {
   }
 
   const elapsed = window.performance.now() - start
-  window.setTimeout(
-    runUpdateLoop,
-    0,
-    elapsed
-  )
+  window.setTimeout(runUpdateLoop, 0, elapsed)
 }
 
 /**
@@ -492,17 +490,11 @@ function drawScene (gl, state) {
 
     // View Matrix & Camera ....
     const viewMatrix = mat4.create()
-    const camFront = vec3.fromValues(0, 0, 0)
-    vec3.add(
-      camFront,
-      new Float32Array(state.camera.position),
-      new Float32Array(state.camera.front)
-    )
     mat4.lookAt(
       viewMatrix,
-      new Float32Array(state.camera.position),
-      camFront,
-      new Float32Array(state.camera.up)
+      state.camera.position,
+      state.camera.center,
+      state.camera.up
     )
     gl.uniformMatrix4fv(
       object.programInfo.uniformLocations.view,
