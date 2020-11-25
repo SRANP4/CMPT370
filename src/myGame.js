@@ -1,19 +1,16 @@
 // @ts-check
 'use strict'
 
-import { vec3 } from '../lib/gl-matrix/index.js'
 import {
-  rotateCameraAroundXAxis,
-  rotateCameraAroundYAxis
+  adjustCameraPitch,
+  adjustCameraYaw,
+  updateCameraEulerLookDir
 } from './cameraFunctions.js'
 import {
   keysDown,
   keysPressed,
-  mousePressed,
-  mouseReleased,
   mouseXDelta,
   mouseYDelta,
-  RIGHT_MOUSE_BTN,
   setupEvents as setupInputEvents,
   updateInput
 } from './inputHelper.js'
@@ -26,8 +23,6 @@ import {
 
 // If you want to use globals here you can. Initialize them in startGame then update/change them in gameLoop
 let flyCamEnabled = false
-
-let mouseDragLook = false
 
 /**
  *
@@ -73,8 +68,11 @@ function updateFlyCam (state) {
   if (flyCamEnabled) {
     const moveSpeed = 0.05
 
-    rotateCameraAroundYAxis(state.camera, mouseXDelta / 80)
-    rotateCameraAroundXAxis(state.camera, -mouseYDelta / 80)
+    // adjustCameraYaw(state.camera, mouseXDelta / 200)
+    // adjustCameraPitch(state.camera, -mouseYDelta / 200)
+    state.camera.yaw += mouseXDelta / 200
+    state.camera.pitch -= mouseYDelta / 200
+    updateCameraEulerLookDir(state.camera)
 
     if (keysDown.get('a')) {
       // rotateCameraAroundYAxis(state.camera, -0.16)
@@ -83,31 +81,26 @@ function updateFlyCam (state) {
     }
 
     if (keysDown.get('d')) {
-      // rotateCameraAroundYAxis(state.camera, 0.16)
       state.camera.position[0] -= moveSpeed
       state.camera.center[0] -= moveSpeed
     }
 
     if (keysDown.get('w')) {
-      // rotateCameraAroundYAxis(state.camera, -0.16)
       state.camera.position[2] += moveSpeed
       state.camera.center[2] += moveSpeed
     }
 
     if (keysDown.get('s')) {
-      // rotateCameraAroundYAxis(state.camera, 0.16)
       state.camera.position[2] -= moveSpeed
       state.camera.center[2] -= moveSpeed
     }
 
     if (keysDown.get(' ')) {
-      // rotateCameraAroundYAxis(state.camera, -0.16)
       state.camera.position[1] += moveSpeed
       state.camera.center[1] += moveSpeed
     }
 
     if (keysDown.get('Shift')) {
-      // rotateCameraAroundYAxis(state.camera, 0.16)
       state.camera.position[1] -= moveSpeed
       state.camera.center[1] -= moveSpeed
     }

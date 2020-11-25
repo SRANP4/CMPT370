@@ -270,7 +270,7 @@ function main () {
 
   // iterate through the level's objects and add them
   state.loadObjects.forEach(loadObject => {
-    if (loadObject.type === 'mesh') {
+    if (loadObject.type === 'nomesh') {
       parseOBJFileToJSON(loadObject.model, createMesh, loadObject)
     } else if (loadObject.type === 'cube') {
       const tempCube = new Cube(gl, loadObject)

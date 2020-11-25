@@ -349,7 +349,6 @@ export function initBitangentBuffer (gl, programInfo, bitangents) {
 /**
  *
  * @param {WebGL2RenderingContext} gl
- * @param {import('./types.js').ProgramInfo} programInfo
  * @param {Uint16Array} elementArray
  */
 export function initIndexBuffer (gl, elementArray) {
@@ -442,7 +441,7 @@ export function parseOBJFileToJSON (objFileURL, cb, loadObject) {
       return data.text()
     })
     .then(text => {
-      /** @type {OBJMesh} */
+      /** @type {import('./types.js').OBJMesh} */
       const mesh = OBJLoader.prototype.parse(text)
       cb(mesh, loadObject)
     })
@@ -457,13 +456,13 @@ export function parseOBJFileToJSON (objFileURL, cb, loadObject) {
  * @return {Array<Number>} array of 3 floats representing the colour value
  */
 export function hexToRGB (hex) {
-  let r = hex.substring(1, 3)
-  let g = hex.substring(3, 5)
-  let b = hex.substring(5, 7)
-  r = parseInt(r, 16)
-  g = parseInt(g, 16)
-  b = parseInt(b, 16)
-  return [r / 255, g / 255, b / 255]
+  const r = hex.substring(1, 3)
+  const g = hex.substring(3, 5)
+  const b = hex.substring(5, 7)
+  const rNum = parseInt(r, 16)
+  const gNum = parseInt(g, 16)
+  const bNum = parseInt(b, 16)
+  return [rNum / 255, gNum / 255, bNum / 255]
 }
 
 /**

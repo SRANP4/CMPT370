@@ -4,9 +4,14 @@
 // // Camera helper funcs // //
 
 import { vec3 } from '../lib/gl-matrix/index.js'
+import { toRadians } from './commonFunctions.js'
+
+const xAxis = vec3.fromValues(1, 0, 0)
+const yAxis = vec3.fromValues(0, 1, 0)
+const zAxis = vec3.fromValues(0, 0, 1)
 
 /**
- *
+ * "true" rotation, but probably not what you want
  * @param {import('./types').Camera} cam
  * @param {number} radians
  */
@@ -20,7 +25,7 @@ export function rotateCameraAroundYAxis (cam, radians) {
 }
 
 /**
- *
+ * "true" rotation, but probably not what you want
  * @param {import('./types').Camera} cam
  * @param {number} radians
  */
@@ -31,6 +36,21 @@ export function rotateCameraAroundXAxis (cam, radians) {
   vec3.add(cam.center, cam.center, centerTranslate)
   updateCameraAtVec(cam)
   updateCameraUpVec(cam)
+}
+
+/**
+ * Adjust the pitch and yaw on camera object, then call this
+ * Good for mouse look
+ * Based on: https://learnopengl.com/Getting-started/Camera
+ * @param {import('./types.js').Camera} cam
+ */
+export function updateCameraEulerLookDir (cam) {
+  cam.at[0] = Math.cos(cam.yaw) * Math.cos(cam.pitch)
+  cam.at[1] = Math.sin(cam.pitch)
+  cam.at[2] = Math.sin(cam.yaw) * Math.cos(cam.pitch)
+  vec3.normalize(cam.at, cam.at)
+
+  cam.center = vec3.add(cam.center, cam.position, cam.at)
 }
 
 /**
@@ -70,12 +90,15 @@ function updateCameraUpVec (cam) {
  * @returns {import('./types').Camera}
  */
 export function initCameraFromStatefile (statefileCamera) {
+  /** @type { import('./types.js').Camera } */
   const cam = {
     at: vec3.create(),
     up: new Float32Array(statefileCamera.up),
     position: new Float32Array(statefileCamera.position),
     center: new Float32Array(statefileCamera.front),
-    right: vec3.create()
+    right: vec3.create(),
+    pitch: toRadians(statefileCamera.pitch),
+    yaw: toRadians(statefileCamera.yaw)
   }
 
   updateCameraAtVec(cam)

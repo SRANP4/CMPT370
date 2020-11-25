@@ -48,6 +48,8 @@ declare type Camera = {
     up: vec3;
     right: vec3;
     at: vec3;
+    pitch: number; // radians
+    yaw: number; // radians
 }
 
 declare type MouseConfiguration = {
@@ -167,7 +169,7 @@ declare type ProgramInfo = {
         vertexPosition: number;
         vertexNormal: number;
         vertexUV: number;
-        // vertexBitangent: number;
+        vertexBitangent?: number;
     }
     uniformLocations: {
         projection: WebGLUniformLocation;
@@ -185,8 +187,8 @@ declare type ProgramInfo = {
         lightStrengths: WebGLUniformLocation;
         samplerExists: WebGLUniformLocation;
         sampler: WebGLUniformLocation
-        // normalSamplerExists: WebGLUniformLocation;
-        // normalSampler: WebGLUniformLocation;
+        normalSamplerExists?: WebGLUniformLocation;
+        normalSampler?: WebGLUniformLocation;
     }
 }
 
