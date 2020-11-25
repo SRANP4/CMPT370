@@ -2,6 +2,7 @@
 'use strict'
 
 import { vec3 } from '../lib/gl-matrix/index.js'
+import { rotateCameraAroundYAxis } from './cameraFunctions.js'
 
 /*
   TODO add fly cam
@@ -11,6 +12,7 @@ import { vec3 } from '../lib/gl-matrix/index.js'
 
 // If you want to use globals here you can. Initialize them in startGame then update/change them in gameLoop
 const flyCamEnabled = false
+const keys = {}
 
 /**
  *
@@ -27,6 +29,14 @@ export function startGame (state) {
     false
   )
 
+  document.addEventListener('keydown', event => {
+    keys[event.key] = true
+  })
+
+  document.addEventListener('keyup', event => {
+    keys[event.key] = false
+  })
+
   // add mouse listeners here
 }
 
@@ -38,13 +48,19 @@ export function startGame (state) {
 export function fixedUpdate (state, deltaTime) {
   // handle physics here
   // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
+  if (keys.a) {
+    rotateCameraAroundYAxis(state.camera, -0.16)
+    // state.camera.position[0] += 0.05
+  }
+
+  if (keys.d) {
+    rotateCameraAroundYAxis(state.camera, 0.16)
+    // state.camera.position[0] -= 0.05
+  }
 }
 
 /**
  *
  * @param {import("./types").AppState} state
  */
-export function update (state) {
-  // handle inputs here
-  // state.camera.
-}
+export function update (state) {}

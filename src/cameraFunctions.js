@@ -10,7 +10,7 @@ import { vec3 } from '../lib/gl-matrix/index.js'
  * @param {import('./types').Camera} cam
  * @param {number} radians
  */
-function rotateCameraAroundYAxis (cam, radians) {
+export function rotateCameraAroundYAxis (cam, radians) {
   // rotate camera around Y
   const centerTranslate = vec3.create()
   vec3.scale(centerTranslate, cam.right, radians)
@@ -24,11 +24,11 @@ function rotateCameraAroundYAxis (cam, radians) {
  * @param {import('./types').Camera} cam
  * @param {number} radians
  */
-function rotateCameraAroundXAxis (cam, radians) {
+export function rotateCameraAroundXAxis (cam, radians) {
   // rotate camera around X
   const centerTranslate = vec3.create()
   vec3.scale(centerTranslate, cam.up, radians)
-  vec3.add(state.camera.center, cam.center, centerTranslate)
+  vec3.add(cam.center, cam.center, centerTranslate)
   updateCameraAtVec(cam)
   updateCameraUpVec(cam)
 }
