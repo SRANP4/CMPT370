@@ -54,6 +54,8 @@ declare type Camera = {
     at: vec3;
     pitch: number; // radians
     yaw: number; // radians
+    nearClip: number;
+    farClip: number;
 }
 
 declare type MouseConfiguration = {

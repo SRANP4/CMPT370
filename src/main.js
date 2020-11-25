@@ -91,7 +91,7 @@ const frameTimeStats = {
 // This function loads on window load, uses async functions to load the scene then try to render it
 window.onload = async () => {
   try {
-    await parseSceneFile('./statefiles/def_scene.json', state)
+    await parseSceneFile('./statefiles/gm_scene.json', state)
     main()
   } catch (err) {
     console.error(err)
@@ -508,8 +508,8 @@ function drawScene (gl, state) {
     const projectionMatrix = mat4.create()
     const fovy = (60.0 * Math.PI) / 180.0 // Vertical field of view in radians
     const aspect = state.canvas.clientWidth / state.canvas.clientHeight // Aspect ratio of the canvas
-    const near = 0.1 // Near clipping plane
-    const far = 1000000.0 // Far clipping plane
+    const near = state.camera.nearClip // Near clipping plane
+    const far = state.camera.farClip // Far clipping plane
 
     mat4.perspective(projectionMatrix, fovy, aspect, near, far)
     gl.uniformMatrix4fv(

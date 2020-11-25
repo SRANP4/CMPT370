@@ -149,7 +149,11 @@ function updateDebugStats (state) {
     '\nPitch: ' +
     pitch.toFixed(2).toString() +
     ' Yaw: ' +
-    yaw.toFixed(2).toString()
+    yaw.toFixed(2).toString() +
+    '\nNear clip: ' +
+    state.camera.nearClip.toString() +
+    '\nFar clip: ' +
+    state.camera.farClip.toString()
 
   if (keysPressed.get('-')) {
     state.selectedObjIndex = (state.selectedObjIndex - 1) % state.objectCount
