@@ -2,7 +2,21 @@
 'use strict'
 
 import { vec3 } from '../lib/gl-matrix/index.js'
-import { rotateCameraAroundYAxis } from './cameraFunctions.js'
+import {
+  rotateCameraAroundXAxis,
+  rotateCameraAroundYAxis
+} from './cameraFunctions.js'
+import {
+  keysDown,
+  keysPressed,
+  mousePressed,
+  mouseReleased,
+  mouseXDelta,
+  mouseYDelta,
+  RIGHT_MOUSE_BTN,
+  setupEvents as setupInputEvents,
+  updateInput
+} from './inputHelper.js'
 
 /*
   TODO add fly cam
@@ -12,14 +26,8 @@ import { rotateCameraAroundYAxis } from './cameraFunctions.js'
 
 // If you want to use globals here you can. Initialize them in startGame then update/change them in gameLoop
 let flyCamEnabled = false
-/** @type {Map<string, boolean>} */
-const keysDownLast = new Map()
-/** @type {Map<string, boolean>} */
-const keysDown = new Map()
-/** @type {Map<string, boolean>} */
-const keysPressed = new Map()
-/** @type {Map<string, boolean>} */
-const keysReleased = new Map()
+
+let mouseDragLook = false
 
 /**
  *
@@ -36,15 +44,7 @@ export function startGame (state) {
     false
   )
 
-  window.addEventListener('keydown', event => {
-    keysDown.set(event.key, true)
-  })
-
-  window.addEventListener('keyup', event => {
-    keysDown.set(event.key, false)
-  })
-
-  // add mouse listeners here
+  setupInputEvents(state.canvas)
 }
 
 /**
@@ -53,7 +53,7 @@ export function startGame (state) {
  * @param { number } deltaTime time difference between the previous frame that was drawn and the current frame
  */
 export function fixedUpdate (state, deltaTime) {
-  updatePressedKeys()
+  updateInput()
   // handle physics here
   // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
 
@@ -72,6 +72,9 @@ function updateFlyCam (state) {
 
   if (flyCamEnabled) {
     const moveSpeed = 0.05
+
+    rotateCameraAroundYAxis(state.camera, mouseXDelta / 80)
+    rotateCameraAroundXAxis(state.camera, -mouseYDelta / 80)
 
     if (keysDown.get('a')) {
       // rotateCameraAroundYAxis(state.camera, -0.16)
@@ -116,29 +119,3 @@ function updateFlyCam (state) {
  * @param {import("./types").AppState} state
  */
 export function update (state) {}
-
-/**
- *
- */
-function updatePressedKeys () {
-  keysDown.forEach((_, key) => {
-    if (keysDown.get(key) && !keysDownLast.get(key)) {
-      console.log(key)
-      keysPressed.set(key, true)
-    }
-
-    if (keysDown.get(key) && keysDownLast.get(key)) {
-      keysPressed.set(key, false)
-    }
-
-    if (!keysDown.get(key) && keysDownLast.get(key)) {
-      keysReleased.set(key, true)
-    }
-
-    if (!keysDown.get(key) && !keysDownLast.get(key)) {
-      keysReleased.set(key, false)
-    }
-
-    keysDownLast.set(key, keysDown.get(key))
-  })
-}
