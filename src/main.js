@@ -656,7 +656,6 @@ function drawScene (gl, state) {
     if (object.type === 'mesh' || object.type === 'meshCustom') {
       gl.drawArrays(gl.TRIANGLES, offset, object.buffers.numVertices / 3)
     } else {
-      // gl.drawArrays(gl.TRIANGLES, offset, object.buffers.numVertices / 3)
       gl.drawElements(
         gl.TRIANGLES,
         object.buffers.numVertices,

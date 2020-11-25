@@ -1,5 +1,11 @@
 {
   "standard": {
-    "ignore": ["*.d.ts"]
+    "ignore": [
+      "*.d.ts"
+    ]
+  },
+  "dependencies": {
+    "expand-vertex-data": "^1.1.2",
+    "wavefront-obj-parser": "^2.0.1"
   }
 }

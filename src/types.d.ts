@@ -12,7 +12,7 @@ declare type AppState = {
     updateTimeTextElement: HTMLElement;
     camPosTextElement: HTMLElement;
     objInfoTextElement: HTMLElement;
-    
+
     selectedObjIndex: number;
 
     loadObjects: Array<StateFileObject>;
@@ -90,8 +90,9 @@ declare type StateFileObject = {
     diffuseTexture: string;
     normalTexture: string;
     rotation: Array<number>; //4x4 matrix flattened as number array
-    parent: ?string;
-    model: ?string;
+    parent?: string;
+    model?: string;
+    meshType?: string
 }
 
 declare type SceneSettings = {
@@ -145,6 +146,15 @@ declare type OBJMesh = {
     normals: Array<number>;
 }
 
+declare type JsonMesh = {
+    positions: Array<number>;
+    uvs: Array<number>;
+    normals: Array<number>;
+    normalIndices?: Array<number>;
+    uvIndices?: Array<number>;
+    positionIndices?: Array<number>;
+}
+
 declare type DrawingObject = {
     name: string;
     material: StateFileMaterial;
@@ -154,8 +164,8 @@ declare type DrawingObject = {
     diffuseTexture: string;
     normalTexture: string;
     rotation: Array<number>; //4x4 matrix flattened as number array
-    parent: ?string;
-    model: ?string;
+    parent?: string;
+    model?: string;
 }
 
 declare type Material = {

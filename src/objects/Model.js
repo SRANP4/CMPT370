@@ -38,7 +38,7 @@ export class Model {
     this.programInfo = null
     this.model = {
       vertices: meshDetails.vertices,
-      triangles: [], // models don't support triangles atm
+      triangles: [], // no support for triangles atm
       normals: meshDetails.normals,
       uvs: meshDetails.uvs,
       bitangents: [], // models don't support bitangents atm, but we need model object data unified

@@ -70,9 +70,12 @@ function updateFlyCam (state) {
     // mouse look
     state.camera.yaw += mouseXDelta / 200
     state.camera.pitch -= mouseYDelta / 200
-    if (state.camera.pitch > pitchLookLimit) state.camera.pitch = pitchLookLimit
-    if (state.camera.pitch < -pitchLookLimit)
+    if (state.camera.pitch > pitchLookLimit) {
+      state.camera.pitch = pitchLookLimit
+    }
+    if (state.camera.pitch < -pitchLookLimit) {
       state.camera.pitch = -pitchLookLimit
+    }
     state.camera.yaw = state.camera.yaw % (Math.PI * 2)
 
     updateCameraEulerLookDir(state.camera)
