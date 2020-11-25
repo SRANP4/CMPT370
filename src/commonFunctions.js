@@ -2,7 +2,7 @@
 'use strict'
 
 import { printError } from './uiSetup.js'
-import { vec3 } from '../lib/gl-matrix/index.js'
+import { mat4, vec3 } from '../lib/gl-matrix/index.js'
 import { OBJLoader } from '../lib/three-object-loader.js'
 import { initCameraFromStatefile } from './cameraFunctions.js'
 
@@ -499,4 +499,33 @@ export function parseSceneFile (file, state) {
         reject(err)
       })
   })
+}
+
+/**
+ * Not really my code, translated it from the python version found below:
+ * https://gamedev.stackexchange.com/questions/50963/how-to-extract-euler-angles-from-transformation-matrix
+ * APPARENTLY THIS ISN'T WORTH WHILE INCLUDING IN GL MATRIX??? no idea why
+ * @param {mat4} rot
+ * @returns {vec3} euler angles (yaw, pitch, roll)
+ */
+export function rotationMatrixToEulerAngles (rot) {
+  const out = vec3.create()
+  // stackoverflow code shows its matrix as ROW major (gl matrix is COLUMN major)
+  // additionally its indices start at 1 (gl matrix starts at 0)
+
+  if (rot[0] === 1.0) {
+    out[0] = Math.atan2(rot[8], rot[14])
+    out[1] = 0
+    out[2] = 0
+  } else if (rot[0] === -1.0) {
+    out[0] = Math.atan2(rot[8], rot[14])
+    out[1] = 0
+    out[2] = 0
+  } else {
+    out[0] = Math.atan2(-rot[2], rot[0])
+    out[1] = Math.asin(rot[1])
+    out[2] = Math.atan2(-rot[9], rot[5])
+  }
+
+  return out
 }
