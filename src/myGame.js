@@ -139,21 +139,15 @@ function updateDebugStats (state) {
   const pitch = state.camera.pitch
   const yaw = state.camera.yaw
 
+  // prettier-ignore
   state.camPosTextElement.innerText =
-    'X: ' +
-    pos[0].toFixed(2).toString() +
-    ' Y: ' +
-    pos[1].toFixed(2).toString() +
-    ' Z: ' +
-    pos[2].toFixed(2).toString() +
-    '\nPitch: ' +
-    pitch.toFixed(2).toString() +
-    ' Yaw: ' +
-    yaw.toFixed(2).toString() +
-    '\nNear clip: ' +
-    state.camera.nearClip.toString() +
-    '\nFar clip: ' +
-    state.camera.farClip.toString()
+    'X: ' + pos[0].toFixed(2).toString() +
+    ' Y: ' + pos[1].toFixed(2).toString() +
+    ' Z: ' + pos[2].toFixed(2).toString() +
+    '\nPitch: ' + pitch.toFixed(2).toString() +
+    ' Yaw: ' + yaw.toFixed(2).toString() +
+    '\nNear clip: ' + state.camera.nearClip.toString() +
+    '\nFar clip: ' + state.camera.farClip.toString()
 
   if (keysPressed.get('-')) {
     state.selectedObjIndex = (state.selectedObjIndex - 1) % state.objectCount
@@ -167,21 +161,30 @@ function updateDebugStats (state) {
   }
 
   const obj = state.objects[state.selectedObjIndex]
+  // prettier-ignore
   state.objInfoTextElement.innerText =
     'Object index: ' + state.selectedObjIndex.toString() +
     '\nName: ' + obj.name +
     '\nType: ' + obj.type +
     '\nLoaded: ' + obj.loaded +
+    '\n----------Transform info----------' +
     '\nPosition: ' + obj.model.position.toString() +
     '\nRotation: ' + obj.model.rotation.toString() +
     '\nScale: ' + obj.model.scale.toString() +
+    '\n----------Material info----------' +
     '\nDiffuse texture: ' + obj.model.diffuseTexture +
     '\nNormal texture: ' + obj.model.normalTexture +
     '\nAmbientVal: ' + obj.material.ambient.toString() +
     '\nDiffuseVal: ' + obj.material.diffuse.toString() +
     '\nSpecularVal: ' + obj.material.specular.toString() +
     '\nnVal: ' + obj.material.n.toString() +
-    '\nalphaVal: ' + obj.material.alpha.toString()
+    '\nalphaVal: ' + obj.material.alpha.toString() +
+    '\n----------Model info----------' +
+    '\nVertex count: ' + obj.model.vertices.length.toString() +
+    '\nTriangle count: ' + obj.model.triangles.length.toString() +
+    '\nUV count: ' + obj.model.uvs.length.toString() +
+    '\nNormal count: ' + obj.model.normals.length.toString() +
+    '\nBitangent count: ' + obj.model.bitangents.length.toString()
 }
 
 /**
