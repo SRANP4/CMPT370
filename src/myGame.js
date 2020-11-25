@@ -11,8 +11,13 @@ import { rotateCameraAroundYAxis } from './cameraFunctions.js'
 */
 
 // If you want to use globals here you can. Initialize them in startGame then update/change them in gameLoop
-const flyCamEnabled = false
-const keys = {}
+let flyCamEnabled = false
+/** @type {Map<string, boolean>} */
+const keysDownLast = new Map()
+/** @type {Map<string, boolean>} */
+const keysDown = new Map()
+/** @type {Map<string, boolean>} */
+const keysPressed = new Map()
 
 /**
  *
@@ -30,11 +35,11 @@ export function startGame (state) {
   )
 
   document.addEventListener('keydown', event => {
-    keys[event.key] = true
+    keysDown.set(event.key, true)
   })
 
   document.addEventListener('keyup', event => {
-    keys[event.key] = false
+    keysDown.set(event.key, false)
   })
 
   // add mouse listeners here
@@ -46,16 +51,25 @@ export function startGame (state) {
  * @param { number } deltaTime time difference between the previous frame that was drawn and the current frame
  */
 export function fixedUpdate (state, deltaTime) {
+  updatePressedKeys()
   // handle physics here
   // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
-  if (keys.a) {
-    rotateCameraAroundYAxis(state.camera, -0.16)
-    // state.camera.position[0] += 0.05
+
+  if (keysPressed['`']) {
+    flyCamEnabled = !flyCamEnabled
+    console.log('fly cam: ' + flyCamEnabled)
   }
 
-  if (keys.d) {
-    rotateCameraAroundYAxis(state.camera, 0.16)
-    // state.camera.position[0] -= 0.05
+  if (flyCamEnabled) {
+    if (keysDown.get('a')) {
+      rotateCameraAroundYAxis(state.camera, -0.16)
+      // state.camera.position[0] += 0.05
+    }
+
+    if (keysDown.get('d')) {
+      rotateCameraAroundYAxis(state.camera, 0.16)
+      // state.camera.position[0] -= 0.05
+    }
   }
 }
 
@@ -64,3 +78,20 @@ export function fixedUpdate (state, deltaTime) {
  * @param {import("./types").AppState} state
  */
 export function update (state) {}
+
+/**
+ *
+ */
+function updatePressedKeys () {
+  keysDown.forEach((_, key) => {
+    if (keysDown.get(key) && !keysDownLast.get(key)) {
+      keysPressed[key] = true
+    }
+
+    if (keysDown.get(key) && keysDownLast.get(key)) {
+      keysPressed[key] = false
+    }
+
+    keysDownLast.set(key, keysDown.get(key))
+  })
+}
