@@ -266,7 +266,8 @@ function main () {
     samplerNormExists: 0,
     constVal: 1,
     lights: [],
-    objects: []
+    objects: [],
+    selectedObjIndex: 0
   }
 
   state.numLights = state.pointLights.length
@@ -426,7 +427,7 @@ function runUpdateLoop (lastTickTime) {
  * @purpose - Helper function for adding a new object to the scene and refreshing the GUI
  */
 function addObjectToScene (state, object) {
-  // object.name = object.name
+  state.objectCount += 1
   state.objects.push(object)
 }
 

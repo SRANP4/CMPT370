@@ -71,7 +71,8 @@ function updateFlyCam (state) {
     state.camera.yaw += mouseXDelta / 200
     state.camera.pitch -= mouseYDelta / 200
     if (state.camera.pitch > pitchLookLimit) state.camera.pitch = pitchLookLimit
-    if (state.camera.pitch < -pitchLookLimit) state.camera.pitch = -pitchLookLimit
+    if (state.camera.pitch < -pitchLookLimit)
+      state.camera.pitch = -pitchLookLimit
     state.camera.yaw = state.camera.yaw % (Math.PI * 2)
 
     updateCameraEulerLookDir(state.camera)
@@ -149,6 +150,34 @@ function updateDebugStats (state) {
     pitch.toFixed(2).toString() +
     ' Yaw: ' +
     yaw.toFixed(2).toString()
+
+  if (keysPressed.get('-')) {
+    state.selectedObjIndex = (state.selectedObjIndex - 1) % state.objectCount
+    if (state.selectedObjIndex < 0) {
+      state.selectedObjIndex = state.objectCount - 1
+    }
+  }
+
+  if (keysPressed.get('=')) {
+    state.selectedObjIndex = (state.selectedObjIndex + 1) % state.objectCount
+  }
+
+  const obj = state.objects[state.selectedObjIndex]
+  state.objInfoTextElement.innerText =
+    'Object index: ' + state.selectedObjIndex.toString() +
+    '\nName: ' + obj.name +
+    '\nType: ' + obj.type +
+    '\nLoaded: ' + obj.loaded +
+    '\nPosition: ' + obj.model.position.toString() +
+    '\nRotation: ' + obj.model.rotation.toString() +
+    '\nScale: ' + obj.model.scale.toString() +
+    '\nDiffuse texture: ' + obj.model.diffuseTexture +
+    '\nNormal texture: ' + obj.model.normalTexture +
+    '\nAmbientVal: ' + obj.material.ambient.toString() +
+    '\nDiffuseVal: ' + obj.material.diffuse.toString() +
+    '\nSpecularVal: ' + obj.material.specular.toString() +
+    '\nnVal: ' + obj.material.n.toString() +
+    '\nalphaVal: ' + obj.material.alpha.toString()
 }
 
 /**

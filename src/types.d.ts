@@ -12,7 +12,8 @@ declare type AppState = {
     updateTimeTextElement: HTMLElement;
     camPosTextElement: HTMLElement;
     objInfoTextElement: HTMLElement;
-
+    
+    selectedObjIndex: number;
 
     loadObjects: Array<StateFileObject>;
     pointLights: Array<StateFileLight>;
