@@ -62,6 +62,7 @@ function updateCameraAtVec (cam) {
   vec3.sub(at, at, cam.position)
   vec3.normalize(at, at)
   cam.at = at
+  vec3.normalize(cam.at, cam.at)
 }
 
 /**
@@ -72,6 +73,7 @@ function updateCameraRightVec (cam) {
   const right = vec3.fromValues(cam.at[0], cam.at[1], cam.at[2])
   vec3.cross(right, right, cam.up)
   cam.right = right
+  vec3.normalize(cam.right, cam.right)
 }
 
 /**
