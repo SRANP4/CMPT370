@@ -42,7 +42,7 @@
       {
         "name": "Ship",
         "material": {
-          "diffuse": [0.3, 0.3, 0.3],
+          "diffuse": [0.0, 0.0, 1.0],
           "ambient": [0.3, 0.3, 0.3],
           "specular": [0.5, 0.5, 0.5],
           "n": 25.000002,
@@ -188,11 +188,11 @@
       "backgroundColor": [1.0, 1.0, 1.0],
       "camera": {
         "name": "mainCamera",
-        "position": [0, 0.5, -3],
+        "position": [14.26, 0.38, 5.87],
         "front": [0, 0, 1],
         "up": [0, 1, 0],
-        "pitch": 0,
-        "yaw": 90,
+        "pitch": -0.05,
+        "yaw": 3.21,
         "roll": 0,
         "moveSpeed": 10,
         "move": false,

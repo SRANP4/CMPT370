@@ -19,42 +19,7 @@ export function getObject (state, name) {
   return objectToFind
 }
 
-/**
- *
- * @param {number[][]} vertices array of arrays, vertices numbers
- * @returns {import("./types").BoundingBox}
- */
-export function getBoundingBoxVerySlowly (vertices) {
-  let xMin = 0
-  let xMax = 0
-  let yMin = 0
-  let yMax = 0
-  let zMin = 0
-  let zMax = 0
 
-  for (let i = 0; i < vertices.length / 3; i += 3) {
-    if (vertices[i][0] > xMax) {
-      xMax = vertices[i][0]
-    }
-    if (vertices[i][0] < xMin) {
-      xMin = vertices[i][0]
-    }
-    if (vertices[i + 1][1] > yMax) {
-      yMax = vertices[i + 1][1]
-    }
-    if (vertices[i + 1][1] < yMin) {
-      yMin = vertices[i + 1][1]
-    }
-    if (vertices[i + 2][2] > zMax) {
-      zMax = vertices[i + 2][2]
-    }
-    if (vertices[i + 2][2] < zMin) {
-      zMin = vertices[i + 2][2]
-    }
-  }
-  // console.log( { xMin, yMin, zMin, xMax, yMax, zMax });
-  return { xMin, yMin, zMin, xMax, yMax, zMax }
-}
 
 export function scaleBoundingBox (boundingBox, scaleVec) {
   const newBox = {

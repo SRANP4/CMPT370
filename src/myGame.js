@@ -6,15 +6,15 @@ import { updateCameraEulerLookDir } from './cameraFunctions.js'
 import {
   createRigidbody,
   createSphere,
-  updateRigidbodies
+  updateRigidbodies,
+  getBoundingBoxFromModelVertices
 } from './collisionFunctions.js'
-import { rotationMatrixToEulerAngles } from './commonFunctions.js'
 import {
   keysDown,
   keysPressed,
   mouseXDelta,
   mouseYDelta,
-  setupEvents as setupInputEvents,
+  setupInputEvents,
   updateInput
 } from './inputHelper.js'
 import { getObject } from './sceneFunctions.js'
@@ -27,6 +27,8 @@ import { getObject } from './sceneFunctions.js'
 // If you want to use globals here you can. Initialize them in startGame then update/change them in gameLoop
 let flyCamEnabled = false
 const rigidbodies = []
+let sphereColliding = false
+let shipObj = null
 
 /**
  *
@@ -44,11 +46,11 @@ export function startGame (state) {
   )
 
   setupInputEvents(state.canvas)
-
+  shipObj = getObject(state, 'Ship')
   // create the colliders for objects
   const shipRb = createRigidbody(
-    getObject(state, 'Ship'),
-    createSphere(vec3.create(), 3),
+    shipObj,
+    getBoundingBoxFromModelVertices(shipObj),
     /**
      *
      * @param {import('./types.js').Rigidbody} rb
@@ -69,7 +71,8 @@ export function startGame (state) {
      * @param {import('./types.js').Rigidbody} otherRb
      */
     function (rb, otherRb) {
-      otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
+      // otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
+      sphereColliding = true
     }
   )
   sphereRb.gravityStrength = 0
@@ -87,9 +90,15 @@ export function fixedUpdate (state, deltaTime) {
   updateInput()
   // handle physics here
   // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
-
+  sphereColliding = false
   updateRigidbodies(rigidbodies, deltaTime)
   updateFlyCam(state)
+
+  if (sphereColliding) {
+    shipObj.material.diffuse = [1.0, 0, 0]
+  } else {
+    shipObj.material.diffuse = [0, 0, 1.0]
+  }
 }
 
 /**

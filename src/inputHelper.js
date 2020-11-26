@@ -31,7 +31,7 @@ let gatheredMouseYMovement = 0
  *
  * @param {HTMLCanvasElement} canvas
  */
-export function setupEvents (canvas) {
+export function setupInputEvents (canvas) {
   // button / key press events
 
   window.addEventListener('keydown', event => {

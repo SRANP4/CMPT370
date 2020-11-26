@@ -254,3 +254,50 @@ export function translateBoundingBox (box, pos) {
   box.zMin += pos[2]
   box.zMax += pos[2]
 }
+
+/**
+ *
+ * @param {Cube | Plane | Model} drawingObj array of arrays, vertices numbers
+ * @returns {import("./types").BoundingBox}
+ */
+export function getBoundingBoxFromModelVertices (drawingObj) {
+  const vertices = drawingObj.model.vertices.flat()
+
+  let xMin = 0
+  let xMax = 0
+  let yMin = 0
+  let yMax = 0
+  let zMin = 0
+  let zMax = 0
+
+  for (let i = 0; i < vertices.length / 3; i += 3) {
+    if (vertices[i] > xMax) {
+      xMax = vertices[i]
+    }
+    if (vertices[i] < xMin) {
+      xMin = vertices[i]
+    }
+    if (vertices[i + 1] > yMax) {
+      yMax = vertices[i + 1]
+    }
+    if (vertices[i + 1] < yMin) {
+      yMin = vertices[i + 1]
+    }
+    if (vertices[i + 2] > zMax) {
+      zMax = vertices[i + 2]
+    }
+    if (vertices[i + 2] < zMin) {
+      zMin = vertices[i + 2]
+    }
+  }
+  // console.log( { xMin, yMin, zMin, xMax, yMax, zMax });
+  return {
+    colliderType: COLLIDER_TYPE_BOX,
+    xMin: xMin,
+    yMin: yMin,
+    zMin: zMin,
+    xMax: xMax,
+    yMax: yMax,
+    zMax: zMax
+  }
+}
