@@ -21,6 +21,28 @@ export function getObject (state, name) {
 
 /**
  *
+ * @param {vec3} pos
+ * @param {number} width
+ * @param {number} height
+ * @param {number} depth
+ * @return {import("./types").BoundingBox}
+ */
+export function createBoundingBox (pos, width, height, depth) {
+  /** @type{import("./types").BoundingBox} */
+  const box = {
+    xMax: pos[0] + width / 2,
+    xMin: pos[0] - width / 2,
+    yMax: pos[1] + height / 2,
+    yMin: pos[1] - height / 2,
+    zMax: pos[2] + depth / 2,
+    zMin: pos[2] - depth / 2
+  }
+
+  return box
+}
+
+/**
+ *
  * @param {import("./types").BoundingBox} a
  * @param {import("./types").BoundingBox} b
  * @returns {boolean}
@@ -41,7 +63,7 @@ export function intersect (a, b) {
  * @param {number[][]} vertices array of arrays, vertices numbers
  * @returns {import("./types").BoundingBox}
  */
-export function getBoundingBox (vertices) {
+export function getBoundingBoxVerySlowly (vertices) {
   let xMin = 0
   let xMax = 0
   let yMin = 0
@@ -100,15 +122,16 @@ export function scaleBoundingBox (boundingBox, scaleVec) {
   return newBox
 }
 
-export function translateBoundingBox (boundingBox, translateVector) {
-  const newBox = {}
-
-  newBox.xMin = boundingBox.xMin + translateVector[0]
-  newBox.xMax = boundingBox.xMax + translateVector[0]
-  newBox.yMin = boundingBox.yMin + translateVector[1]
-  newBox.yMax = boundingBox.yMax + translateVector[1]
-  newBox.zMin = boundingBox.zMin + translateVector[2]
-  newBox.zMax = boundingBox.zMax + translateVector[2]
-
-  return newBox
+/**
+ *
+ * @param {import("./types").BoundingBox} box
+ * @param {vec3} pos
+ */
+export function translateBoundingBox (box, pos) {
+  box.xMin += pos[0]
+  box.xMax += pos[0]
+  box.yMin += pos[1]
+  box.yMax += pos[1]
+  box.zMin += pos[2]
+  box.zMax += pos[2]
 }
