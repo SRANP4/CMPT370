@@ -54,14 +54,26 @@
         "scale": [1, 1, 1],
         "diffuseTexture": "default.jpg",
         "normalTexture": "defaultNorm.jpg",
-        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "rotation": [
+          1,
+          0,
+          -1.518794157107095e-8,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1.518794157107095e-8,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
         "parent": null,
-        "model": "pirate_ship_fixed.obj",
-        "preCalcCentroid": [
-          0.011951647698879242,
-          0.004606542177498341,
-          -0.00013292062794789672
-        ]
+        "model": "pirate_ship_fixed.obj"
       },
       {
         "name": "tempMesh",
@@ -80,12 +92,7 @@
         "normalTexture": "defaultNorm.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
-        "model": "bunny.obj",
-        "preCalcCentroid": [
-          -0.2530944049358368,
-          0.6549662947654724,
-          0.17283309996128082
-        ]
+        "model": "bunny.obj"
       },
       {
         "name": "Cannon",
@@ -140,7 +147,7 @@
       }
     ],
     "settings": {
-      "backgroundColor": [1.0, 0.753, 0.796],
+      "backgroundColor": [1.0, 1.0, 1.0],
       "camera": {
         "name": "mainCamera",
         "position": [0, 0.5, -3],
