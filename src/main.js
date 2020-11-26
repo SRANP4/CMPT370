@@ -64,6 +64,7 @@ const TICK_RATE_MS = 16
 
 // previousTicks is a circular array
 // initial second of data will be bunk due to a lot of 0s in the array
+/** @type { import('./types.js').TimeStats } */
 const fixedUpdateTimeStats = {
   totalElements: 120, // this is configurable (120 is 2 seconds worth of ticks)
   previousTime: undefined, // this is initialized in initializeTickTimeStats as Float32Array
@@ -71,6 +72,7 @@ const fixedUpdateTimeStats = {
   averageTime: 0
 }
 
+/** @type { import('./types.js').TimeStats } */
 const updateTimeStats = {
   totalElements: 120, // this is configurable (120 is 2 seconds worth of ticks)
   previousTime: undefined, // this is initialized in initializeTickTimeStats as Float32Array
@@ -78,6 +80,7 @@ const updateTimeStats = {
   averageTime: 0
 }
 
+/** @type { import('./types.js').TimeStats } */
 const frameTimeStats = {
   totalElements: 120, // this is configurable (120 is 2 seconds worth of ticks)
   previousTime: undefined, // this is initialized in initializeTickTimeStats as Float32Array
@@ -88,7 +91,7 @@ const frameTimeStats = {
 // This function loads on window load, uses async functions to load the scene then try to render it
 window.onload = async () => {
   try {
-    await parseSceneFile('./statefiles/scene.json', state)
+    await parseSceneFile('./statefiles/gm_scene.json', state)
     main()
   } catch (err) {
     console.error(err)
@@ -263,7 +266,8 @@ function main () {
     samplerNormExists: 0,
     constVal: 1,
     lights: [],
-    objects: []
+    objects: [],
+    selectedObjIndex: 0
   }
 
   state.numLights = state.pointLights.length
@@ -307,6 +311,16 @@ function main () {
   ))
   state.updateTimeTextElement.innerText = 'UPDATE TIME'
 
+  state.camPosTextElement = /** @type {HTMLElement} */ (document.querySelector(
+    '#camera_position'
+  ))
+  state.camPosTextElement.innerText = 'CAM POS'
+
+  state.objInfoTextElement = /** @type {HTMLElement} */ (document.querySelector(
+    '#object_info'
+  ))
+  state.objInfoTextElement.innerText = 'OBJ INFO'
+
   initializeTimeStats()
   startGame(state)
   runFixedUpdateLoop(0, 0)
@@ -315,6 +329,9 @@ function main () {
   startRendering(gl, state) // now that scene is setup, start rendering it
 }
 
+/**
+ *
+ */
 function initializeTimeStats () {
   fixedUpdateTimeStats.previousTime = new Float32Array(
     fixedUpdateTimeStats.totalElements
@@ -323,6 +340,11 @@ function initializeTimeStats () {
   frameTimeStats.previousTime = new Float32Array(frameTimeStats.totalElements)
 }
 
+/**
+ *
+ * @param {import('./types.js').TimeStats } statObj
+ * @param {number} lastTickTime
+ */
 function calcTimeStats (statObj, lastTickTime) {
   statObj.previousTime[statObj.previousElementIndex] = lastTickTime
   statObj.previousElementIndex =
@@ -336,6 +358,11 @@ function calcTimeStats (statObj, lastTickTime) {
   statObj.averageTime = sum / statObj.totalElements
 }
 
+/**
+ *
+ * @param {number} lastTickTime
+ * @param {number} lastTickEndTime
+ */
 function runFixedUpdateLoop (lastTickTime, lastTickEndTime) {
   const start = window.performance.now()
   calcTimeStats(fixedUpdateTimeStats, lastTickTime)
@@ -372,6 +399,10 @@ function runFixedUpdateLoop (lastTickTime, lastTickEndTime) {
   )
 }
 
+/**
+ *
+ * @param {number} lastTickTime
+ */
 function runUpdateLoop (lastTickTime) {
   const start = window.performance.now()
   calcTimeStats(updateTimeStats, lastTickTime)
@@ -396,7 +427,7 @@ function runUpdateLoop (lastTickTime) {
  * @purpose - Helper function for adding a new object to the scene and refreshing the GUI
  */
 function addObjectToScene (state, object) {
-  // object.name = object.name
+  state.objectCount += 1
   state.objects.push(object)
 }
 
@@ -477,8 +508,8 @@ function drawScene (gl, state) {
     const projectionMatrix = mat4.create()
     const fovy = (60.0 * Math.PI) / 180.0 // Vertical field of view in radians
     const aspect = state.canvas.clientWidth / state.canvas.clientHeight // Aspect ratio of the canvas
-    const near = 0.1 // Near clipping plane
-    const far = 1000000.0 // Far clipping plane
+    const near = state.camera.nearClip // Near clipping plane
+    const far = state.camera.farClip // Far clipping plane
 
     mat4.perspective(projectionMatrix, fovy, aspect, near, far)
     gl.uniformMatrix4fv(
@@ -625,7 +656,6 @@ function drawScene (gl, state) {
     if (object.type === 'mesh' || object.type === 'meshCustom') {
       gl.drawArrays(gl.TRIANGLES, offset, object.buffers.numVertices / 3)
     } else {
-      // gl.drawArrays(gl.TRIANGLES, offset, object.buffers.numVertices / 3)
       gl.drawElements(
         gl.TRIANGLES,
         object.buffers.numVertices,

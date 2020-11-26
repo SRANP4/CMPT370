@@ -21,6 +21,25 @@
         "model": null
       },
       {
+        "name": "tempCube",
+        "material": {
+          "diffuse": [0.5, 0, 0],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 10,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "cube",
+        "position": [0, 1, 7],
+        "scale": [1, 1, 1],
+        "diffuseTexture": "default.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": null,
+        "model": null
+      },
+      {
         "name": "Ship",
         "material": {
           "diffuse": [0.3, 0.3, 0.3],
@@ -35,26 +54,38 @@
         "scale": [1, 1, 1],
         "diffuseTexture": "default.jpg",
         "normalTexture": "defaultNorm.jpg",
-        "rotation": [
-          1,
-          0,
-          -1.518794157107095e-8,
-          0,
-          0,
-          1,
-          0,
-          0,
-          1.518794157107095e-8,
-          0,
-          1,
-          0,
-          0,
-          0,
-          0,
-          1
-        ],
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
-        "model": "Pirate_ship.obj"
+        "model": "pirate_ship_fixed.obj",
+        "preCalcCentroid": [
+          0.011951647698879242,
+          0.004606542177498341,
+          -0.00013292062794789672
+        ]
+      },
+      {
+        "name": "tempMesh",
+        "material": {
+          "diffuse": [0.3, 0.6, 0.3],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 1
+        },
+        "type": "mesh",
+        "position": [-2, 0, 1],
+        "scale": [1, 1, 1],
+        "diffuseTexture": "default.png",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": null,
+        "model": "bunny.obj",
+        "preCalcCentroid": [
+          -0.2530944049358368,
+          0.6549662947654724,
+          0.17283309996128082
+        ]
       },
       {
         "name": "Cannon",
@@ -68,7 +99,7 @@
         },
         "type": "mesh",
         "position": [-4, 0.5, -2],
-        "scale": [0.015625, 0.015625, 0.015625],
+        "scale": [1, 1, 1],
         "diffuseTexture": "default.jpg",
         "normalTexture": "defaultNorm.jpg",
         "rotation": [
@@ -90,7 +121,7 @@
           1
         ],
         "parent": null,
-        "model": "artillery_cannon.obj"
+        "model": "artillery_cannon_fixed.obj"
       }
     ],
     "pointLights": [

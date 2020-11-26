@@ -9,7 +9,8 @@ import {
   initShaderProgram,
   initTextureCoords,
   initIndexBuffer,
-  initNormalAttribute
+  initNormalAttribute,
+  calculateCentroid
 } from '../commonFunctions.js'
 import { shaderValuesErrorCheck } from '../uiSetup.js'
 
@@ -36,9 +37,17 @@ export class Model {
     this.material = { ...object.material }
     this.buffers = null
     this.programInfo = null
+    this.centroid =
+      object.preCalcCentroid != null
+        ? vec3.fromValues(
+            object.preCalcCentroid[0],
+            object.preCalcCentroid[1],
+            object.preCalcCentroid[2]
+          )
+        : null
     this.model = {
       vertices: meshDetails.vertices,
-      triangles: [], // models don't support triangles atm
+      triangles: [], // no support for triangles atm
       normals: meshDetails.normals,
       uvs: meshDetails.uvs,
       bitangents: [], // models don't support bitangents atm, but we need model object data unified
@@ -188,7 +197,9 @@ export class Model {
   }
 
   async setup () {
-    this.centroid = await asyncCalcCentroid(this.model.vertices)
+    if (this.centroid == null) {
+      this.centroid = await asyncCalcCentroid(this.model.vertices)
+    }
     this.lightingShader()
     this.scale(this.initialTransform.scale)
     this.translate(this.initialTransform.position)

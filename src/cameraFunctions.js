@@ -6,6 +6,9 @@
 import { vec3 } from '../lib/gl-matrix/index.js'
 import { toRadians } from './commonFunctions.js'
 
+const DEFAULT_NEAR_CLIP = 0.1
+const DEFAULT_FAR_CLIP = 1000000.0
+
 /**
  * "true" rotation, but probably not what you want
  * @param {import('./types').Camera} cam
@@ -95,7 +98,9 @@ export function initCameraFromStatefile (statefileCamera) {
     center: new Float32Array(statefileCamera.front),
     right: vec3.create(),
     pitch: toRadians(statefileCamera.pitch),
-    yaw: toRadians(statefileCamera.yaw)
+    yaw: toRadians(statefileCamera.yaw),
+    nearClip: DEFAULT_NEAR_CLIP,
+    farClip: DEFAULT_FAR_CLIP
   }
 
   updateCameraAtVec(cam)

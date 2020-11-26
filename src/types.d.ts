@@ -10,6 +10,10 @@ declare type AppState = {
     renderTimeTextElement: HTMLElement;
     tickDeltaTimeTextElement: HTMLElement;
     updateTimeTextElement: HTMLElement;
+    camPosTextElement: HTMLElement;
+    objInfoTextElement: HTMLElement;
+
+    selectedObjIndex: number;
 
     loadObjects: Array<StateFileObject>;
     pointLights: Array<StateFileLight>;
@@ -50,6 +54,8 @@ declare type Camera = {
     at: vec3;
     pitch: number; // radians
     yaw: number; // radians
+    nearClip: number;
+    farClip: number;
 }
 
 declare type MouseConfiguration = {
@@ -58,6 +64,13 @@ declare type MouseConfiguration = {
 
 declare type KeyboardState = {
 
+}
+
+declare type TimeStats = {
+    totalElements: number
+    previousTime: Float32Array
+    previousElementIndex: number
+    averageTime: number
 }
 
 declare type StateFile = Array<StateFileScene>;
@@ -77,8 +90,10 @@ declare type StateFileObject = {
     diffuseTexture: string;
     normalTexture: string;
     rotation: Array<number>; //4x4 matrix flattened as number array
-    parent: ?string;
-    model: ?string;
+    parent?: string;
+    model?: string;
+    meshType?: string
+    preCalcCentroid?: Array<number> //vec3
 }
 
 declare type SceneSettings = {
@@ -132,6 +147,15 @@ declare type OBJMesh = {
     normals: Array<number>;
 }
 
+declare type JsonMesh = {
+    positions: Array<number>;
+    uvs: Array<number>;
+    normals: Array<number>;
+    normalIndices?: Array<number>;
+    uvIndices?: Array<number>;
+    positionIndices?: Array<number>;
+}
+
 declare type DrawingObject = {
     name: string;
     material: StateFileMaterial;
@@ -141,8 +165,8 @@ declare type DrawingObject = {
     diffuseTexture: string;
     normalTexture: string;
     rotation: Array<number>; //4x4 matrix flattened as number array
-    parent: ?string;
-    model: ?string;
+    parent?: string;
+    model?: string;
 }
 
 declare type Material = {

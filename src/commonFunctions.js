@@ -125,20 +125,30 @@ export function doAsyncCalc (center, x, y, z) {
 export function asyncCalcCentroid (vertices) {
   return new Promise((resolve, reject) => {
     const center = vec3.fromValues(0.0, 0.0, 0.0)
-    const promises = []
     for (let t = 0; t < vertices.length; t += 3) {
-      promises.push(
-        doAsyncCalc(center, vertices[t], vertices[t + 1], vertices[t + 2])
+      vec3.add(
+        center,
+        center,
+        vec3.fromValues(vertices[t], vertices[t + 1], vertices[t + 2])
       )
     }
-    Promise.all(promises)
-      .then(() => {
-        vec3.scale(center, center, 1 / (vertices.length / 3))
-        resolve(center)
-      })
-      .catch(err => {
-        reject(err)
-      })
+    vec3.scale(center, center, 1 / (vertices.length / 3))
+    // const center = vec3.fromValues(0.0, 0.0, 0.0)
+    // const promises = []
+    // for (let t = 0; t < vertices.length; t += 3) {
+    //   promises.push(
+    //     doAsyncCalc(center, vertices[t], vertices[t + 1], vertices[t + 2])
+    //   )
+    // }
+    // Promise.all(promises)
+    //   .then(() => {
+    //     vec3.scale(center, center, 1 / (vertices.length / 3))
+    //     resolve(center)
+    //   })
+    //   .catch(err => {
+    //     reject(err)
+    //   })
+    resolve(center)
   })
 }
 
