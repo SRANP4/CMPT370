@@ -4,7 +4,7 @@
 
 import { mat4, vec3 } from '../lib/gl-matrix/index.js'
 import { parseOBJFileToJSON, parseSceneFile } from './commonFunctions.js'
-import { gameLoop, startGame } from './myGame.js'
+import { fixedUpdate, startGame, update } from './myGame.js'
 import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
 import { Plane } from './objects/Plane.js'
@@ -64,13 +64,23 @@ const TICK_RATE_MS = 16
 
 // previousTicks is a circular array
 // initial second of data will be bunk due to a lot of 0s in the array
-const tickTimeStats = {
+/** @type { import('./types.js').TimeStats } */
+const fixedUpdateTimeStats = {
   totalElements: 120, // this is configurable (120 is 2 seconds worth of ticks)
   previousTime: undefined, // this is initialized in initializeTickTimeStats as Float32Array
   previousElementIndex: 0,
   averageTime: 0
 }
 
+/** @type { import('./types.js').TimeStats } */
+const updateTimeStats = {
+  totalElements: 120, // this is configurable (120 is 2 seconds worth of ticks)
+  previousTime: undefined, // this is initialized in initializeTickTimeStats as Float32Array
+  previousElementIndex: 0,
+  averageTime: 0
+}
+
+/** @type { import('./types.js').TimeStats } */
 const frameTimeStats = {
   totalElements: 120, // this is configurable (120 is 2 seconds worth of ticks)
   previousTime: undefined, // this is initialized in initializeTickTimeStats as Float32Array
@@ -81,7 +91,7 @@ const frameTimeStats = {
 // This function loads on window load, uses async functions to load the scene then try to render it
 window.onload = async () => {
   try {
-    await parseSceneFile('./statefiles/scene.json', state)
+    await parseSceneFile('./statefiles/gm_scene.json', state)
     main()
   } catch (err) {
     console.error(err)
@@ -205,7 +215,7 @@ function main () {
           // Diffuse term : Ld * (N dot L)
           // We don't multiply Kd for now as it changes with texture 
           // calculate diffuse term Kd*Ld*dot(N,L)
-          float diff = abs(dot(normal, lightDirection));
+          float diff = max(dot(normal, lightDirection), 0.0);
           // calculate diffuse colour for texture and no-texture  
           vec3 Kd = diffuseVal;
           if (samplerExists == 1) {
@@ -256,7 +266,8 @@ function main () {
     samplerNormExists: 0,
     constVal: 1,
     lights: [],
-    objects: []
+    objects: [],
+    selectedObjIndex: 0
   }
 
   state.numLights = state.pointLights.length
@@ -295,19 +306,46 @@ function main () {
   ))
   state.tickDeltaTimeTextElement.innerText = 'TICK DELTA TIME'
 
+  state.updateTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
+    '#update_delta_time'
+  ))
+  state.updateTimeTextElement.innerText = 'UPDATE TIME'
+
+  state.camPosTextElement = /** @type {HTMLElement} */ (document.querySelector(
+    '#camera_position'
+  ))
+  state.camPosTextElement.innerText = 'CAM POS'
+
+  state.objInfoTextElement = /** @type {HTMLElement} */ (document.querySelector(
+    '#object_info'
+  ))
+  state.objInfoTextElement.innerText = 'OBJ INFO'
+
   initializeTimeStats()
   startGame(state)
-  runSimulationLoop(0, 0)
+  runFixedUpdateLoop(0, 0)
+  runUpdateLoop(0)
 
   startRendering(gl, state) // now that scene is setup, start rendering it
 }
 
+/**
+ *
+ */
 function initializeTimeStats () {
-  tickTimeStats.previousTime = new Float32Array(tickTimeStats.totalElements)
+  fixedUpdateTimeStats.previousTime = new Float32Array(
+    fixedUpdateTimeStats.totalElements
+  )
+  updateTimeStats.previousTime = new Float32Array(updateTimeStats.totalElements)
   frameTimeStats.previousTime = new Float32Array(frameTimeStats.totalElements)
 }
 
-function updateTimeStats (statObj, lastTickTime) {
+/**
+ *
+ * @param {import('./types.js').TimeStats } statObj
+ * @param {number} lastTickTime
+ */
+function calcTimeStats (statObj, lastTickTime) {
   statObj.previousTime[statObj.previousElementIndex] = lastTickTime
   statObj.previousElementIndex =
     (statObj.previousElementIndex + 1) % statObj.totalElements
@@ -320,13 +358,18 @@ function updateTimeStats (statObj, lastTickTime) {
   statObj.averageTime = sum / statObj.totalElements
 }
 
-function runSimulationLoop (lastTickTime, lastTickEndTime) {
+/**
+ *
+ * @param {number} lastTickTime
+ * @param {number} lastTickEndTime
+ */
+function runFixedUpdateLoop (lastTickTime, lastTickEndTime) {
   const start = window.performance.now()
-  updateTimeStats(tickTimeStats, lastTickTime)
+  calcTimeStats(fixedUpdateTimeStats, lastTickTime)
   // update the overlay
   state.tickTimeTextElement.innerText =
-    'Average tick time: ' +
-    tickTimeStats.averageTime.toFixed(6).toString() +
+    'Average fixed update time: ' +
+    fixedUpdateTimeStats.averageTime.toFixed(6).toString() +
     'ms'
 
   const deltaTime = window.performance.now() - lastTickEndTime
@@ -339,7 +382,7 @@ function runSimulationLoop (lastTickTime, lastTickEndTime) {
   // NOTE: For debugging it might be useful to use hasFocus instead,
   // as the game will pause when you click into the F12 debug panel
   if (document.visibilityState === 'visible') {
-    simulate(deltaTime)
+    fixedUpdate(state, deltaTime) // constantly call our game loop
   }
 
   // always pass back to the browser, even if this means a janky tick rate,
@@ -349,7 +392,7 @@ function runSimulationLoop (lastTickTime, lastTickEndTime) {
   const now = window.performance.now()
   const elapsed = now - start
   window.setTimeout(
-    runSimulationLoop,
+    runFixedUpdateLoop,
     Math.max(0, TICK_RATE_MS - elapsed),
     elapsed,
     now
@@ -358,10 +401,23 @@ function runSimulationLoop (lastTickTime, lastTickEndTime) {
 
 /**
  *
- * @param {number} deltaTime
+ * @param {number} lastTickTime
  */
-function simulate (deltaTime) {
-  gameLoop(state, deltaTime) // constantly call our game loop
+function runUpdateLoop (lastTickTime) {
+  const start = window.performance.now()
+  calcTimeStats(updateTimeStats, lastTickTime)
+  // update the overlay
+  state.updateTimeTextElement.innerText =
+    'Average update time: ' +
+    updateTimeStats.averageTime.toFixed(6).toString() +
+    'ms'
+
+  if (document.visibilityState === 'visible') {
+    update(state) // constantly call our game loop
+  }
+
+  const elapsed = window.performance.now() - start
+  window.setTimeout(runUpdateLoop, 0, elapsed)
 }
 
 /**
@@ -371,7 +427,7 @@ function simulate (deltaTime) {
  * @purpose - Helper function for adding a new object to the scene and refreshing the GUI
  */
 function addObjectToScene (state, object) {
-  // object.name = object.name
+  state.objectCount += 1
   state.objects.push(object)
 }
 
@@ -389,7 +445,7 @@ function startRendering (gl, state) {
   // This function is called when we want to render a frame to the canvas
   function render () {
     const start = window.performance.now()
-    updateTimeStats(frameTimeStats, lastFrameElapsed)
+    calcTimeStats(frameTimeStats, lastFrameElapsed)
     state.renderTimeTextElement.innerText =
       'Average frame time: ' +
       frameTimeStats.averageTime.toFixed(6).toString() +
@@ -452,8 +508,8 @@ function drawScene (gl, state) {
     const projectionMatrix = mat4.create()
     const fovy = (60.0 * Math.PI) / 180.0 // Vertical field of view in radians
     const aspect = state.canvas.clientWidth / state.canvas.clientHeight // Aspect ratio of the canvas
-    const near = 0.1 // Near clipping plane
-    const far = 1000000.0 // Far clipping plane
+    const near = state.camera.nearClip // Near clipping plane
+    const far = state.camera.farClip // Far clipping plane
 
     mat4.perspective(projectionMatrix, fovy, aspect, near, far)
     gl.uniformMatrix4fv(
@@ -465,17 +521,11 @@ function drawScene (gl, state) {
 
     // View Matrix & Camera ....
     const viewMatrix = mat4.create()
-    const camFront = vec3.fromValues(0, 0, 0)
-    vec3.add(
-      camFront,
-      new Float32Array(state.camera.position),
-      new Float32Array(state.camera.front)
-    )
     mat4.lookAt(
       viewMatrix,
-      new Float32Array(state.camera.position),
-      camFront,
-      new Float32Array(state.camera.up)
+      state.camera.position,
+      state.camera.center,
+      state.camera.up
     )
     gl.uniformMatrix4fv(
       object.programInfo.uniformLocations.view,
@@ -606,7 +656,6 @@ function drawScene (gl, state) {
     if (object.type === 'mesh' || object.type === 'meshCustom') {
       gl.drawArrays(gl.TRIANGLES, offset, object.buffers.numVertices / 3)
     } else {
-      // gl.drawArrays(gl.TRIANGLES, offset, object.buffers.numVertices / 3)
       gl.drawElements(
         gl.TRIANGLES,
         object.buffers.numVertices,

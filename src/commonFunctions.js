@@ -1,6 +1,10 @@
+// @ts-check
+'use strict'
+
 import { printError } from './uiSetup.js'
-import { vec3 } from '../lib/gl-matrix/index.js'
+import { mat4, quat, vec3 } from '../lib/gl-matrix/index.js'
 import { OBJLoader } from '../lib/three-object-loader.js'
+import { initCameraFromStatefile } from './cameraFunctions.js'
 
 /**
  * @param  {WebGL2RenderingContext} gl WebGL2 Context
@@ -121,20 +125,30 @@ export function doAsyncCalc (center, x, y, z) {
 export function asyncCalcCentroid (vertices) {
   return new Promise((resolve, reject) => {
     const center = vec3.fromValues(0.0, 0.0, 0.0)
-    const promises = []
     for (let t = 0; t < vertices.length; t += 3) {
-      promises.push(
-        doAsyncCalc(center, vertices[t], vertices[t + 1], vertices[t + 2])
+      vec3.add(
+        center,
+        center,
+        vec3.fromValues(vertices[t], vertices[t + 1], vertices[t + 2])
       )
     }
-    Promise.all(promises)
-      .then(() => {
-        vec3.scale(center, center, 1 / (vertices.length / 3))
-        resolve(center)
-      })
-      .catch(err => {
-        reject(err)
-      })
+    vec3.scale(center, center, 1 / (vertices.length / 3))
+    // const center = vec3.fromValues(0.0, 0.0, 0.0)
+    // const promises = []
+    // for (let t = 0; t < vertices.length; t += 3) {
+    //   promises.push(
+    //     doAsyncCalc(center, vertices[t], vertices[t + 1], vertices[t + 2])
+    //   )
+    // }
+    // Promise.all(promises)
+    //   .then(() => {
+    //     vec3.scale(center, center, 1 / (vertices.length / 3))
+    //     resolve(center)
+    //   })
+    //   .catch(err => {
+    //     reject(err)
+    //   })
+    resolve(center)
   })
 }
 
@@ -345,7 +359,6 @@ export function initBitangentBuffer (gl, programInfo, bitangents) {
 /**
  *
  * @param {WebGL2RenderingContext} gl
- * @param {import('./types.js').ProgramInfo} programInfo
  * @param {Uint16Array} elementArray
  */
 export function initIndexBuffer (gl, elementArray) {
@@ -438,7 +451,7 @@ export function parseOBJFileToJSON (objFileURL, cb, loadObject) {
       return data.text()
     })
     .then(text => {
-      /** @type {OBJMesh} */
+      /** @type {import('./types.js').OBJMesh} */
       const mesh = OBJLoader.prototype.parse(text)
       cb(mesh, loadObject)
     })
@@ -453,13 +466,13 @@ export function parseOBJFileToJSON (objFileURL, cb, loadObject) {
  * @return {Array<Number>} array of 3 floats representing the colour value
  */
 export function hexToRGB (hex) {
-  let r = hex.substring(1, 3)
-  let g = hex.substring(3, 5)
-  let b = hex.substring(5, 7)
-  r = parseInt(r, 16)
-  g = parseInt(g, 16)
-  b = parseInt(b, 16)
-  return [r / 255, g / 255, b / 255]
+  const r = hex.substring(1, 3)
+  const g = hex.substring(3, 5)
+  const b = hex.substring(5, 7)
+  const rNum = parseInt(r, 16)
+  const gNum = parseInt(g, 16)
+  const bNum = parseInt(b, 16)
+  return [rNum / 255, gNum / 255, bNum / 255]
 }
 
 /**
@@ -472,13 +485,13 @@ export function parseSceneFile (file, state) {
     window
       .fetch(file)
       .then(data => {
-        return /** @type {StateFile} */ (data.json())
+        return /** @type {Promise<import('./types.js').StateFile>} */ (data.json())
       })
       .then((jData) /** @type {StateFile} */ => {
         state.loadObjects = jData[0].objects
         state.pointLights = jData[0].pointLights
         state.settings = jData[0].settings
-        state.camera = state.settings.camera
+        state.camera = initCameraFromStatefile(state.settings.camera)
         state.numberOfObjectsToLoad = jData[0].objects.length
         resolve()
       })
@@ -486,4 +499,57 @@ export function parseSceneFile (file, state) {
         reject(err)
       })
   })
+}
+
+/**
+ * @param {mat4} rot
+ * @returns {vec3} euler angles (yaw, pitch, roll)
+ */
+export function rotationMatrixToEulerAngles (rot) {
+  const out = vec3.create()
+  const q = quat.create()
+  mat4.getRotation(q, rot)
+
+  getEuler(out, q)
+
+  return out
+}
+
+/**
+ * NOT MY CODE FROM https://github.com/toji/gl-matrix/issues/329
+ * Returns an euler angle representation of a quaternion (it kinda works :/)
+ * @param  {vec3} out Euler angles, pitch-yaw-roll
+ * @param  {quat} quat Quaternion
+ * @return {vec3} out
+ */
+export function getEuler (out, quat) {
+  const x = quat[0]
+  const y = quat[1]
+  const z = quat[2]
+  const w = quat[3]
+  const x2 = x * x
+  const y2 = y * y
+  const z2 = z * z
+  const w2 = w * w
+  const unit = x2 + y2 + z2 + w2
+  const test = x * w - y * z
+  if (test > 0.499995 * unit) {
+    // TODO: Use glmatrix.EPSILON
+    // singularity at the north pole
+    out[0] = Math.PI / 2
+    out[1] = 2 * Math.atan2(y, x)
+    out[2] = 0
+  } else if (test < -0.499995 * unit) {
+    // TODO: Use glmatrix.EPSILON
+    // singularity at the south pole
+    out[0] = -Math.PI / 2
+    out[1] = 2 * Math.atan2(y, x)
+    out[2] = 0
+  } else {
+    out[0] = Math.asin(2 * (x * z - w * y))
+    out[1] = Math.atan2(2 * (x * w + y * z), 1 - 2 * (z2 + w2))
+    out[2] = Math.atan2(2 * (x * y + z * w), 1 - 2 * (y2 + z2))
+  }
+  // TODO: Return them as degrees and not as radians
+  return out
 }
