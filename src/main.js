@@ -412,19 +412,20 @@ function startRendering (gl, state) {
 
   // This function is called when we want to render a frame to the canvas
   function render (now) {
-    calcTimeStats(frameTimeStats, lastFrameElapsed)
-    state.renderTimeTextElement.innerText =
-      'Average frame time: ' + frameTimeStats.averageTime.toFixed(6) + 'ms'
-
-    updateDebugStats(state)
+    // fixed update has its own stat tracking
     runFixedUpdateLoop(now)
 
     // Draw our scene
+    const drawStart = window.performance.now()
+    calcTimeStats(frameTimeStats, lastFrameElapsed)
+    state.renderTimeTextElement.innerText =
+      'Average frame time: ' + frameTimeStats.averageTime.toFixed(6) + 'ms'
+    updateDebugStats(state)
     drawScene(gl, state)
 
     // Request another frame when this one is done
     window.requestAnimationFrame(render)
-    lastFrameElapsed = window.performance.now() - now
+    lastFrameElapsed = window.performance.now() - drawStart
   }
   // Draw the scene
   window.requestAnimationFrame(render)
