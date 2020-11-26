@@ -262,32 +262,35 @@ export function translateBoundingBox (box, pos) {
  */
 export function getBoundingBoxFromModelVertices (drawingObj) {
   const vertices = drawingObj.model.vertices.flat()
+  const xoffset = drawingObj.model.position[0]
+  const yoffset = drawingObj.model.position[1]
+  const zoffset = drawingObj.model.position[2]
 
-  let xMin = 0
-  let xMax = 0
-  let yMin = 0
-  let yMax = 0
-  let zMin = 0
-  let zMax = 0
+  let xMin = xoffset
+  let xMax = xoffset
+  let yMin = yoffset
+  let yMax = yoffset
+  let zMin = zoffset
+  let zMax = zoffset
 
   for (let i = 0; i < vertices.length / 3; i += 3) {
-    if (vertices[i] > xMax) {
-      xMax = vertices[i]
+    if (vertices[i] + xoffset > xMax) {
+      xMax = vertices[i] + xoffset
     }
-    if (vertices[i] < xMin) {
-      xMin = vertices[i]
+    if (vertices[i] + xoffset < xMin) {
+      xMin = vertices[i] + xoffset
     }
-    if (vertices[i + 1] > yMax) {
-      yMax = vertices[i + 1]
+    if (vertices[i + 1] + yoffset > yMax) {
+      yMax = vertices[i + 1] + yoffset
     }
-    if (vertices[i + 1] < yMin) {
-      yMin = vertices[i + 1]
+    if (vertices[i + 1] + yoffset < yMin) {
+      yMin = vertices[i + 1] + yoffset
     }
-    if (vertices[i + 2] > zMax) {
-      zMax = vertices[i + 2]
+    if (vertices[i + 2] + zoffset > zMax) {
+      zMax = vertices[i + 2] + zoffset
     }
-    if (vertices[i + 2] < zMin) {
-      zMin = vertices[i + 2]
+    if (vertices[i + 2] + zoffset < zMin) {
+      zMin = vertices[i + 2] + zoffset
     }
   }
   // console.log( { xMin, yMin, zMin, xMax, yMax, zMax });
