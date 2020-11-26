@@ -2,7 +2,7 @@
 'use strict'
 
 import { printError } from './uiSetup.js'
-import { mat4, vec3 } from '../lib/gl-matrix/index.js'
+import { mat4, quat, vec3 } from '../lib/gl-matrix/index.js'
 import { OBJLoader } from '../lib/three-object-loader.js'
 import { initCameraFromStatefile } from './cameraFunctions.js'
 
@@ -502,30 +502,54 @@ export function parseSceneFile (file, state) {
 }
 
 /**
- * Not really my code, translated it from the python version found below:
- * https://gamedev.stackexchange.com/questions/50963/how-to-extract-euler-angles-from-transformation-matrix
- * APPARENTLY THIS ISN'T WORTH WHILE INCLUDING IN GL MATRIX??? no idea why
  * @param {mat4} rot
  * @returns {vec3} euler angles (yaw, pitch, roll)
  */
 export function rotationMatrixToEulerAngles (rot) {
   const out = vec3.create()
-  // stackoverflow code shows its matrix as ROW major (gl matrix is COLUMN major)
-  // additionally its indices start at 1 (gl matrix starts at 0)
+  const q = quat.create()
+  mat4.getRotation(q, rot)
 
-  if (rot[0] === 1.0) {
-    out[0] = Math.atan2(rot[8], rot[14])
-    out[1] = 0
+  getEuler(out, q)
+
+  return out
+}
+
+/**
+ * NOT MY CODE FROM https://github.com/toji/gl-matrix/issues/329
+ * Returns an euler angle representation of a quaternion (it kinda works :/)
+ * @param  {vec3} out Euler angles, pitch-yaw-roll
+ * @param  {quat} quat Quaternion
+ * @return {vec3} out
+ */
+export function getEuler (out, quat) {
+  const x = quat[0]
+  const y = quat[1]
+  const z = quat[2]
+  const w = quat[3]
+  const x2 = x * x
+  const y2 = y * y
+  const z2 = z * z
+  const w2 = w * w
+  const unit = x2 + y2 + z2 + w2
+  const test = x * w - y * z
+  if (test > 0.499995 * unit) {
+    // TODO: Use glmatrix.EPSILON
+    // singularity at the north pole
+    out[0] = Math.PI / 2
+    out[1] = 2 * Math.atan2(y, x)
     out[2] = 0
-  } else if (rot[0] === -1.0) {
-    out[0] = Math.atan2(rot[8], rot[14])
-    out[1] = 0
+  } else if (test < -0.499995 * unit) {
+    // TODO: Use glmatrix.EPSILON
+    // singularity at the south pole
+    out[0] = -Math.PI / 2
+    out[1] = 2 * Math.atan2(y, x)
     out[2] = 0
   } else {
-    out[0] = Math.atan2(-rot[2], rot[0])
-    out[1] = Math.asin(rot[1])
-    out[2] = Math.atan2(-rot[9], rot[5])
+    out[0] = Math.asin(2 * (x * z - w * y))
+    out[1] = Math.atan2(2 * (x * w + y * z), 1 - 2 * (z2 + w2))
+    out[2] = Math.atan2(2 * (x * y + z * w), 1 - 2 * (y2 + z2))
   }
-
+  // TODO: Return them as degrees and not as radians
   return out
 }
