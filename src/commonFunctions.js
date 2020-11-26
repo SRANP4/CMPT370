@@ -301,8 +301,6 @@ export function initTextureCoords (gl, programInfo, textureCoords) {
       gl.enableVertexAttribArray(programInfo.attribLocations.vertexUV)
     }
 
-    // TODO: Create and populate a buffer for the UV coordinates
-
     return textureCoordBuffer
   }
 }
@@ -353,8 +351,6 @@ export function initBitangentBuffer (gl, programInfo, bitangents) {
       // Tell WebGL to use this attribute
       gl.enableVertexAttribArray(programInfo.attribLocations.vertexBitangent)
     }
-
-    // TODO: Create and populate a buffer for the UV coordinates
 
     return bitangentBuffer
   }

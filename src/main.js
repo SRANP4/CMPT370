@@ -9,44 +9,22 @@ import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
 import { Plane } from './objects/Plane.js'
 import { getObject } from './sceneFunctions.js'
-import { initDebugStats, uiOnLoaded, printError, updateDebugStats } from './uiSetup.js'
-
-// useful references:
-// collision: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
-
-/*
-  three tiers of objects?
-    actor: move, physics, complex scripting, visual, audio
-    pawn: physics, visual, audio, simple scripting
-    prop: visual, audio
-*/
+import {
+  initDebugStats,
+  uiOnLoaded,
+  printError,
+  updateDebugStats
+} from './uiSetup.js'
 
 /*
-  update physics
-    - update velocity and gravity
-    - check for collisions
-    - send events for collisions (queue for scripts to pick up)
-      - includes collision info (entity id of other collider???)
 
-  TODO break state into smaller state objects, monolithic state is hard to keep in my small brain
-
-  TODO basic non-transparent (diffuse) rendering (use a state file from Zach's refinery engine)
   TODO correct rendering with rotation and position
 
   TODO enemy ship that moves back and forth, rotates in direction it is moving
 
-  TODO collision checking for spheres (use spheres for ships and cannonball)
-  TODO physics loop, send collision events to callback functions
-
   TODO add fire cannonball mechanic, log when collision detected with ship
 
-  =================================================================================================
-
-  TODO write basic blinn-phong shader and basic fragment shader
   TODO transparent rendering as a layer on top of opaque rendering pass (basically just for water)
-  TODO camera / aim controls
-
-  TODO collision checking for AABB
 
   TODO load shaders from glsl files, per object shaders
 
