@@ -2,95 +2,61 @@
   {
     "objects": [
       {
-        "name": "tempPlane",
+        "name": "tempCube",
         "material": {
-          "diffuse": [0, 0.8, 0.803921568627451],
+          "diffuse": [0.5, 0, 0],
           "ambient": [0.5, 0.5, 0.5],
           "specular": [0.5, 0.5, 0.5],
-          "n": 1,
+          "n": 10,
           "alpha": 1,
-          "shaderType": 1
+          "shaderType": 3
         },
-        "type": "plane",
-        "position": [0, -2, 0],
-        "scale": [10240, 1, 10240],
-        "diffuseTexture": "",
+        "type": "cube",
+        "position": [0, 0, 1],
+        "scale": [1, 1, 1],
+        "diffuseTexture": "default.jpg",
         "normalTexture": "defaultNorm.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
         "model": null
       },
       {
-        "name": "Ship",
+        "name": "tempPlane",
         "material": {
           "diffuse": [0.3, 0.3, 0.3],
-          "ambient": [0.3, 0.3, 0.3],
+          "ambient": [0.5, 0.5, 0.5],
           "specular": [0.5, 0.5, 0.5],
-          "n": 25.000002,
-          "shaderType": 1,
-          "alpha": 1
+          "n": 1,
+          "alpha": 1,
+          "shaderType": 4
         },
-        "type": "mesh",
-        "position": [0, 1, 7],
-        "scale": [1, 1, 1],
+        "type": "plane",
+        "position": [0, -2, 0],
+        "scale": [10, 1, 10],
         "diffuseTexture": "default.jpg",
         "normalTexture": "defaultNorm.jpg",
-        "rotation": [
-          1,
-          0,
-          -1.518794157107095e-8,
-          0,
-          0,
-          1,
-          0,
-          0,
-          1.518794157107095e-8,
-          0,
-          1,
-          0,
-          0,
-          0,
-          0,
-          1
-        ],
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
-        "model": "Pirate_ship.obj"
+        "model": null
       },
       {
-        "name": "Cannon",
+        "name": "tempMesh",
         "material": {
-          "diffuse": [0.5882, 0.5882, 0.5882],
-          "ambient": [0.3, 0.3, 0.3],
+          "diffuse": [0.3, 0.6, 0.3],
+          "ambient": [0.5, 0.5, 0.5],
           "specular": [0.5, 0.5, 0.5],
-          "n": 10.000002,
-          "shaderType": 1,
-          "alpha": 1
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 1
         },
         "type": "mesh",
-        "position": [-4, 0.5, -2],
-        "scale": [0.015625, 0.015625, 0.015625],
-        "diffuseTexture": "default.jpg",
+        "position": [-2, 0, 1],
+        "scale": [1, 1, 1],
+        "diffuseTexture": "default.png",
         "normalTexture": "defaultNorm.jpg",
-        "rotation": [
-          0.25882095098495483,
-          0,
-          -0.9659253358840942,
-          0,
-          0,
-          1,
-          0,
-          0,
-          0.9659253358840942,
-          0,
-          0.25882095098495483,
-          0,
-          0,
-          0,
-          0,
-          1
-        ],
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
-        "model": "artillery_cannon.obj"
+        "model": "bunny.obj"
       }
     ],
     "pointLights": [
@@ -101,7 +67,6 @@
         "strength": 2,
         "quadratic": 0.035,
         "linear": 0.09,
-        "parent": null,
         "constant": 1,
         "nearPlane": 0.5,
         "farPlane": 100,
@@ -123,7 +88,7 @@
         "canvasFocused": false,
         "rateX": 0,
         "rateY": 0,
-        "keyboard": { "s": false, "a": false, "d": false, "w": false },
+        "keyboard": {},
         "viewMatrix": {
           "0": -1,
           "1": 0,
@@ -137,9 +102,9 @@
           "9": 0,
           "10": -1,
           "11": 0,
-          "12": -0.15559963881969452,
+          "12": 0,
           "13": -0.5,
-          "14": -6.002475261688232,
+          "14": -3,
           "15": 1
         },
         "sensitivity": 0.4

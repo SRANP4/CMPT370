@@ -9,11 +9,12 @@ declare type AppState = {
     tickTimeTextElement: HTMLElement;
     renderTimeTextElement: HTMLElement;
     tickDeltaTimeTextElement: HTMLElement;
+    updateTimeTextElement: HTMLElement;
 
     loadObjects: Array<StateFileObject>;
     pointLights: Array<StateFileLight>;
     settings: SceneSettings;
-    camera: StateFileCamera;
+    camera: Camera;
     numberOfObjectsToLoad: number;
 
     gl: WebGL2RenderingContext;
@@ -39,6 +40,16 @@ declare type AppState = {
     viewMatrix: mat4;
     samplerExists: number;
     samplerNormExists: number;
+}
+
+declare type Camera = {
+    position: vec3;
+    center: vec3;
+    up: vec3;
+    right: vec3;
+    at: vec3;
+    pitch: number; // radians
+    yaw: number; // radians
 }
 
 declare type MouseConfiguration = {
@@ -158,7 +169,7 @@ declare type ProgramInfo = {
         vertexPosition: number;
         vertexNormal: number;
         vertexUV: number;
-        // vertexBitangent: number;
+        vertexBitangent?: number;
     }
     uniformLocations: {
         projection: WebGLUniformLocation;
@@ -176,8 +187,8 @@ declare type ProgramInfo = {
         lightStrengths: WebGLUniformLocation;
         samplerExists: WebGLUniformLocation;
         sampler: WebGLUniformLocation
-        // normalSamplerExists: WebGLUniformLocation;
-        // normalSampler: WebGLUniformLocation;
+        normalSamplerExists?: WebGLUniformLocation;
+        normalSampler?: WebGLUniformLocation;
     }
 }
 
