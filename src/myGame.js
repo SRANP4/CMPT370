@@ -3,6 +3,7 @@
 
 import { vec3 } from '../lib/gl-matrix/index.js'
 import { updateCameraEulerLookDir } from './cameraFunctions.js'
+import { rotationMatrixToEulerAngles } from './commonFunctions.js'
 import {
   keysDown,
   keysPressed,
@@ -143,11 +144,11 @@ function updateDebugStats (state) {
 
   // prettier-ignore
   state.camPosTextElement.innerText =
-    'X: ' + pos[0].toFixed(2).toString() +
-    ' Y: ' + pos[1].toFixed(2).toString() +
-    ' Z: ' + pos[2].toFixed(2).toString() +
-    '\nPitch: ' + pitch.toFixed(2).toString() +
-    ' Yaw: ' + yaw.toFixed(2).toString() +
+    'X: ' + pos[0].toFixed(2) +
+    ' Y: ' + pos[1].toFixed(2) +
+    ' Z: ' + pos[2].toFixed(2) +
+    '\nPitch: ' + pitch.toFixed(2) +
+    ' Yaw: ' + yaw.toFixed(2) +
     '\nNear clip: ' + state.camera.nearClip.toString() +
     '\nFar clip: ' + state.camera.farClip.toString()
 
@@ -163,6 +164,9 @@ function updateDebugStats (state) {
   }
 
   const obj = state.objects[state.selectedObjIndex]
+
+  const eulerAngles = rotationMatrixToEulerAngles(obj.model.rotation)
+
   // prettier-ignore
   state.objInfoTextElement.innerText =
     'Object index: ' + state.selectedObjIndex.toString() +
@@ -171,7 +175,9 @@ function updateDebugStats (state) {
     '\nLoaded: ' + obj.loaded +
     '\n----------Transform info----------' +
     '\nPosition: ' + obj.model.position.toString() +
-    '\nRotation: ' + obj.model.rotation.toString() +
+    '\nRotation: Yaw: ' + eulerAngles[1].toFixed(2) +
+    ' Pitch: ' + eulerAngles[0].toFixed(2) +
+    ' Roll: ' + eulerAngles[2].toFixed(2) +
     '\nScale: ' + obj.model.scale.toString() +
     '\n----------Material info----------' +
     '\nDiffuse texture: ' + obj.model.diffuseTexture +
@@ -186,8 +192,7 @@ function updateDebugStats (state) {
     '\nTriangle count: ' + obj.model.triangles.length.toString() +
     '\nUV count: ' + obj.model.uvs.length.toString() +
     '\nNormal count: ' + obj.model.normals.length.toString() +
-    '\nBitangent count: ' + obj.model.bitangents.length.toString() +
-    '\nCentroid: ' + obj.centroid.toString()
+    '\nBitangent count: ' + obj.model.bitangents.length.toString()
 }
 
 /**

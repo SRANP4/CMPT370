@@ -2,7 +2,7 @@
 'use strict'
 
 import { printError } from './uiSetup.js'
-import { vec3 } from '../lib/gl-matrix/index.js'
+import { mat4, quat, vec3 } from '../lib/gl-matrix/index.js'
 import { OBJLoader } from '../lib/three-object-loader.js'
 import { initCameraFromStatefile } from './cameraFunctions.js'
 
@@ -499,4 +499,57 @@ export function parseSceneFile (file, state) {
         reject(err)
       })
   })
+}
+
+/**
+ * @param {mat4} rot
+ * @returns {vec3} euler angles (yaw, pitch, roll)
+ */
+export function rotationMatrixToEulerAngles (rot) {
+  const out = vec3.create()
+  const q = quat.create()
+  mat4.getRotation(q, rot)
+
+  getEuler(out, q)
+
+  return out
+}
+
+/**
+ * NOT MY CODE FROM https://github.com/toji/gl-matrix/issues/329
+ * Returns an euler angle representation of a quaternion (it kinda works :/)
+ * @param  {vec3} out Euler angles, pitch-yaw-roll
+ * @param  {quat} quat Quaternion
+ * @return {vec3} out
+ */
+export function getEuler (out, quat) {
+  const x = quat[0]
+  const y = quat[1]
+  const z = quat[2]
+  const w = quat[3]
+  const x2 = x * x
+  const y2 = y * y
+  const z2 = z * z
+  const w2 = w * w
+  const unit = x2 + y2 + z2 + w2
+  const test = x * w - y * z
+  if (test > 0.499995 * unit) {
+    // TODO: Use glmatrix.EPSILON
+    // singularity at the north pole
+    out[0] = Math.PI / 2
+    out[1] = 2 * Math.atan2(y, x)
+    out[2] = 0
+  } else if (test < -0.499995 * unit) {
+    // TODO: Use glmatrix.EPSILON
+    // singularity at the south pole
+    out[0] = -Math.PI / 2
+    out[1] = 2 * Math.atan2(y, x)
+    out[2] = 0
+  } else {
+    out[0] = Math.asin(2 * (x * z - w * y))
+    out[1] = Math.atan2(2 * (x * w + y * z), 1 - 2 * (z2 + w2))
+    out[2] = Math.atan2(2 * (x * y + z * w), 1 - 2 * (y2 + z2))
+  }
+  // TODO: Return them as degrees and not as radians
+  return out
 }

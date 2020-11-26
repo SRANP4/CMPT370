@@ -1,7 +1,7 @@
 # Blender MTL File: 'None'
 # Material Count: 9
 
-newmtl Material__1
+newmtl Material__1.001
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -11,7 +11,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material__2
+newmtl Material__2.001
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -21,7 +21,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material__3
+newmtl Material__3.001
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -31,7 +31,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material__4
+newmtl Material__4.001
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -41,7 +41,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material__5
+newmtl Material__5.001
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -51,7 +51,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material__6
+newmtl Material__6.001
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -61,7 +61,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material__7
+newmtl Material__7.001
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -71,7 +71,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material__8
+newmtl Material__8.001
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
@@ -81,7 +81,7 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material__9
+newmtl Material__9.001
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
