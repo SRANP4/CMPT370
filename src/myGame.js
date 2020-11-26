@@ -175,8 +175,8 @@ function updateDebugStats (state) {
     '\nLoaded: ' + obj.loaded +
     '\n----------Transform info----------' +
     '\nPosition: ' + obj.model.position.toString() +
-    '\nRotation: Yaw: ' + eulerAngles[0].toFixed(2) +
-    ' Pitch: ' + eulerAngles[1].toFixed(2) +
+    '\nRotation: Yaw: ' + eulerAngles[1].toFixed(2) +
+    ' Pitch: ' + eulerAngles[0].toFixed(2) +
     ' Roll: ' + eulerAngles[2].toFixed(2) +
     '\nScale: ' + obj.model.scale.toString() +
     '\n----------Material info----------' +
