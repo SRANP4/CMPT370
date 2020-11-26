@@ -14,7 +14,7 @@
         "type": "plane",
         "position": [0, -2, 0],
         "scale": [10240, 1, 10240],
-        "diffuseTexture": "default.jpg",
+        "diffuseTexture": "",
         "normalTexture": "defaultNorm.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
@@ -93,6 +93,44 @@
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
         "model": "bunny.obj"
+      },
+      {
+        "name": "otherQub",
+        "material": {
+          "diffuse": [0.3, 0.6, 0.3],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 1
+        },
+        "type": "cube",
+        "position": [-2, 0, 1],
+        "scale": [1, 1, 1],
+        "diffuseTexture": "default.png",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": null,
+        "model": null
+      },
+      {
+        "name": "sphere",
+        "material": {
+          "diffuse": [0.3, 0.6, 0.3],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 1
+        },
+        "type": "mesh",
+        "position": [0, 0.5, 2],
+        "scale": [1, 1, 1],
+        "diffuseTexture": "default.png",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": null,
+        "model": "sphere.obj"
       },
       {
         "name": "Cannon",

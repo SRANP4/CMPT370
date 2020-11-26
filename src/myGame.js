@@ -3,6 +3,11 @@
 
 import { vec3 } from '../lib/gl-matrix/index.js'
 import { updateCameraEulerLookDir } from './cameraFunctions.js'
+import {
+  createRigidbody,
+  createSphere,
+  updateRigidbodies
+} from './collisionFunctions.js'
 import { rotationMatrixToEulerAngles } from './commonFunctions.js'
 import {
   keysDown,
@@ -12,6 +17,7 @@ import {
   setupEvents as setupInputEvents,
   updateInput
 } from './inputHelper.js'
+import { getObject } from './sceneFunctions.js'
 
 /*
   TODO add debug object markers
@@ -20,6 +26,7 @@ import {
 
 // If you want to use globals here you can. Initialize them in startGame then update/change them in gameLoop
 let flyCamEnabled = false
+const rigidbodies = []
 
 /**
  *
@@ -37,6 +44,38 @@ export function startGame (state) {
   )
 
   setupInputEvents(state.canvas)
+
+  // create the colliders for objects
+  const shipRb = createRigidbody(
+    getObject(state, 'Ship'),
+    createSphere(vec3.create(), 3),
+    /**
+     *
+     * @param {import('./types.js').Rigidbody} rb
+     * @param {import('./types.js').Rigidbody} otherRb
+     */
+    function (rb, otherRb) {}
+  )
+  shipRb.gravityStrength = 0
+
+  rigidbodies.push(shipRb)
+
+  const sphereRb = createRigidbody(
+    getObject(state, 'sphere'),
+    createSphere(vec3.create(), 1),
+    /**
+     *
+     * @param {import('./types.js').Rigidbody} rb
+     * @param {import('./types.js').Rigidbody} otherRb
+     */
+    function (rb, otherRb) {
+      otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
+    }
+  )
+  sphereRb.gravityStrength = 0
+  sphereRb.velocity[2] = 2
+
+  rigidbodies.push(sphereRb)
 }
 
 /**
@@ -49,8 +88,8 @@ export function fixedUpdate (state, deltaTime) {
   // handle physics here
   // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
 
+  updateRigidbodies(rigidbodies, deltaTime)
   updateFlyCam(state)
-  updateDebugStats(state)
 }
 
 /**
@@ -131,68 +170,6 @@ function updateFlyCam (state) {
       state.camera.center[1] -= moveSpeed
     }
   }
-}
-
-/**
- *
- * @param {import('./types.js').AppState} state
- */
-function updateDebugStats (state) {
-  const pos = state.camera.position
-  const pitch = state.camera.pitch
-  const yaw = state.camera.yaw
-
-  // prettier-ignore
-  state.camPosTextElement.innerText =
-    'X: ' + pos[0].toFixed(2) +
-    ' Y: ' + pos[1].toFixed(2) +
-    ' Z: ' + pos[2].toFixed(2) +
-    '\nPitch: ' + pitch.toFixed(2) +
-    ' Yaw: ' + yaw.toFixed(2) +
-    '\nNear clip: ' + state.camera.nearClip.toString() +
-    '\nFar clip: ' + state.camera.farClip.toString()
-
-  if (keysPressed.get('-')) {
-    state.selectedObjIndex = (state.selectedObjIndex - 1) % state.objectCount
-    if (state.selectedObjIndex < 0) {
-      state.selectedObjIndex = state.objectCount - 1
-    }
-  }
-
-  if (keysPressed.get('=')) {
-    state.selectedObjIndex = (state.selectedObjIndex + 1) % state.objectCount
-  }
-
-  const obj = state.objects[state.selectedObjIndex]
-
-  const eulerAngles = rotationMatrixToEulerAngles(obj.model.rotation)
-
-  // prettier-ignore
-  state.objInfoTextElement.innerText =
-    'Object index: ' + state.selectedObjIndex.toString() +
-    '\nName: ' + obj.name +
-    '\nType: ' + obj.type +
-    '\nLoaded: ' + obj.loaded +
-    '\n----------Transform info----------' +
-    '\nPosition: ' + obj.model.position.toString() +
-    '\nRotation: Yaw: ' + eulerAngles[1].toFixed(2) +
-    ' Pitch: ' + eulerAngles[0].toFixed(2) +
-    ' Roll: ' + eulerAngles[2].toFixed(2) +
-    '\nScale: ' + obj.model.scale.toString() +
-    '\n----------Material info----------' +
-    '\nDiffuse texture: ' + obj.model.diffuseTexture +
-    '\nNormal texture: ' + obj.model.normalTexture +
-    '\nAmbientVal: ' + obj.material.ambient.toString() +
-    '\nDiffuseVal: ' + obj.material.diffuse.toString() +
-    '\nSpecularVal: ' + obj.material.specular.toString() +
-    '\nnVal: ' + obj.material.n.toString() +
-    '\nalphaVal: ' + obj.material.alpha.toString() +
-    '\n----------Model info----------' +
-    '\nVertex count: ' + obj.model.vertices.length.toString() +
-    '\nTriangle count: ' + obj.model.triangles.length.toString() +
-    '\nUV count: ' + obj.model.uvs.length.toString() +
-    '\nNormal count: ' + obj.model.normals.length.toString() +
-    '\nBitangent count: ' + obj.model.bitangents.length.toString()
 }
 
 /**

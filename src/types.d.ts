@@ -27,8 +27,8 @@ declare type AppState = {
     canvas: HTMLCanvasElement;
     objectCount: number;
     lightIndices: Array<any>; //appears to not be used
-    keyboard: KeyboardState;
-    mouse: MouseConfiguration;
+    keyboard?: any;
+    mouse?: any;
     gameStarted: boolean;
     samplerExists: number;
     samplerNormExists: number;
@@ -44,33 +44,6 @@ declare type AppState = {
     viewMatrix: mat4;
     samplerExists: number;
     samplerNormExists: number;
-}
-
-declare type Camera = {
-    position: vec3;
-    center: vec3;
-    up: vec3;
-    right: vec3;
-    at: vec3;
-    pitch: number; // radians
-    yaw: number; // radians
-    nearClip: number;
-    farClip: number;
-}
-
-declare type MouseConfiguration = {
-    sensitivity: number;
-}
-
-declare type KeyboardState = {
-
-}
-
-declare type TimeStats = {
-    totalElements: number
-    previousTime: Float32Array
-    previousElementIndex: number
-    averageTime: number
 }
 
 declare type StateFile = Array<StateFileScene>;
@@ -141,32 +114,29 @@ declare type StateFileMaterial = {
     shaderType: number;
 }
 
+declare type Camera = {
+    position: vec3;
+    center: vec3;
+    up: vec3;
+    right: vec3;
+    at: vec3;
+    pitch: number; // radians
+    yaw: number; // radians
+    nearClip: number;
+    farClip: number;
+}
+
+declare type TimeStats = {
+    totalElements: number
+    previousTime: Float32Array
+    previousElementIndex: number
+    averageTime: number
+}
+
 declare type OBJMesh = {
     vertices: Array<number>;
     uvs: Array<number>;
     normals: Array<number>;
-}
-
-declare type JsonMesh = {
-    positions: Array<number>;
-    uvs: Array<number>;
-    normals: Array<number>;
-    normalIndices?: Array<number>;
-    uvIndices?: Array<number>;
-    positionIndices?: Array<number>;
-}
-
-declare type DrawingObject = {
-    name: string;
-    material: StateFileMaterial;
-    type: string;
-    position: Array<number>; //vec3
-    scale: Array<number>; //vec3
-    diffuseTexture: string;
-    normalTexture: string;
-    rotation: Array<number>; //4x4 matrix flattened as number array
-    parent?: string;
-    model?: string;
 }
 
 declare type Material = {
@@ -176,15 +146,6 @@ declare type Material = {
     n: number;
     alpha: number;
     shaderType: number;
-}
-
-declare type BoundingBox = {
-    xMin: number;
-    yMin: number;
-    zMin: number;
-    xMax: number;
-    yMax: number;
-    zMax: number;
 }
 
 declare type ProgramInfo = {
@@ -216,52 +177,29 @@ declare type ProgramInfo = {
     }
 }
 
-declare type GlBuffers = {
-    vao: WebGLVertexArrayObject
-    attributes: {
-        position: WebGLBuffer
-        normal: WebGLBuffer
-        uv: WebGLBuffer
-        // bitangents: WebGLBuffer
-    },
-    indices: WebGLBuffer
-    numVertices: number
+declare type Rigidbody = {
+    pos: vec3
+    drawingObj: Model | Cube | Plane
+    collisionCallback: CallableFunction
+    velocity: vec3
+    drag: vec3
+    gravityDirection: vec3
+    gravityStrength: number
+    collider: Sphere | BoundingBox
 }
 
-declare type ComponentSet<T> = {
-    components: Array<T>,
-    entityMap: Map<number, number>,
-    bitfield: number
+declare type BoundingBox = {
+    colliderType: number
+    xMin: number
+    yMin: number
+    zMin: number
+    xMax: number
+    yMax: number
+    zMax: number
 }
 
-// declare type LightComponent = {
-//     colour: vec3,
-//     strength: number
-// }
-
-declare type AABBCollider = {
-    width: number,
-    height: number
-}
-
-declare type SphereCollider = {
+declare type Sphere = {
+    colliderType: number
+    pos: vec3
     radius: number
-}
-
-declare type RigidbodyComponent = {
-    velocity: vec3,
-    gravityDirection: vec3,
-    gravityStrength: number,
-    aabbColliders: Array<AABBCollider>,
-    sphereColliders: Array<SphereCollider>
-}
-
-declare type MeshDataComponent = {
-    mesh: number,
-    textureId: number
-}
-
-declare type HealthComponent = {
-    currentHealth: number,
-    maxHealth: number
 }
