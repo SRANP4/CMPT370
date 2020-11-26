@@ -103,6 +103,10 @@ export function calculateCentroid (vertices, cb) {
 export function toRadians (angle) {
   return angle * (Math.PI / 180)
 }
+
+export function toDegrees (radians) {
+  return radians * 180 / Math.PI
+}
 /**
  *
  * @param {vec3} center

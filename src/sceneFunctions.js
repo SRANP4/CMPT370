@@ -19,8 +19,6 @@ export function getObject (state, name) {
   return objectToFind
 }
 
-
-
 export function scaleBoundingBox (boundingBox, scaleVec) {
   const newBox = {
     xMin: boundingBox.xMin,

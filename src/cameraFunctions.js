@@ -105,8 +105,7 @@ export function initCameraFromStatefile (statefileCamera) {
     farClip: DEFAULT_FAR_CLIP
   }
 
-  updateCameraAtVec(cam)
-  updateCameraRightVec(cam)
+  updateCameraEulerLookDir(cam)
 
   return cam
 }

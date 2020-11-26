@@ -1,7 +1,7 @@
 // @ts-check
 'use strict'
 
-import { rotationMatrixToEulerAngles } from './commonFunctions.js'
+import { rotationMatrixToEulerAngles, toDegrees } from './commonFunctions.js'
 import { keysPressed } from './inputHelper.js'
 
 /**
@@ -103,8 +103,8 @@ export function updateDebugStats (state) {
     'X: ' + pos[0].toFixed(2) +
     ' Y: ' + pos[1].toFixed(2) +
     ' Z: ' + pos[2].toFixed(2) +
-    '\nPitch: ' + pitch.toFixed(2) +
-    ' Yaw: ' + yaw.toFixed(2) +
+    '\nPitch: ' + toDegrees(pitch).toFixed(2) +
+    ' Yaw: ' + toDegrees(yaw).toFixed(2) +
     '\nNear clip: ' + state.camera.nearClip.toString() +
     '\nFar clip: ' + state.camera.farClip.toString()
 
@@ -131,9 +131,9 @@ export function updateDebugStats (state) {
     '\nLoaded: ' + obj.loaded +
     '\n----------Transform info----------' +
     '\nPosition: ' + obj.model.position.toString() +
-    '\nRotation: Yaw: ' + eulerAngles[1].toFixed(2) +
-    ' Pitch: ' + eulerAngles[0].toFixed(2) +
-    ' Roll: ' + eulerAngles[2].toFixed(2) +
+    '\nRotation: Yaw: ' + toDegrees(eulerAngles[1]).toFixed(2) +
+    ' Pitch: ' + toDegrees(eulerAngles[0]).toFixed(2) +
+    ' Roll: ' + toDegrees(eulerAngles[2]).toFixed(2) +
     '\nScale: ' + obj.model.scale.toString() +
     '\n----------Material info----------' +
     '\nDiffuse texture: ' + obj.model.diffuseTexture +
