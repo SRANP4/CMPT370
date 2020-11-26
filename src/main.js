@@ -9,7 +9,7 @@ import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
 import { Plane } from './objects/Plane.js'
 import { getObject } from './sceneFunctions.js'
-import { initDebugStats, printError, updateDebugStats } from './uiSetup.js'
+import { initDebugStats, uiOnLoaded, printError, updateDebugStats } from './uiSetup.js'
 
 // useful references:
 // collision: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
@@ -308,6 +308,7 @@ function addObjectToScene (state, object) {
   state.objects.push(object)
 
   if (state.objectCount === state.loadObjects.length) {
+    uiOnLoaded(state)
     startGameLogic()
   }
 }

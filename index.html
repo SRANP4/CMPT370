@@ -14,6 +14,10 @@
         font-family: monospace;
         padding: 1em;
       }
+      #loading_indicator_container {
+        width: 100%;
+        background-color: red;
+      }
     </style>
   </head>
 
@@ -23,6 +27,7 @@
     <div id="myNavBar"></div>
 
     <div id="overlay">
+      <div id="loading_indicator_container"><span id ="loading_indicator">LOADING...</span></div>
       <div>Use ` to toggle fly cam</div>
       <div>------------------------------------------------------</div>
       <div><span id="update_delta_time">DEBUG TEXT</span></div>

@@ -93,6 +93,16 @@ export function initDebugStats (state) {
  *
  * @param {import('./types.js').AppState} state
  */
+export function uiOnLoaded (state) {
+  /** @type {HTMLElement} */ ;document
+    .querySelector('#loading_indicator_container')
+    .remove()
+}
+
+/**
+ *
+ * @param {import('./types.js').AppState} state
+ */
 export function updateDebugStats (state) {
   const pos = state.camera.position
   const pitch = state.camera.pitch
