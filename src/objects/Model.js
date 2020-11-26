@@ -23,6 +23,8 @@ export class Model {
    */
   constructor (glContext, object, meshDetails) {
     this.gl = glContext
+    /** @type {import('../types.js').Rigidbody} */
+    this.rigidbody = null
     this.vertShader = ''
     this.fragShader = ''
     this.name = object.name

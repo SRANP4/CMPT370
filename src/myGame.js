@@ -90,6 +90,17 @@ export function startGame (state) {
  */
 export function fixedUpdate (state, deltaTime) {
   updateInput()
+  if (keysPressed.get('-')) {
+    state.selectedObjIndex = (state.selectedObjIndex - 1) % state.objectCount
+    if (state.selectedObjIndex < 0) {
+      state.selectedObjIndex = state.objectCount - 1
+    }
+  }
+
+  if (keysPressed.get('=')) {
+    state.selectedObjIndex = (state.selectedObjIndex + 1) % state.objectCount
+  }
+
   updateFlyCam(state)
 
   if (keysPressed.get('p')) simulationEnabled = !simulationEnabled

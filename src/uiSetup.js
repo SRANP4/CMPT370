@@ -1,6 +1,7 @@
 // @ts-check
 'use strict'
 
+import { COLLIDER_TYPE_SPHERE } from './collisionFunctions.js'
 import { rotationMatrixToEulerAngles, toDegrees } from './commonFunctions.js'
 import { keysPressed } from './inputHelper.js'
 
@@ -124,24 +125,50 @@ export function updateDebugStats (state) {
     '\nNear clip: ' + state.camera.nearClip.toString() +
     '\nFar clip: ' + state.camera.farClip.toString()
 
-  if (keysPressed.get('-')) {
-    state.selectedObjIndex = (state.selectedObjIndex - 1) % state.objectCount
-    if (state.selectedObjIndex < 0) {
-      state.selectedObjIndex = state.objectCount - 1
-    }
-  }
-
-  if (keysPressed.get('=')) {
-    state.selectedObjIndex = (state.selectedObjIndex + 1) % state.objectCount
-  }
-
   const obj = state.objects[state.selectedObjIndex]
 
   const eulerAngles = rotationMatrixToEulerAngles(obj.model.rotation)
 
+  let rigidbodyInfo = ''
+
+  if (obj.rigidbody != null) {
+    const rb = obj.rigidbody
+
+    let colliderInfo = ''
+    if (rb.collider.colliderType == COLLIDER_TYPE_SPHERE) {
+      const col = /** @type {import('./types.js').Sphere} */ (rb.collider)
+      // prettier-ignore
+      colliderInfo =
+        '\n--------Sphere collider info--------' +
+        '\nPos: ' + col.pos.toString() +
+        '\nRadius: ' + col.radius.toString()
+    } else {
+      const col = /** @type {import('./types.js').BoundingBox} */ (rb.collider)
+      // prettier-ignore
+      colliderInfo =
+        '\n--------Bounding box collider info--------' +
+        '\nxMin: ' + col.xMin.toString() +
+        '\nxMax: ' + col.xMax.toString() +
+        '\nyMin: ' + col.yMin.toString() +
+        '\nyMax: ' + col.yMax.toString() +
+        '\nzMin: ' + col.zMin.toString() +
+        '\nzMax: ' + col.zMax.toString()
+    }
+
+    // prettier-ignore
+    rigidbodyInfo =
+    '\n----------Rigidbody info----------' +
+    '\nPos: ' + rb.pos.toString() +
+    '\nVelocity: ' + rb.velocity.toString() +
+    '\nDrag: ' + rb.drag.toString() +
+    '\nGravity direction: ' + rb.gravityDirection.toString() +
+    '\nGravity strength: ' + rb.gravityStrength.toString() +
+     colliderInfo
+  }
+
   // prettier-ignore
   state.objInfoTextElement.innerText =
-    'Object index: ' + state.selectedObjIndex.toString() +
+    '\nObject index: ' + state.selectedObjIndex.toString() +
     '\nName: ' + obj.name +
     '\nType: ' + obj.type +
     '\nLoaded: ' + obj.loaded +
@@ -164,5 +191,6 @@ export function updateDebugStats (state) {
     '\nTriangle count: ' + obj.model.triangles.length.toString() +
     '\nUV count: ' + obj.model.uvs.length.toString() +
     '\nNormal count: ' + obj.model.normals.length.toString() +
-    '\nBitangent count: ' + obj.model.bitangents.length.toString()
+    '\nBitangent count: ' + obj.model.bitangents.length.toString() +
+    rigidbodyInfo
 }

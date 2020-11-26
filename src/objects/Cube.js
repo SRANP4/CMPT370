@@ -22,6 +22,8 @@ export class Cube {
   constructor (glContext, object) {
     // this.state = {}
     this.gl = glContext
+    /** @type {import('../types.js').Rigidbody} */
+    this.rigidbody = null
     this.vertShader = ''
     this.fragShader = ''
     this.name = object.name
