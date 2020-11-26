@@ -94,9 +94,15 @@ export function initDebugStats (state) {
  * @param {import('./types.js').AppState} state
  */
 export function uiOnLoaded (state) {
-  /** @type {HTMLElement} */ ;document
-    .querySelector('#loading_indicator_container')
-    .remove()
+  /** @type {HTMLElement} */
+  const loadingContainer = document.querySelector(
+    '#loading_indicator_container'
+  )
+  loadingContainer.style.backgroundColor = 'green'
+
+  /** @type {HTMLElement} */
+  const statusText = document.querySelector('#status')
+  statusText.innerText = 'Press P to start/pause the simulation'
 }
 
 /**

@@ -8,7 +8,7 @@ import { Plane } from './objects/Plane.js'
 
 const COLLIDER_TYPE_SPHERE = 0
 const COLLIDER_TYPE_BOX = 1
-const GRAVITY_STRENGTH = 0.5
+const GRAVITY_STRENGTH = 9.81
 const GRAVITY_DIRECTION = vec3.fromValues(0, -1, 0)
 const VELOCITY_CAP = vec3.fromValues(30, 30, 30)
 

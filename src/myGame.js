@@ -26,6 +26,7 @@ import { getObject } from './sceneFunctions.js'
 
 // If you want to use globals here you can. Initialize them in startGame then update/change them in gameLoop
 let flyCamEnabled = false
+let simulationEnabled = false
 const rigidbodies = []
 let sphereColliding = false
 let shipObj = null
@@ -75,8 +76,9 @@ export function startGame (state) {
       sphereColliding = true
     }
   )
-  sphereRb.gravityStrength = 0
-  sphereRb.velocity[2] = 2
+  //sphereRb.gravityStrength = 0
+  sphereRb.velocity[1] = 5
+  sphereRb.velocity[2] = 20
 
   rigidbodies.push(sphereRb)
 }
@@ -88,16 +90,21 @@ export function startGame (state) {
  */
 export function fixedUpdate (state, deltaTime) {
   updateInput()
-  // handle physics here
-  // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
-  sphereColliding = false
-  updateRigidbodies(rigidbodies, deltaTime)
   updateFlyCam(state)
 
-  if (sphereColliding) {
-    shipObj.material.diffuse = [1.0, 0, 0]
-  } else {
-    shipObj.material.diffuse = [0, 0, 1.0]
+  if (keysPressed.get('p')) simulationEnabled = !simulationEnabled
+
+  if (simulationEnabled) {
+    // handle physics here
+    // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
+    sphereColliding = false
+    updateRigidbodies(rigidbodies, deltaTime)
+
+    if (sphereColliding) {
+      shipObj.material.diffuse = [1.0, 0, 0]
+    } else {
+      shipObj.material.diffuse = [0, 0, 1.0]
+    }
   }
 }
 

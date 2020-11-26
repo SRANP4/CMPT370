@@ -12,7 +12,7 @@
           "shaderType": 1
         },
         "type": "plane",
-        "position": [0, -2, 0],
+        "position": [0, -20, 0],
         "scale": [10240, 1, 10240],
         "diffuseTexture": "",
         "normalTexture": "defaultNorm.jpg",
@@ -188,11 +188,11 @@
       "backgroundColor": [1.0, 1.0, 1.0],
       "camera": {
         "name": "mainCamera",
-        "position": [19.06, 0.22, 5.78],
+        "position": [15.65, 4.12, -11.22],
         "front": [0, 0, 1],
         "up": [0, 1, 0],
-        "pitch": -0.57,
-        "yaw": -178.99,
+        "pitch": -10.02,
+        "yaw": 127.72,
         "roll": 0,
         "moveSpeed": 10,
         "move": false,
