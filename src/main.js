@@ -9,44 +9,22 @@ import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
 import { Plane } from './objects/Plane.js'
 import { getObject } from './sceneFunctions.js'
-import { printError } from './uiSetup.js'
-
-// useful references:
-// collision: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
-
-/*
-  three tiers of objects?
-    actor: move, physics, complex scripting, visual, audio
-    pawn: physics, visual, audio, simple scripting
-    prop: visual, audio
-*/
+import {
+  initDebugStats,
+  uiOnLoaded,
+  printError,
+  updateDebugStats
+} from './uiSetup.js'
 
 /*
-  update physics
-    - update velocity and gravity
-    - check for collisions
-    - send events for collisions (queue for scripts to pick up)
-      - includes collision info (entity id of other collider???)
 
-  TODO break state into smaller state objects, monolithic state is hard to keep in my small brain
-
-  TODO basic non-transparent (diffuse) rendering (use a state file from Zach's refinery engine)
   TODO correct rendering with rotation and position
 
   TODO enemy ship that moves back and forth, rotates in direction it is moving
 
-  TODO collision checking for spheres (use spheres for ships and cannonball)
-  TODO physics loop, send collision events to callback functions
-
   TODO add fire cannonball mechanic, log when collision detected with ship
 
-  =================================================================================================
-
-  TODO write basic blinn-phong shader and basic fragment shader
   TODO transparent rendering as a layer on top of opaque rendering pass (basically just for water)
-  TODO camera / aim controls
-
-  TODO collision checking for AABB
 
   TODO load shaders from glsl files, per object shaders
 
@@ -291,42 +269,34 @@ function main () {
     }
   })
 
-  state.tickTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
-    '#tick_time'
-  ))
-  state.tickTimeTextElement.innerText = 'TICK TIME'
-
-  state.renderTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
-    '#render_time'
-  ))
-  state.renderTimeTextElement.innerText = 'RENDER TIME'
-
-  state.tickDeltaTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
-    '#tick_delta_time'
-  ))
-  state.tickDeltaTimeTextElement.innerText = 'TICK DELTA TIME'
-
-  state.updateTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
-    '#update_delta_time'
-  ))
-  state.updateTimeTextElement.innerText = 'UPDATE TIME'
-
-  state.camPosTextElement = /** @type {HTMLElement} */ (document.querySelector(
-    '#camera_position'
-  ))
-  state.camPosTextElement.innerText = 'CAM POS'
-
-  state.objInfoTextElement = /** @type {HTMLElement} */ (document.querySelector(
-    '#object_info'
-  ))
-  state.objInfoTextElement.innerText = 'OBJ INFO'
-
+  // start rendering
+  initDebugStats(state)
   initializeTimeStats()
-  startGame(state)
-  runFixedUpdateLoop(0, 0)
-  runUpdateLoop(0)
+  startRendering(state.gl, state) // now that scene is setup, start rendering it
+}
 
-  startRendering(gl, state) // now that scene is setup, start rendering it
+/**
+ *
+ * @param {import('./types.js').AppState} state object containing scene values
+ * @param {Model | Cube | Plane} object the object to be added to the scene
+ * @purpose - Helper function for adding a new object to the scene and refreshing the GUI
+ */
+function addObjectToScene (state, object) {
+  state.objectCount += 1
+  state.objects.push(object)
+
+  if (state.objectCount === state.loadObjects.length) {
+    uiOnLoaded(state)
+    startGameLogic()
+  }
+}
+
+function startGameLogic () {
+  console.log('Models loaded, starting game logic')
+  startGame(state)
+  const now = window.performance.now()
+  runFixedUpdateLoop(now, now)
+  // runUpdateLoop(now)
 }
 
 /**
@@ -422,17 +392,6 @@ function runUpdateLoop (lastTickTime) {
 
 /**
  *
- * @param {import('./types.js').AppState} state object containing scene values
- * @param {Model | Cube | Plane} object the object to be added to the scene
- * @purpose - Helper function for adding a new object to the scene and refreshing the GUI
- */
-function addObjectToScene (state, object) {
-  state.objectCount += 1
-  state.objects.push(object)
-}
-
-/**
- *
  * @param {WebGL2RenderingContext} gl
  * @param {import('./types.js').AppState} state object containing scene values
  * @purpose - Calls the drawscene per frame
@@ -450,6 +409,8 @@ function startRendering (gl, state) {
       'Average frame time: ' +
       frameTimeStats.averageTime.toFixed(6).toString() +
       'ms'
+
+    updateDebugStats(state)
 
     // Draw our scene
     drawScene(gl, state)

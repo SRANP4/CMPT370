@@ -3,15 +3,21 @@
 
 import { vec3 } from '../lib/gl-matrix/index.js'
 import { updateCameraEulerLookDir } from './cameraFunctions.js'
-import { rotationMatrixToEulerAngles } from './commonFunctions.js'
+import {
+  createRigidbody,
+  createSphere,
+  updateRigidbodies,
+  getBoundingBoxFromModelVertices
+} from './collisionFunctions.js'
 import {
   keysDown,
   keysPressed,
   mouseXDelta,
   mouseYDelta,
-  setupEvents as setupInputEvents,
+  setupInputEvents,
   updateInput
 } from './inputHelper.js'
+import { getObject } from './sceneFunctions.js'
 
 /*
   TODO add debug object markers
@@ -20,6 +26,10 @@ import {
 
 // If you want to use globals here you can. Initialize them in startGame then update/change them in gameLoop
 let flyCamEnabled = false
+let simulationEnabled = false
+const rigidbodies = []
+let sphereColliding = false
+let shipObj = null
 
 /**
  *
@@ -37,6 +47,40 @@ export function startGame (state) {
   )
 
   setupInputEvents(state.canvas)
+  shipObj = getObject(state, 'Ship')
+  // create the colliders for objects
+  const shipRb = createRigidbody(
+    shipObj,
+    getBoundingBoxFromModelVertices(shipObj),
+    /**
+     *
+     * @param {import('./types.js').Rigidbody} rb
+     * @param {import('./types.js').Rigidbody} otherRb
+     */
+    function (rb, otherRb) {}
+  )
+  shipRb.gravityStrength = 0
+
+  rigidbodies.push(shipRb)
+
+  const sphereRb = createRigidbody(
+    getObject(state, 'sphere'),
+    createSphere(vec3.create(), 1),
+    /**
+     *
+     * @param {import('./types.js').Rigidbody} rb
+     * @param {import('./types.js').Rigidbody} otherRb
+     */
+    function (rb, otherRb) {
+      // otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
+      sphereColliding = true
+    }
+  )
+  //sphereRb.gravityStrength = 0
+  sphereRb.velocity[1] = 5
+  sphereRb.velocity[2] = 20
+
+  rigidbodies.push(sphereRb)
 }
 
 /**
@@ -46,11 +90,33 @@ export function startGame (state) {
  */
 export function fixedUpdate (state, deltaTime) {
   updateInput()
-  // handle physics here
-  // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
+  if (keysPressed.get('-')) {
+    state.selectedObjIndex = (state.selectedObjIndex - 1) % state.objectCount
+    if (state.selectedObjIndex < 0) {
+      state.selectedObjIndex = state.objectCount - 1
+    }
+  }
+
+  if (keysPressed.get('=')) {
+    state.selectedObjIndex = (state.selectedObjIndex + 1) % state.objectCount
+  }
 
   updateFlyCam(state)
-  updateDebugStats(state)
+
+  if (keysPressed.get('p')) simulationEnabled = !simulationEnabled
+
+  if (simulationEnabled) {
+    // handle physics here
+    // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
+    sphereColliding = false
+    updateRigidbodies(rigidbodies, deltaTime)
+
+    if (sphereColliding) {
+      shipObj.material.diffuse = [1.0, 0, 0]
+    } else {
+      shipObj.material.diffuse = [0, 0, 1.0]
+    }
+  }
 }
 
 /**
@@ -131,68 +197,6 @@ function updateFlyCam (state) {
       state.camera.center[1] -= moveSpeed
     }
   }
-}
-
-/**
- *
- * @param {import('./types.js').AppState} state
- */
-function updateDebugStats (state) {
-  const pos = state.camera.position
-  const pitch = state.camera.pitch
-  const yaw = state.camera.yaw
-
-  // prettier-ignore
-  state.camPosTextElement.innerText =
-    'X: ' + pos[0].toFixed(2) +
-    ' Y: ' + pos[1].toFixed(2) +
-    ' Z: ' + pos[2].toFixed(2) +
-    '\nPitch: ' + pitch.toFixed(2) +
-    ' Yaw: ' + yaw.toFixed(2) +
-    '\nNear clip: ' + state.camera.nearClip.toString() +
-    '\nFar clip: ' + state.camera.farClip.toString()
-
-  if (keysPressed.get('-')) {
-    state.selectedObjIndex = (state.selectedObjIndex - 1) % state.objectCount
-    if (state.selectedObjIndex < 0) {
-      state.selectedObjIndex = state.objectCount - 1
-    }
-  }
-
-  if (keysPressed.get('=')) {
-    state.selectedObjIndex = (state.selectedObjIndex + 1) % state.objectCount
-  }
-
-  const obj = state.objects[state.selectedObjIndex]
-
-  const eulerAngles = rotationMatrixToEulerAngles(obj.model.rotation)
-
-  // prettier-ignore
-  state.objInfoTextElement.innerText =
-    'Object index: ' + state.selectedObjIndex.toString() +
-    '\nName: ' + obj.name +
-    '\nType: ' + obj.type +
-    '\nLoaded: ' + obj.loaded +
-    '\n----------Transform info----------' +
-    '\nPosition: ' + obj.model.position.toString() +
-    '\nRotation: Yaw: ' + eulerAngles[1].toFixed(2) +
-    ' Pitch: ' + eulerAngles[0].toFixed(2) +
-    ' Roll: ' + eulerAngles[2].toFixed(2) +
-    '\nScale: ' + obj.model.scale.toString() +
-    '\n----------Material info----------' +
-    '\nDiffuse texture: ' + obj.model.diffuseTexture +
-    '\nNormal texture: ' + obj.model.normalTexture +
-    '\nAmbientVal: ' + obj.material.ambient.toString() +
-    '\nDiffuseVal: ' + obj.material.diffuse.toString() +
-    '\nSpecularVal: ' + obj.material.specular.toString() +
-    '\nnVal: ' + obj.material.n.toString() +
-    '\nalphaVal: ' + obj.material.alpha.toString() +
-    '\n----------Model info----------' +
-    '\nVertex count: ' + obj.model.vertices.length.toString() +
-    '\nTriangle count: ' + obj.model.triangles.length.toString() +
-    '\nUV count: ' + obj.model.uvs.length.toString() +
-    '\nNormal count: ' + obj.model.normals.length.toString() +
-    '\nBitangent count: ' + obj.model.bitangents.length.toString()
 }
 
 /**

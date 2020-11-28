@@ -23,6 +23,8 @@ export class Model {
    */
   constructor (glContext, object, meshDetails) {
     this.gl = glContext
+    /** @type {import('../types.js').Rigidbody} */
+    this.rigidbody = null
     this.vertShader = ''
     this.fragShader = ''
     this.name = object.name
@@ -196,9 +198,20 @@ export class Model {
     console.log(this.name + ' loaded successfully!')
   }
 
-  async setup () {
+  // async setup () {
+  //   if (this.centroid == null) {
+  //     this.centroid = await asyncCalcCentroid(this.model.vertices)
+  //   }
+  //   this.lightingShader()
+  //   this.scale(this.initialTransform.scale)
+  //   this.translate(this.initialTransform.position)
+  //   this.model.rotation = new Float32Array(this.initialTransform.rotation)
+  //   this.initBuffers()
+  // }
+
+  setup () {
     if (this.centroid == null) {
-      this.centroid = await asyncCalcCentroid(this.model.vertices)
+      this.centroid = calculateCentroid(this.model.vertices)
     }
     this.lightingShader()
     this.scale(this.initialTransform.scale)

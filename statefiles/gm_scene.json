@@ -12,9 +12,9 @@
           "shaderType": 1
         },
         "type": "plane",
-        "position": [0, -2, 0],
+        "position": [0, -20, 0],
         "scale": [10240, 1, 10240],
-        "diffuseTexture": "default.jpg",
+        "diffuseTexture": "",
         "normalTexture": "defaultNorm.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
@@ -42,7 +42,7 @@
       {
         "name": "Ship",
         "material": {
-          "diffuse": [0.3, 0.3, 0.3],
+          "diffuse": [0.0, 0.0, 1.0],
           "ambient": [0.3, 0.3, 0.3],
           "specular": [0.5, 0.5, 0.5],
           "n": 25.000002,
@@ -93,6 +93,44 @@
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
         "model": "bunny.obj"
+      },
+      {
+        "name": "otherQub",
+        "material": {
+          "diffuse": [0.3, 0.6, 0.3],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 1
+        },
+        "type": "cube",
+        "position": [-2, 0, 1],
+        "scale": [1, 1, 1],
+        "diffuseTexture": "default.png",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": null,
+        "model": null
+      },
+      {
+        "name": "sphere",
+        "material": {
+          "diffuse": [0.3, 0.6, 0.3],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 1
+        },
+        "type": "mesh",
+        "position": [0, 0.5, 2],
+        "scale": [1, 1, 1],
+        "diffuseTexture": "default.png",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": null,
+        "model": "sphere.obj"
       },
       {
         "name": "Cannon",
@@ -150,11 +188,11 @@
       "backgroundColor": [1.0, 1.0, 1.0],
       "camera": {
         "name": "mainCamera",
-        "position": [0, 0.5, -3],
+        "position": [15.65, 4.12, -11.22],
         "front": [0, 0, 1],
         "up": [0, 1, 0],
-        "pitch": 0,
-        "yaw": 90,
+        "pitch": -10.02,
+        "yaw": 127.72,
         "roll": 0,
         "moveSpeed": 10,
         "move": false,
