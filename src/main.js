@@ -66,6 +66,14 @@ const frameTimeStats = {
   averageTime: 0
 }
 
+/** @type { import('./types.js').TimeStats } */
+const deltaTimeStats = {
+  totalElements: 120, // this is configurable (120 is 2 seconds worth of ticks)
+  previousTime: undefined, // this is initialized in initializeTickTimeStats as Float32Array
+  previousElementIndex: 0,
+  averageTime: 0
+}
+
 // This function loads on window load, uses async functions to load the scene then try to render it
 window.onload = async () => {
   try {
@@ -294,8 +302,8 @@ function addObjectToScene (state, object) {
 function startGameLogic () {
   console.log('Models loaded, starting game logic')
   startGame(state)
-  const now = window.performance.now()
-  runFixedUpdateLoop(now, now)
+  // const now = window.performance.now()
+  // runFixedUpdateLoop(now, now)
   // runUpdateLoop(now)
 }
 
@@ -308,6 +316,7 @@ function initializeTimeStats () {
   )
   updateTimeStats.previousTime = new Float32Array(updateTimeStats.totalElements)
   frameTimeStats.previousTime = new Float32Array(frameTimeStats.totalElements)
+  deltaTimeStats.previousTime = new Float32Array(deltaTimeStats.totalElements)
 }
 
 /**
@@ -328,45 +337,47 @@ function calcTimeStats (statObj, lastTickTime) {
   statObj.averageTime = sum / statObj.totalElements
 }
 
+let deltaTimeSum = 0
+let lastUpdateTime = 0
 /**
  *
- * @param {number} lastTickTime
- * @param {number} lastTickEndTime
+ * @param {number} now
  */
-function runFixedUpdateLoop (lastTickTime, lastTickEndTime) {
-  const start = window.performance.now()
-  calcTimeStats(fixedUpdateTimeStats, lastTickTime)
-  // update the overlay
-  state.tickTimeTextElement.innerText =
-    'Average fixed update time: ' +
-    fixedUpdateTimeStats.averageTime.toFixed(6).toString() +
-    'ms'
+function runFixedUpdateLoop (now) {
+  deltaTimeSum += now - lastUpdateTime
 
-  const deltaTime = window.performance.now() - lastTickEndTime
-  state.deltaTime = deltaTime
-  state.tickDeltaTimeTextElement.innerText =
-    'Tick delta time: ' + deltaTime.toFixed(6).toString() + 'ms'
+  if (deltaTimeSum >= TICK_RATE_MS) {
+    const start = now
 
-  // don't hog cpu if the page isn't visible (effectively pauses the game when it
-  // backgrounds)
-  // NOTE: For debugging it might be useful to use hasFocus instead,
-  // as the game will pause when you click into the F12 debug panel
-  if (document.visibilityState === 'visible') {
-    fixedUpdate(state, deltaTime) // constantly call our game loop
+    state.deltaTime = deltaTimeSum
+    calcTimeStats(deltaTimeStats, deltaTimeSum)
+    state.tickDeltaTimeTextElement.innerText =
+      'Average tick delta time: ' + deltaTimeStats.averageTime.toFixed(6) + 'ms'
+
+    // don't hog cpu if the page isn't visible (effectively pauses the game when it
+    // backgrounds)
+    // NOTE: For debugging it might be useful to use hasFocus instead,
+    // as the game will pause when you click into the F12 debug panel
+    if (document.visibilityState === 'visible') {
+      fixedUpdate(state, deltaTimeSum) // constantly call our game loop
+    }
+
+    // always pass back to the browser, even if this means a janky tick rate,
+    // its more important to let the browser function properly
+    // ideally this will callback immediately if we're *redline* (taking up
+    // 16 ms or more per tick)
+    const timeLength = window.performance.now() - start
+
+    calcTimeStats(fixedUpdateTimeStats, timeLength)
+    // update the overlay
+    state.tickTimeTextElement.innerText =
+      'Average fixed update time: ' +
+      fixedUpdateTimeStats.averageTime.toFixed(6) +
+      'ms'
+
+    deltaTimeSum = 0
+    lastUpdateTime = start
   }
-
-  // always pass back to the browser, even if this means a janky tick rate,
-  // its more important to let the browser function properly
-  // ideally this will callback immediately if we're *redline* (taking up
-  // 16 ms or more per tick)
-  const now = window.performance.now()
-  const elapsed = now - start
-  window.setTimeout(
-    runFixedUpdateLoop,
-    Math.max(0, TICK_RATE_MS - elapsed),
-    elapsed,
-    now
-  )
 }
 
 /**
@@ -378,9 +389,7 @@ function runUpdateLoop (lastTickTime) {
   calcTimeStats(updateTimeStats, lastTickTime)
   // update the overlay
   state.updateTimeTextElement.innerText =
-    'Average update time: ' +
-    updateTimeStats.averageTime.toFixed(6).toString() +
-    'ms'
+    'Average update time: ' + updateTimeStats.averageTime.toFixed(6) + 'ms'
 
   if (document.visibilityState === 'visible') {
     update(state) // constantly call our game loop
@@ -402,22 +411,21 @@ function startRendering (gl, state) {
   let lastFrameElapsed = 0
 
   // This function is called when we want to render a frame to the canvas
-  function render () {
-    const start = window.performance.now()
-    calcTimeStats(frameTimeStats, lastFrameElapsed)
-    state.renderTimeTextElement.innerText =
-      'Average frame time: ' +
-      frameTimeStats.averageTime.toFixed(6).toString() +
-      'ms'
-
-    updateDebugStats(state)
+  function render (now) {
+    // fixed update has its own stat tracking
+    runFixedUpdateLoop(now)
 
     // Draw our scene
+    const drawStart = window.performance.now()
+    calcTimeStats(frameTimeStats, lastFrameElapsed)
+    state.renderTimeTextElement.innerText =
+      'Average frame time: ' + frameTimeStats.averageTime.toFixed(6) + 'ms'
+    updateDebugStats(state)
     drawScene(gl, state)
 
     // Request another frame when this one is done
     window.requestAnimationFrame(render)
-    lastFrameElapsed = window.performance.now() - start
+    lastFrameElapsed = window.performance.now() - drawStart
   }
   // Draw the scene
   window.requestAnimationFrame(render)
