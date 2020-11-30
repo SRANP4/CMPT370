@@ -9,32 +9,13 @@
           "specular": [0.5, 0.5, 0.5],
           "n": 1,
           "alpha": 1,
-          "shaderType": 1
-        },
-        "type": "plane",
-        "position": [0, -20, 0],
-        "scale": [10240, 1, 10240],
-        "diffuseTexture": "",
-        "normalTexture": "defaultNorm.jpg",
-        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        "parent": null,
-        "model": null
-      },
-      {
-        "name": "tempCube",
-        "material": {
-          "diffuse": [0.5, 0, 0],
-          "ambient": [0.5, 0.5, 0.5],
-          "specular": [0.5, 0.5, 0.5],
-          "n": 10,
-          "alpha": 1,
           "shaderType": 3
         },
-        "type": "cube",
-        "position": [0, 1, 7],
-        "scale": [1, 1, 1],
-        "diffuseTexture": "default.jpg",
-        "normalTexture": "defaultNorm.jpg",
+        "type": "plane",
+        "position": [0, -1.8, 0],
+        "scale": [10240, 1, 10240],
+        "diffuseTexture": "Water.jpg",
+        "normalTexture": "Water_001_NORM.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
         "model": null
@@ -76,44 +57,6 @@
         "model": "pirate_ship_fixed.obj"
       },
       {
-        "name": "tempMesh",
-        "material": {
-          "diffuse": [0.3, 0.6, 0.3],
-          "ambient": [0.5, 0.5, 0.5],
-          "specular": [0.5, 0.5, 0.5],
-          "n": 3,
-          "alpha": 1,
-          "shaderType": 1
-        },
-        "type": "mesh",
-        "position": [-2, 0, 1],
-        "scale": [1, 1, 1],
-        "diffuseTexture": "default.png",
-        "normalTexture": "defaultNorm.jpg",
-        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        "parent": null,
-        "model": "bunny.obj"
-      },
-      {
-        "name": "otherQub",
-        "material": {
-          "diffuse": [0.3, 0.6, 0.3],
-          "ambient": [0.5, 0.5, 0.5],
-          "specular": [0.5, 0.5, 0.5],
-          "n": 3,
-          "alpha": 1,
-          "shaderType": 1
-        },
-        "type": "cube",
-        "position": [-2, 0, 1],
-        "scale": [1, 1, 1],
-        "diffuseTexture": "default.png",
-        "normalTexture": "defaultNorm.jpg",
-        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        "parent": null,
-        "model": null
-      },
-      {
         "name": "sphere",
         "material": {
           "diffuse": [0.3, 0.6, 0.3],
@@ -143,29 +86,29 @@
           "alpha": 1
         },
         "type": "mesh",
-        "position": [-4, 0.5, -2],
+        "position": [-2.9, -1, 0],
         "scale": [1, 1, 1],
         "diffuseTexture": "default.jpg",
         "normalTexture": "defaultNorm.jpg",
         "rotation": [
-          0.25882095098495483,
-          0,
-          -0.9659253358840942,
-          0,
-          0,
+          0.000002357255425522453,
+          1.5187978874564578e-8,
           1,
           0,
+          -1.518794157107095e-8,
+          1,
+          -1.518794157107095e-8,
           0,
-          0.9659253358840942,
-          0,
-          0.25882095098495483,
+          -1,
+          -1.5187907820291002e-8,
+          0.000002357255425522453,
           0,
           0,
           0,
           0,
           1
-        ],
-        "parent": null,
+      ],
+        "parent": "Ship",
         "model": "artillery_cannon_fixed.obj"
       }
     ],
