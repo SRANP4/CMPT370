@@ -81,6 +81,82 @@ export function startGame (state) {
   sphereRb.velocity[2] = 20
 
   rigidbodies.push(sphereRb)
+
+  shipObj = getObject(state, 'Ship2')
+  // create the colliders for objects
+  // @ts-ignore
+  const shipRb2 = createRigidbody(
+    shipObj,
+    getBoundingBoxFromModelVertices(shipObj),
+    /**
+     *
+     * @param {import('./types.js').Rigidbody} rb
+     * @param {import('./types.js').Rigidbody} otherRb
+     */
+    function (rb, otherRb) {}
+  )
+  shipRb2.gravityStrength = 0
+
+  rigidbodies.push(shipRb2)
+
+  // @ts-ignore
+  const sphereRb2 = createRigidbody(
+    getObject(state, 'sphere2'),
+    createSphere(vec3.create(), 1),
+    /**
+     *
+     * @param {import('./types.js').Rigidbody} rb
+     * @param {import('./types.js').Rigidbody} otherRb
+     */
+    function (rb, otherRb) {
+      // otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
+      sphereColliding = true
+    }
+  )
+  //sphereRb.gravityStrength = 0
+  sphereRb2.velocity[1] = 5
+  sphereRb2.velocity[2] = 20
+
+  rigidbodies.push(sphereRb2)
+
+  shipObj = getObject(state, 'Ship3')
+  // create the colliders for objects
+  // @ts-ignore
+  const shipRb3 = createRigidbody(
+    shipObj,
+    getBoundingBoxFromModelVertices(shipObj),
+    /**
+     *
+     * @param {import('./types.js').Rigidbody} rb
+     * @param {import('./types.js').Rigidbody} otherRb
+     */
+    function (rb, otherRb) {}
+  )
+  shipRb3.gravityStrength = 0
+
+  rigidbodies.push(shipRb3)
+
+  // @ts-ignore
+  const sphereRb3 = createRigidbody(
+    getObject(state, 'sphere3'),
+    createSphere(vec3.create(), 1),
+    /**
+     *
+     * @param {import('./types.js').Rigidbody} rb
+     * @param {import('./types.js').Rigidbody} otherRb
+     */
+    function (rb, otherRb) {
+      // otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
+      sphereColliding = true
+    }
+  )
+  //sphereRb.gravityStrength = 0
+  sphereRb3.velocity[1] = 5
+  sphereRb3.velocity[2] = 20
+
+  rigidbodies.push(sphereRb3)
+
+
 }
 
 /**
