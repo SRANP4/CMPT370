@@ -30,13 +30,14 @@ let simulationEnabled = false
 const rigidbodies = []
 let sphereColliding = false
 let shipObj = null
+let sphereObj = null
 
 /**
  *
  * @param { import("./types").AppState } state Game state
  * @usage Use this function for initializing any in game values in our state or adding event listeners
  */
-export function startGame (state) {
+export function startGame(state) {
   // this just prevents right click from opening up the context menu :)
   document.addEventListener(
     'contextmenu',
@@ -47,48 +48,166 @@ export function startGame (state) {
   )
 
   setupInputEvents(state.canvas)
-  shipObj = getObject(state, 'Ship')
-  // create the colliders for objects
-  const shipRb = createRigidbody(
-    shipObj,
-    getBoundingBoxFromModelVertices(shipObj),
-    /**
-     *
-     * @param {import('./types.js').Rigidbody} rb
-     * @param {import('./types.js').Rigidbody} otherRb
-     */
-    function (rb, otherRb) {}
-  )
-  shipRb.gravityStrength = 0
 
-  rigidbodies.push(shipRb)
+  let ships = ["Ship1", "Ship2", "Ship3"]
+  for (let i =0; i< ships.length; i++) {
+    shipObj = getObject(state, (ships[i]).toString())
+    const shipRb = createRigidbody(
+      shipObj,
+      getBoundingBoxFromModelVertices(shipObj),
+      /**
+       *
+       * @param {import('./types.js').Rigidbody} rb
+       * @param {import('./types.js').Rigidbody} otherRb
+       */
+      function (rb, otherRb) { }
+    )
+    shipRb.gravityStrength = 0
+    rigidbodies.push(shipRb);
+  }
 
-  const sphereRb = createRigidbody(
-    getObject(state, 'sphere'),
-    createSphere(vec3.create(), 1),
-    /**
-     *
-     * @param {import('./types.js').Rigidbody} rb
-     * @param {import('./types.js').Rigidbody} otherRb
-     */
-    function (rb, otherRb) {
-      // otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
-      sphereColliding = true
-    }
-  )
-  //sphereRb.gravityStrength = 0
-  sphereRb.velocity[1] = 5
-  sphereRb.velocity[2] = 20
+  let spheres = ["sphere1", "sphere2", "sphere3", "sphere4", "sphere5", "sphere6", "sphere7", "sphere8", "sphere9"]
+  for (let i =0; i< spheres.length; i++) {
+      sphereObj = getObject(state, (spheres[i]).toString())
+      console.log((spheres[i]).toString())
+      const sphereRb = createRigidbody(
+        sphereObj,
+        createSphere(vec3.create(), 1),
+        /**
+         *
+         * @param {import('./types.js').Rigidbody} rb
+         * @param {import('./types.js').Rigidbody} otherRb
+         */
+        function (rb, otherRb) {
+        // otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
+        sphereColliding = true
+      }
+    )
+    //sphereRb.gravityStrength = 0
+    sphereRb.velocity[1] = 5
+    sphereRb.velocity[2] = 20
 
-  rigidbodies.push(sphereRb)
+    rigidbodies.push(sphereRb)
+
+  }
 }
+//   shipObj = getObject(state, 'Ship')
+//   // create the colliders for objects
+//   const shipRb = createRigidbody(
+//     shipObj,
+//     getBoundingBoxFromModelVertices(shipObj),
+//     /**
+//      *
+//      * @param {import('./types.js').Rigidbody} rb
+//      * @param {import('./types.js').Rigidbody} otherRb
+//      */
+//     function (rb, otherRb) {}
+//   )
+//   shipRb.gravityStrength = 0
+
+//   rigidbodies.push(shipRb)
+
+//   const sphereRb = createRigidbody(
+//     getObject(state, 'sphere'),
+//     createSphere(vec3.create(), 1),
+//     /**
+//      *
+//      * @param {import('./types.js').Rigidbody} rb
+//      * @param {import('./types.js').Rigidbody} otherRb
+//      */
+//     function (rb, otherRb) {
+//       // otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
+//       sphereColliding = true
+//     }
+//   )
+//   //sphereRb.gravityStrength = 0
+//   sphereRb.velocity[1] = 5
+//   sphereRb.velocity[2] = 20
+
+//   rigidbodies.push(sphereRb)
+
+//   shipObj = getObject(state, 'Ship2')
+//   // create the colliders for objects
+//   // @ts-ignore
+//   const shipRb2 = createRigidbody(
+//     shipObj,
+//     getBoundingBoxFromModelVertices(shipObj),
+//     /**
+//      *
+//      * @param {import('./types.js').Rigidbody} rb
+//      * @param {import('./types.js').Rigidbody} otherRb
+//      */
+//     function (rb, otherRb) {}
+//   )
+//   shipRb2.gravityStrength = 0
+
+//   rigidbodies.push(shipRb2)
+
+//   // @ts-ignore
+//   const sphereRb2 = createRigidbody(
+//     getObject(state, 'sphere2'),
+//     createSphere(vec3.create(), 1),
+//     /**
+//      *
+//      * @param {import('./types.js').Rigidbody} rb
+//      * @param {import('./types.js').Rigidbody} otherRb
+//      */
+//     function (rb, otherRb) {
+//       // otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
+//       sphereColliding = true
+//     }
+//   )
+//   //sphereRb.gravityStrength = 0
+//   sphereRb2.velocity[1] = 5
+//   sphereRb2.velocity[2] = 20
+
+//   rigidbodies.push(sphereRb2)
+
+//   shipObj = getObject(state, 'Ship3')
+//   // create the colliders for objects
+//   // @ts-ignore
+//   const shipRb3 = createRigidbody(
+//     shipObj,
+//     getBoundingBoxFromModelVertices(shipObj),
+//     /**
+//      *
+//      * @param {import('./types.js').Rigidbody} rb
+//      * @param {import('./types.js').Rigidbody} otherRb
+//      */
+//     function (rb, otherRb) {}
+//   )
+//   shipRb3.gravityStrength = 0
+
+//   rigidbodies.push(shipRb3)
+
+//   // @ts-ignore
+//   const sphereRb3 = createRigidbody(
+//     getObject(state, 'sphere3'),
+//     createSphere(vec3.create(), 1),
+//     /**
+//      *
+//      * @param {import('./types.js').Rigidbody} rb
+//      * @param {import('./types.js').Rigidbody} otherRb
+//      */
+//     function (rb, otherRb) {
+//       // otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
+//       sphereColliding = true
+//     }
+//   )
+//   //sphereRb.gravityStrength = 0
+//   sphereRb3.velocity[1] = 5
+//   sphereRb3.velocity[2] = 20
+
+//   rigidbodies.push(sphereRb3)
+
+// }
 
 /**
  *
  * @param { import("./types").AppState } state Game state
  * @param { number } deltaTime time difference between the previous frame that was drawn and the current frame
  */
-export function fixedUpdate (state, deltaTime) {
+export function fixedUpdate(state, deltaTime) {
   updateInput()
   if (keysPressed.get('-')) {
     state.selectedObjIndex = (state.selectedObjIndex - 1) % state.objectCount
@@ -123,7 +242,7 @@ export function fixedUpdate (state, deltaTime) {
  *
  * @param {import('./types.js').AppState} state
  */
-function updateFlyCam (state) {
+function updateFlyCam(state) {
   if (keysPressed.get('`')) {
     flyCamEnabled = !flyCamEnabled
     console.log('fly cam: ' + flyCamEnabled)
@@ -203,4 +322,4 @@ function updateFlyCam (state) {
  *
  * @param {import("./types").AppState} state
  */
-export function update (state) {}
+export function update(state) { }
