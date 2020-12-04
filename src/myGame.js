@@ -79,7 +79,7 @@ export function startGame(state) {
         //   rb.drawingObj.material.diffuse = [1.0, 0, 0]
         //   otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
         // }
-        collidedShip = shipObj
+        //collidedShip = shipObj
       }
     )
     shipRb.gravityStrength = 0
@@ -105,7 +105,8 @@ export function startGame(state) {
         
         sphereColliding= true
         movespheres.splice(0,1)
-        collidedSphere = sphereObj
+        collidedSphere = rb.drawingObj
+        collidedShip = otherRb.drawingObj
         
       }
     )
@@ -141,8 +142,8 @@ export function fixedUpdate(state, deltaTime) {
     // handle physics here
     // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
     sphereColliding = false
-    collidedShip = null
-    collidedSphere = null
+    //collidedShip = null
+    //collidedSphere = null
     if (movespheres.length > 0){
       let moveSphere = movespheres[0]
 
@@ -164,7 +165,6 @@ export function fixedUpdate(state, deltaTime) {
 
       //change color of sphere
       collidedSphere.material.diffuse = [1.0, 0, 0]
-      console.log(collidedSphere.name)
 
       //reduce health of ship
       health[collidedShip.name] -= 1
