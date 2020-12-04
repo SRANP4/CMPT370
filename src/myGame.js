@@ -2,12 +2,14 @@
 'use strict'
 
 import { vec3 } from '../lib/gl-matrix/index.js'
+import { random } from '../lib/gl-matrix/vec3.js'
 import { updateCameraEulerLookDir } from './cameraFunctions.js'
 import {
   createRigidbody,
   createSphere,
   updateRigidbodies,
-  getBoundingBoxFromModelVertices
+  getBoundingBoxFromModelVertices,
+  sphereIntersect
 } from './collisionFunctions.js'
 import {
   keysDown,
@@ -31,6 +33,14 @@ const rigidbodies = []
 let sphereColliding = false
 let shipObj = null
 let sphereObj = null
+var health = {"Ship1": 3, "Ship2": 3, "Ship3": 3}
+let collidedShip = null
+let collidedSphere = null
+var spheres = ["sphere1", "sphere2", "sphere3", "sphere4", "sphere5", "sphere6", "sphere7", "sphere8", "sphere9"]
+var movespheres = ["sphere1", "sphere2", "sphere3", "sphere4", "sphere5", "sphere6", "sphere7", "sphere8", "sphere9"]
+
+var ships = ["Ship1", "Ship2", "Ship3"]
+
 
 /**
  *
@@ -49,9 +59,8 @@ export function startGame(state) {
 
   setupInputEvents(state.canvas)
 
-  let ships = ["Ship1", "Ship2", "Ship3"]
   for (let i =0; i< ships.length; i++) {
-    shipObj = getObject(state, (ships[i]).toString())
+    shipObj = getObject(state, ships[i])
     const shipRb = createRigidbody(
       shipObj,
       getBoundingBoxFromModelVertices(shipObj),
@@ -60,147 +69,51 @@ export function startGame(state) {
        * @param {import('./types.js').Rigidbody} rb
        * @param {import('./types.js').Rigidbody} otherRb
        */
-      function (rb, otherRb) { }
+      function (rb, otherRb) {
+        //If two ships collide
+        // if (((rb.drawingObj).toString() in health) && ((otherRb.drawingObj).toString() in health)){
+        //   health[ships[i]]=0
+        //   health[otherRb.drawingObj.name]=0
+        //   //rb.gravityStrength=9.81
+        //   //otherRb.gravityStrength=9.81
+        //   rb.drawingObj.material.diffuse = [1.0, 0, 0]
+        //   otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
+        // }
+        collidedShip = shipObj
+      }
     )
     shipRb.gravityStrength = 0
     rigidbodies.push(shipRb);
   }
 
-  let spheres = ["sphere1", "sphere2", "sphere3", "sphere4", "sphere5", "sphere6", "sphere7", "sphere8", "sphere9"]
   for (let i =0; i< spheres.length; i++) {
-      sphereObj = getObject(state, (spheres[i]).toString())
-      console.log((spheres[i]).toString())
-      const sphereRb = createRigidbody(
-        sphereObj,
-        createSphere(vec3.create(), 1),
-        /**
-         *
-         * @param {import('./types.js').Rigidbody} rb
-         * @param {import('./types.js').Rigidbody} otherRb
-         */
-        function (rb, otherRb) {
-        // otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
-        sphereColliding = true
+    sphereObj = getObject(state, spheres[i])
+    const sphereRb = createRigidbody(
+      sphereObj,
+      createSphere(vec3.create(), 1),
+      /**
+       *
+       * @param {import('./types.js').Rigidbody} rb
+       * @param {import('./types.js').Rigidbody} otherRb
+       */
+      function (rb, otherRb) {
+        // if ((otherRb.drawingObj.name in spheres) && (rb.drawingObj.name in spheres)){
+        //   sphereColliding= false
+        //   rb.gravityStrength = 9.81
+        //   otherRb.gravityStrength = 9.81
+        // }
+        
+        sphereColliding= true
+        movespheres.splice(0,1)
+        collidedSphere = sphereObj
+        
       }
     )
-    //sphereRb.gravityStrength = 0
-    sphereRb.velocity[1] = 5
-    sphereRb.velocity[2] = 20
-
+    
+    sphereRb.gravityStrength=0
     rigidbodies.push(sphereRb)
-
   }
 }
-//   shipObj = getObject(state, 'Ship')
-//   // create the colliders for objects
-//   const shipRb = createRigidbody(
-//     shipObj,
-//     getBoundingBoxFromModelVertices(shipObj),
-//     /**
-//      *
-//      * @param {import('./types.js').Rigidbody} rb
-//      * @param {import('./types.js').Rigidbody} otherRb
-//      */
-//     function (rb, otherRb) {}
-//   )
-//   shipRb.gravityStrength = 0
-
-//   rigidbodies.push(shipRb)
-
-//   const sphereRb = createRigidbody(
-//     getObject(state, 'sphere'),
-//     createSphere(vec3.create(), 1),
-//     /**
-//      *
-//      * @param {import('./types.js').Rigidbody} rb
-//      * @param {import('./types.js').Rigidbody} otherRb
-//      */
-//     function (rb, otherRb) {
-//       // otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
-//       sphereColliding = true
-//     }
-//   )
-//   //sphereRb.gravityStrength = 0
-//   sphereRb.velocity[1] = 5
-//   sphereRb.velocity[2] = 20
-
-//   rigidbodies.push(sphereRb)
-
-//   shipObj = getObject(state, 'Ship2')
-//   // create the colliders for objects
-//   // @ts-ignore
-//   const shipRb2 = createRigidbody(
-//     shipObj,
-//     getBoundingBoxFromModelVertices(shipObj),
-//     /**
-//      *
-//      * @param {import('./types.js').Rigidbody} rb
-//      * @param {import('./types.js').Rigidbody} otherRb
-//      */
-//     function (rb, otherRb) {}
-//   )
-//   shipRb2.gravityStrength = 0
-
-//   rigidbodies.push(shipRb2)
-
-//   // @ts-ignore
-//   const sphereRb2 = createRigidbody(
-//     getObject(state, 'sphere2'),
-//     createSphere(vec3.create(), 1),
-//     /**
-//      *
-//      * @param {import('./types.js').Rigidbody} rb
-//      * @param {import('./types.js').Rigidbody} otherRb
-//      */
-//     function (rb, otherRb) {
-//       // otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
-//       sphereColliding = true
-//     }
-//   )
-//   //sphereRb.gravityStrength = 0
-//   sphereRb2.velocity[1] = 5
-//   sphereRb2.velocity[2] = 20
-
-//   rigidbodies.push(sphereRb2)
-
-//   shipObj = getObject(state, 'Ship3')
-//   // create the colliders for objects
-//   // @ts-ignore
-//   const shipRb3 = createRigidbody(
-//     shipObj,
-//     getBoundingBoxFromModelVertices(shipObj),
-//     /**
-//      *
-//      * @param {import('./types.js').Rigidbody} rb
-//      * @param {import('./types.js').Rigidbody} otherRb
-//      */
-//     function (rb, otherRb) {}
-//   )
-//   shipRb3.gravityStrength = 0
-
-//   rigidbodies.push(shipRb3)
-
-//   // @ts-ignore
-//   const sphereRb3 = createRigidbody(
-//     getObject(state, 'sphere3'),
-//     createSphere(vec3.create(), 1),
-//     /**
-//      *
-//      * @param {import('./types.js').Rigidbody} rb
-//      * @param {import('./types.js').Rigidbody} otherRb
-//      */
-//     function (rb, otherRb) {
-//       // otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
-//       sphereColliding = true
-//     }
-//   )
-//   //sphereRb.gravityStrength = 0
-//   sphereRb3.velocity[1] = 5
-//   sphereRb3.velocity[2] = 20
-
-//   rigidbodies.push(sphereRb3)
-
-// }
 
 /**
  *
@@ -228,12 +141,45 @@ export function fixedUpdate(state, deltaTime) {
     // handle physics here
     // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
     sphereColliding = false
+    collidedShip = null
+    collidedSphere = null
+    if (movespheres.length > 0){
+      let moveSphere = movespheres[0]
+
+      for (let i =0; i< rigidbodies.length; i++){
+        
+        if (rigidbodies[i].drawingObj.name === moveSphere){
+          rigidbodies[i].velocity[1] = 5
+          rigidbodies[i].velocity[2] = 20
+          rigidbodies[i].gravityStrength =9.81
+        }
+      }
+    }
     updateRigidbodies(rigidbodies, deltaTime)
 
     if (sphereColliding) {
-      shipObj.material.diffuse = [1.0, 0, 0]
-    } else {
-      shipObj.material.diffuse = [0, 0, 1.0]
+
+      //change color of ship
+      collidedShip.material.diffuse = [1.0, 0, 0]
+
+      //change color of sphere
+      collidedSphere.material.diffuse = [1.0, 0, 0]
+      console.log(collidedSphere.name)
+
+      //reduce health of ship
+      health[collidedShip.name] -= 1
+
+      for (let i=0; i < rigidbodies.length; i++){
+        if ((rigidbodies[i]).drawingObj.name === collidedShip.name){
+  
+          if (health[collidedShip.name] <= 0){
+            //(rigidbodies[i]).gravityStrength=9.81
+          }
+        }
+      }
+    } 
+    else {
+      //shipObj.material.diffuse = [0, 0, 1.0]
     }
   }
 }
