@@ -183,7 +183,7 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [-10, 0.5, -2],
+        "position": [-10, 0.5, -5],
         "scale": [1, 1, 1],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",
@@ -202,7 +202,7 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [-10, 0.5, 20],
+        "position": [-20, 0.5, 20],
         "scale": [1, 1, 1],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",
@@ -221,7 +221,7 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [-10, 0.5, 18],
+        "position": [-20, 0.5, 15],
         "scale": [1, 1, 1],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",
@@ -240,7 +240,7 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [-10, 0.5, 16],
+        "position": [-20, 0.5, 10],
         "scale": [1, 1, 1],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",
@@ -278,7 +278,7 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [-10, 0.5, 8],
+        "position": [-20, 0.5, 5],
         "scale": [1, 1, 1],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",
@@ -297,7 +297,7 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [-10, 0.5, 6],
+        "position": [-30, 0.5, 0],
         "scale": [1, 1, 1],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",

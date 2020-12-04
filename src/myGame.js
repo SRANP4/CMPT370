@@ -38,7 +38,7 @@ let collidedShip = null
 let collidedSphere = null
 var spheres = ["sphere1", "sphere2", "sphere3", "sphere4", "sphere5", "sphere6", "sphere7", "sphere8", "sphere9"]
 var movespheres = ["sphere1", "sphere2", "sphere3", "sphere4", "sphere5", "sphere6", "sphere7", "sphere8", "sphere9"]
-
+let moveSphere = null
 var ships = ["Ship1", "Ship2", "Ship3"]
 
 
@@ -71,14 +71,14 @@ export function startGame(state) {
        */
       function (rb, otherRb) {
         //If two ships collide
-        // if (((rb.drawingObj).toString() in health) && ((otherRb.drawingObj).toString() in health)){
-        //   health[ships[i]]=0
-        //   health[otherRb.drawingObj.name]=0
-        //   //rb.gravityStrength=9.81
-        //   //otherRb.gravityStrength=9.81
-        //   rb.drawingObj.material.diffuse = [1.0, 0, 0]
-        //   otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
-        // }
+        if ((containsObject((rb.drawingObj.name).toString(),spheres)) && containsObject((otherRb.drawingObj.name).toString(),spheres)){
+          health[rb.drawingObj.name]=0
+          health[otherRb.drawingObj.name]=0
+          rb.gravityStrength=9.81
+          otherRb.gravityStrength=9.81
+          rb.drawingObj.material.diffuse = [1.0, 0, 0]
+          otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
+        }
         //collidedShip = shipObj
       }
     )
@@ -97,16 +97,18 @@ export function startGame(state) {
        * @param {import('./types.js').Rigidbody} otherRb
        */
       function (rb, otherRb) {
-        // if ((otherRb.drawingObj.name in spheres) && (rb.drawingObj.name in spheres)){
-        //   sphereColliding= false
-        //   rb.gravityStrength = 9.81
-        //   otherRb.gravityStrength = 9.81
-        // }
-        
-        sphereColliding= true
-        movespheres.splice(0,1)
-        collidedSphere = rb.drawingObj
-        collidedShip = otherRb.drawingObj
+
+        if (containsObject((otherRb.drawingObj.name),spheres) && containsObject((rb.drawingObj.name),spheres)){
+           sphereColliding= false
+           rb.gravityStrength = 9.81
+           otherRb.gravityStrength = 9.81
+         }
+        else {
+          sphereColliding= true
+          movespheres = movespheres.filter(sphere => sphere !== moveSphere)
+          collidedSphere = rb.drawingObj
+          collidedShip = otherRb.drawingObj
+        }
         
       }
     )
@@ -145,14 +147,14 @@ export function fixedUpdate(state, deltaTime) {
     //collidedShip = null
     //collidedSphere = null
     if (movespheres.length > 0){
-      let moveSphere = movespheres[0]
+      moveSphere = movespheres[Math.floor(Math.random() * movespheres.length)]
 
       for (let i =0; i< rigidbodies.length; i++){
         
         if (rigidbodies[i].drawingObj.name === moveSphere){
           rigidbodies[i].velocity[1] = 5
           rigidbodies[i].velocity[2] = 20
-          rigidbodies[i].gravityStrength =9.81
+          rigidbodies[i].gravityStrength = 10
         }
       }
     }
@@ -171,7 +173,6 @@ export function fixedUpdate(state, deltaTime) {
 
       for (let i=0; i < rigidbodies.length; i++){
         if ((rigidbodies[i]).drawingObj.name === collidedShip.name){
-  
           if (health[collidedShip.name] <= 0){
             //(rigidbodies[i]).gravityStrength=9.81
           }
@@ -269,3 +270,14 @@ function updateFlyCam(state) {
  * @param {import("./types").AppState} state
  */
 export function update(state) { }
+
+function containsObject(obj, list) {
+  var i;
+  for (i = 0; i < list.length; i++) {
+      if (list[i] === obj) {
+          return true;
+      }
+  }
+
+  return false;
+}
