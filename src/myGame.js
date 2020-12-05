@@ -33,7 +33,7 @@ const rigidbodies = []
 let sphereColliding = false
 let shipObj = null
 let sphereObj = null
-var health = {"Ship1": 3, "Ship2": 3, "Ship3": 3}
+var health = {"Ship1": 15, "Ship2": 15, "Ship3": 15}
 let collidedShip = null
 let collidedSphere = null
 var spheres = ["sphere1", "sphere2", "sphere3", "sphere4", "sphere5", "sphere6", "sphere7", "sphere8", "sphere9"]
@@ -71,15 +71,14 @@ export function startGame(state) {
        */
       function (rb, otherRb) {
         //If two ships collide
-        if ((containsObject((rb.drawingObj.name).toString(),spheres)) && containsObject((otherRb.drawingObj.name).toString(),spheres)){
+        if (containsObject((rb.drawingObj.name),ships) && containsObject(otherRb.drawingObj.name,ships)){
           health[rb.drawingObj.name]=0
           health[otherRb.drawingObj.name]=0
           rb.gravityStrength=9.81
           otherRb.gravityStrength=9.81
           rb.drawingObj.material.diffuse = [1.0, 0, 0]
           otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
-          movespheres = movespheres.filter(sphere => sphere !== rb.drawingObj.name)
-          movespheres = movespheres.filter(sphere => sphere !== otherRb.drawingObj.name)
+          
         }
         //collidedShip = shipObj
       }
@@ -104,6 +103,8 @@ export function startGame(state) {
            sphereColliding= false
            rb.gravityStrength = 9.81
            otherRb.gravityStrength = 9.81
+           movespheres = movespheres.filter(sphere => sphere !== rb.drawingObj.name)
+           movespheres = movespheres.filter(sphere => sphere !== otherRb.drawingObj.name)
          }
         else {
           sphereColliding= true
@@ -166,8 +167,6 @@ export function fixedUpdate(state, deltaTime) {
     // handle physics here
     // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
     sphereColliding = false
-    //collidedShip = null
-    //collidedSphere = null
     
     updateRigidbodies(rigidbodies, deltaTime)
 
@@ -185,13 +184,15 @@ export function fixedUpdate(state, deltaTime) {
       for (let i=0; i < rigidbodies.length; i++){
         if ((rigidbodies[i]).drawingObj.name === collidedShip.name){
           if (health[collidedShip.name] <= 0){
-            //(rigidbodies[i]).gravityStrength=9.81
+            (rigidbodies[i]).gravityStrength=9.81
           }
         }
       }
     } 
     else {
-      //shipObj.material.diffuse = [0, 0, 1.0]
+      if (collidedShip != null){
+        collidedShip.material.diffuse = [0, 0, 1.0]
+      }
     }
   }
 }
