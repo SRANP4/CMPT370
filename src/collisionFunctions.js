@@ -263,7 +263,7 @@ export function translateBoundingBox (box, pos) {
  * @returns {import("./types").BoundingBox}
  */
 export function getBoundingBoxFromModelVertices (drawingObj) {
-  const vertices = drawingObj.model.vertices.flat()
+  const vertices = drawingObj.model.vertices
   const xoffset = drawingObj.model.position[0]
   const yoffset = drawingObj.model.position[1]
   const zoffset = drawingObj.model.position[2]

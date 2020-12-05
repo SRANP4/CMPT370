@@ -36,16 +36,17 @@ export class Plane {
     }
     this.material = { ...object.material }
     this.model = {
-      vertices: [
-        [0.0, 0.5, 0.5],
-        [0.0, 0.5, 0.0],
-        [0.5, 0.5, 0.0],
-        [0.5, 0.5, 0.5]
-      ],
-      triangles: [0, 2, 1, 2, 0, 3],
-      uvs: [0.0, 0.0, 5.0, 0.0, 5.0, 5.0, 0.0, 5.0],
-      normals: [0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
-      bitangents: [
+      // prettier-ignore
+      vertices: new Float32Array([
+        0.0, 0.5, 0.5,
+        0.0, 0.5, 0.0,
+        0.5, 0.5, 0.0,
+        0.5, 0.5, 0.5
+      ]),
+      triangles: new Uint16Array([0, 2, 1, 2, 0, 3]),
+      uvs: new Float32Array([0.0, 0.0, 5.0, 0.0, 5.0, 5.0, 0.0, 5.0]),
+      normals: new Float32Array([0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0]),
+      bitangents: new Float32Array([
         0,
         -1,
         0,
@@ -58,7 +59,7 @@ export class Plane {
         0,
         -1,
         0 // top
-      ],
+      ]),
       diffuseTexture: object.diffuseTexture
         ? object.diffuseTexture
         : 'default.png',
@@ -175,11 +176,11 @@ export class Plane {
 
   initBuffers () {
     // create vertices, normal and indices arrays
-    const positions = new Float32Array(this.model.vertices.flat())
-    const normals = new Float32Array(this.model.normals.flat())
-    const indices = new Uint16Array(this.model.triangles)
-    const textureCoords = new Float32Array(this.model.uvs)
-    // const bitangents = new Float32Array(this.model.bitangents)
+    const positions = this.model.vertices
+    const normals = this.model.normals
+    const indices = this.model.triangles
+    const textureCoords = this.model.uvs
+    // const bitangents = this.model.bitangents
 
     const vertexArrayObject = this.gl.createVertexArray()
 
@@ -202,7 +203,7 @@ export class Plane {
   }
 
   setup () {
-    this.centroid = calculateCentroid(this.model.vertices.flat())
+    this.centroid = calculateCentroid(this.model.vertices)
     this.lightingShader()
     this.scale(this.initialTransform.scale)
     this.translate(this.initialTransform.position)

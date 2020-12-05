@@ -139,6 +139,13 @@ declare type OBJMesh = {
     normals: Array<number>;
 }
 
+declare type Mesh = {
+    vertices: Float32Array;
+    uvs: Float32Array;
+    normals: Float32Array;
+    centroid: vec3;
+}
+
 declare type Material = {
     diffuse: vec3;
     ambient: vec3;

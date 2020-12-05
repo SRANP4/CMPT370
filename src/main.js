@@ -87,7 +87,7 @@ window.onload = async () => {
 
 /**
  *
- * @param {import('./types').OBJMesh} mesh contains vertex, normal, uv information for the mesh to be made
+ * @param {import('./types').Mesh} mesh contains vertex, normal, uv information for the mesh to be made
  * @param {import('./types').StateFileObject} loadObject the game object that will use the mesh information
  * @purpose - Helper function called as a callback function when the mesh is done loading for the object
  */
@@ -261,7 +261,9 @@ function main () {
   // iterate through the level's objects and add them
   state.loadObjects.forEach(loadObject => {
     if (loadObject.type === 'mesh') {
-      parseOBJFileToJSON(loadObject.model, createMesh, loadObject)
+      parseOBJFileToJSON(loadObject.model, function (mesh) {
+        createMesh(mesh, loadObject)
+      })
     } else if (loadObject.type === 'cube') {
       const tempCube = new Cube(gl, loadObject)
       tempCube.vertShader = vertShaderSample
