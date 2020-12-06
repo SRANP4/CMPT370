@@ -66,8 +66,9 @@ export class EnemyShip extends GameObject {
   onIntersection(rb, otherRb) {
     // If two ships collide
     if (containsObject(otherRb.drawingObj.name, ships)) {
+      const otherShip = /** @type {EnemyShip} */(otherRb.gameObject)
       this.health = 0
-      otherRb.gameObject.health = 0
+      otherShip.health = 0
       rb.gravityStrength = 9.81
       otherRb.gravityStrength = 9.81
       rb.drawingObj.material.diffuse = [1.0, 0, 0]
