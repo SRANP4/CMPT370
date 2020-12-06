@@ -6,6 +6,7 @@ import { Model } from "./objects/Model";
 import { Plane } from "./objects/Plane";
 
 declare type AppState = {
+    simulationStatusTextElement: HTMLElement;
     tickTimeTextElement: HTMLElement;
     renderTimeTextElement: HTMLElement;
     tickDeltaTimeTextElement: HTMLElement;

@@ -2,14 +2,12 @@
 'use strict'
 
 import { vec3 } from '../lib/gl-matrix/index.js'
-import { random } from '../lib/gl-matrix/vec3.js'
 import { updateCameraEulerLookDir } from './cameraFunctions.js'
 import {
   createRigidbody,
   createSphere,
   updateRigidbodies,
-  getBoundingBoxFromModelVertices,
-  sphereIntersect
+  getBoundingBoxFromModelVertices
 } from './collisionFunctions.js'
 import {
   keysDown,
@@ -20,6 +18,7 @@ import {
   updateInput
 } from './inputHelper.js'
 import { getObject } from './sceneFunctions.js'
+import { updateSimulationStatusIndicator } from './uiSetup.js'
 
 /*
   TODO add debug object markers
@@ -158,6 +157,7 @@ export function startGame (state) {
  */
 export function fixedUpdate (state, deltaTime) {
   updateInput()
+
   if (keysPressed.get('-')) {
     state.selectedObjIndex = (state.selectedObjIndex - 1) % state.objectCount
     if (state.selectedObjIndex < 0) {
@@ -174,6 +174,20 @@ export function fixedUpdate (state, deltaTime) {
   if (keysPressed.get('p')) {
     simulationEnabled = !simulationEnabled
     if (simulationEnabled) {
+      updateSimulationStatusIndicator('Simulation running')
+    } else {
+      updateSimulationStatusIndicator('Simulation paused')
+    }
+  }
+
+  if (simulationEnabled) {
+    // handle physics here
+    // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
+    sphereColliding = false
+
+    updateRigidbodies(rigidbodies, deltaTime)
+
+    if (keysPressed.get('f')) {
       if (movespheres.length > 0) {
         if (containsObject(moveSphere, movespheres)) {
           movespheres = movespheres.filter(sphere => sphere !== moveSphere)
@@ -189,14 +203,6 @@ export function fixedUpdate (state, deltaTime) {
         }
       }
     }
-  }
-
-  if (simulationEnabled) {
-    // handle physics here
-    // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
-    sphereColliding = false
-
-    updateRigidbodies(rigidbodies, deltaTime)
 
     if (sphereColliding) {
       // change color of ship

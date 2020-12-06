@@ -90,6 +90,13 @@ export function initDebugStats (state) {
   state.objInfoTextElement.innerText = 'OBJ INFO'
 }
 
+export function updateSimulationStatusIndicator(message) {
+  const simulationStatusTextElement = /** @type {HTMLElement} */ (document.querySelector(
+    '#simulation_status'
+  ))
+  simulationStatusTextElement.innerText = message
+}
+
 /**
  *
  * @param {import('./types.js').AppState} state
