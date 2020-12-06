@@ -17,7 +17,7 @@ export class EnemyShip extends GameObject {
    * @param {import('./types.js').AppState} state
    * @param {string} name
    */
-  constructor (state, name) {
+  constructor(state, name) {
     super(name)
 
     const shipObj = getObject(state, name)
@@ -31,21 +31,28 @@ export class EnemyShip extends GameObject {
 
     this.drawingObject = shipObj
     this.rigidbody = shipRb
-    this.health = 15
+    this.health = 5
   }
 
   /**
    * called after all other objects are initialized
    * @param {import('./types.js').AppState} state
    */
-  onStart (state) {}
+  onStart(state) { }
+
+  /**
+   * Called each update (BEFORE physics runs)
+   * @param {import('./types.js').AppState} state
+   * @param {number} deltaTime
+   */
+  onEarlyUpdate(state, deltaTime) { }
 
   /**
    * Called each update
    * @param {import('./types.js').AppState} state
    * @param {number} deltaTime
    */
-  onUpdate (state, deltaTime) {
+  onUpdate(state, deltaTime) {
     if (this.health <= 0) {
       this.rigidbody.gravityStrength = 9.81
     }
@@ -56,14 +63,11 @@ export class EnemyShip extends GameObject {
    * @param {import('./types.js').Rigidbody} rb
    * @param {import('./types.js').Rigidbody} otherRb
    */
-  onIntersection (rb, otherRb) {
+  onIntersection(rb, otherRb) {
     // If two ships collide
-    if (
-      containsObject(rb.drawingObj.name, ships) &&
-      containsObject(otherRb.drawingObj.name, ships)
-    ) {
-      health[rb.drawingObj.name] = 0
-      health[otherRb.drawingObj.name] = 0
+    if (containsObject(otherRb.drawingObj.name, ships)) {
+      this.health = 0
+      otherRb.gameObject.health = 0
       rb.gravityStrength = 9.81
       otherRb.gravityStrength = 9.81
       rb.drawingObj.material.diffuse = [1.0, 0, 0]
