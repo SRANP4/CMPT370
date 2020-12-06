@@ -28,7 +28,7 @@ export class Cannonball extends GameObject {
    * @param {import('./types.js').AppState} state
    * @param {string} name
    */
-  constructor (state, name) {
+  constructor(state, name) {
     super(name)
 
     const sphereObj = getObject(state, name)
@@ -44,8 +44,8 @@ export class Cannonball extends GameObject {
     this.rigidbody = sphereRb
     this.damage = 5
     this.sphereColliding = false
-    /** @type {GameObject} */
-    this.collidedSphere = null
+    // /** @type {GameObject} */
+    // this.collidedSphere = null
     /** @type {GameObject} */
     this.collidedShip = null
   }
@@ -54,25 +54,35 @@ export class Cannonball extends GameObject {
    * called after all other objects are initialized
    * @param {import('./types.js').AppState} state
    */
-  onStart (state) {}
+  onStart(state) { }
 
-  /**
-   * Called each update
+    /**
+   * Called each update (BEFORE physics runs)
    * @param {import('./types.js').AppState} state
    * @param {number} deltaTime
    */
-  onUpdate (state, deltaTime) {
+  onEarlyUpdate(state, deltaTime) {
+    this.sphereColliding = false
+  }
+
+  /**
+   * Called each update (AFTER physics runs)
+   * @param {import('./types.js').AppState} state
+   * @param {number} deltaTime
+   */
+  onUpdate(state, deltaTime) {
     if (this.sphereColliding) {
       // change color of ship
       this.collidedShip.drawingObject.material.diffuse = [1.0, 0, 0]
 
-      // change color of sphere
-      this.collidedSphere.drawingObject.material.diffuse = [1.0, 0, 0]
+      // change color of this sphere
+      this.drawingObject.material.diffuse = [1.0, 0, 0];
 
       // reduce health of ship
-      ;/** @type {EnemyShip} */ (this.collidedShip).health -= 1
+      /** @type {EnemyShip} */(this.collidedShip).health -= 1
     } else {
       if (this.collidedShip != null) {
+        // will be set to the last ship intersecting with, so will become red
         this.collidedShip.drawingObject.material.diffuse = [0, 0, 1.0]
       }
     }
@@ -83,25 +93,14 @@ export class Cannonball extends GameObject {
    * @param {import('./types.js').Rigidbody} rb
    * @param {import('./types.js').Rigidbody} otherRb
    */
-  onIntersection (rb, otherRb) {
-    if (
-      containsObject(otherRb.drawingObj.name, spheres) &&
-      containsObject(rb.drawingObj.name, spheres)
-    ) {
+  onIntersection(rb, otherRb) {
+    // if both objects are spheres
+    if (containsObject(otherRb.drawingObj.name, spheres)) {
       this.sphereColliding = false
-      rb.gravityStrength = 9.81
-      otherRb.gravityStrength = 9.81
     } else {
+      // we'll assume the other is a ship
       this.sphereColliding = true
-      if (
-        this.collidedSphere !== null &&
-        this.collidedShip !== null &&
-        !(this.collidedSphere.name === rb.drawingObj.name) &&
-        !(this.collidedShip.name === otherRb.drawingObj.name)
-      ) {
-        this.collidedSphere = rb.gameObject
-        this.collidedShip = otherRb.gameObject
-      }
+      this.collidedShip = otherRb.gameObject
     }
   }
 }

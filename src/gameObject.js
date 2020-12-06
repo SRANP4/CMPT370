@@ -28,9 +28,23 @@ export class GameObject {
   onStart (state) {}
 
   /**
-   * Called each update
+   * Called each update (BEFORE physics runs)
+   * @param {import('./types.js').AppState} state
+   * @param {number} deltaTime
+   */
+  onEarlyUpdate (state, deltaTime) {}
+
+  /**
+   * Called each update (AFTER physics runs)
    * @param {import('./types.js').AppState} state
    * @param {number} deltaTime
    */
   onUpdate (state, deltaTime) {}
+
+  /**
+   * Called each update this object's rigidbody intersects with an object
+   * @param {import('./types.js').Rigidbody} rb
+   * @param {import('./types.js').Rigidbody} otherRb
+   */
+  onIntersection (rb, otherRb) {}
 }

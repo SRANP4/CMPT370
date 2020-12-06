@@ -28,6 +28,7 @@ export function getObject (state, name) {
  * @template T
  * @param {T} obj
  * @param {Array<T>} list
+ * @returns {boolean}
  */
 export function containsObject (obj, list) {
   let i
