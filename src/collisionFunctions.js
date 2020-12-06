@@ -120,8 +120,8 @@ export function updateRigidbodySimulation (deltaTime) {
       if (intersection) {
         // call back provides (this, other)
         // need to do one for both callbacks
-        rb.collisionCallback(rb, otherRb)
-        otherRb.collisionCallback(otherRb, rb)
+        rb.gameObject.onIntersection(rb, otherRb)
+        otherRb.gameObject.onIntersection(otherRb, rb)
       }
     }
   }
