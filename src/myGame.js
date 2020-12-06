@@ -147,7 +147,6 @@ function updateDebugSelectedObject (state) {
     state.selectedObjIndex = (state.selectedObjIndex + 1) % state.objectCount
   }
 }
-}
 
 /**
  *
