@@ -19,6 +19,22 @@ export function getObject (state, name) {
   return objectToFind
 }
 
+/**
+ * @template T
+ * @param {T} obj
+ * @param {Array<T>} list
+ */
+export function containsObject (obj, list) {
+  let i
+  for (i = 0; i < list.length; i++) {
+    if (list[i] === obj) {
+      return true
+    }
+  }
+
+  return false
+}
+
 export function scaleBoundingBox (boundingBox, scaleVec) {
   const newBox = {
     xMin: boundingBox.xMin,

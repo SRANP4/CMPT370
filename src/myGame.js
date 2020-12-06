@@ -18,7 +18,7 @@ import {
   setupInputEvents,
   updateInput
 } from './inputHelper.js'
-import { getObject } from './sceneFunctions.js'
+import { containsObject, getObject } from './sceneFunctions.js'
 import { updateSimulationStatusIndicator } from './uiSetup.js'
 
 /*
@@ -62,10 +62,12 @@ let moveSphere = null
 let ships = ['Ship1', 'Ship2', 'Ship3']
 
 // function createCannonball() {
+//  // object init code here
+//
 //   const cannonball = {
-//     onStart: () => {},
-//     onUpdate: () => {},
-//     onIntersection: () => {},
+//     onStart: () => {}, // called after all other objects are initialized
+//     onUpdate: () => {}, // called each update
+//     onIntersection: () => {}, // called each time this object's rigidbody intersects with an object
 //     drawingObject: undefined,
 //     rigidbody: undefined,
 //     otherVar: 2313
@@ -106,7 +108,6 @@ export function startGame (state) {
           rb.drawingObj.material.diffuse = [1.0, 0, 0]
           otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
         }
-        // collidedShip = shipObj
       }
     )
     shipRb.gravityStrength = 0
@@ -353,19 +354,3 @@ function updateFlyCam (state, deltaTime) {
   }
 }
 
-/**
- *
- * @param {import("./types").AppState} state
- */
-export function update (state) {}
-
-function containsObject (obj, list) {
-  let i
-  for (i = 0; i < list.length; i++) {
-    if (list[i] === obj) {
-      return true
-    }
-  }
-
-  return false
-}
