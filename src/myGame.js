@@ -91,6 +91,10 @@ export function fixedUpdate (state, deltaTime) {
   updateSimulationEnabled()
 
   if (simulationEnabled) {
+    gameObjects.forEach(go => {
+      go.onEarlyUpdate(state, deltaTime)
+    })
+
     // handle physics here
     // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
     updateRigidbodySimulation(deltaTime)
