@@ -119,6 +119,7 @@ export function fixedUpdate (state, deltaTime) {
   }
 }
 
+
 function updateSimulationEnabled () {
   if (keysPressed.get('p')) {
     simulationEnabled = !simulationEnabled
@@ -145,6 +146,7 @@ function updateDebugSelectedObject (state) {
   if (keysPressed.get('=')) {
     state.selectedObjIndex = (state.selectedObjIndex + 1) % state.objectCount
   }
+}
 }
 
 /**
