@@ -2,6 +2,7 @@
 'use strict'
 
 import { vec3 } from '../lib/gl-matrix/index.js'
+import { GameObject } from './gameObject.js'
 import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
 import { Plane } from './objects/Plane.js'
@@ -23,7 +24,7 @@ export function initRigidbodySimulation () {
  *
  * @param {number} deltaTime
  */
-export function updateRigidbodies (deltaTime) {
+export function updateRigidbodySimulation (deltaTime) {
   const deltaTimeSeconds = deltaTime / 1000
 
   // TODO add callbacks for intersection enter and exit
@@ -129,14 +130,16 @@ export function updateRigidbodies (deltaTime) {
 /**
  *
  * @param {Model | Cube | Plane} drawingObject
+ * @param {GameObject} gameObject
  * @param {import('./types').Sphere | import('./types').BoundingBox} collider
  * @param {CallableFunction} collisionCallback is passed (rb, otherRb)
  * @return {import('./types').Rigidbody}
  */
-export function createRigidbody (drawingObject, collider, collisionCallback) {
+export function createRigidbody (drawingObject, gameObject, collider, collisionCallback) {
   const rb = {
     pos: drawingObject.model.position,
     drawingObj: drawingObject,
+    gameObject: gameObject,
     collider: collider,
     collisionCallback: collisionCallback,
     velocity: vec3.create(),

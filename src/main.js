@@ -4,7 +4,7 @@
 
 import { mat4, vec3 } from '../lib/gl-matrix/index.js'
 import { loadMeshFromOBJUrl, parseSceneFile } from './commonFunctions.js'
-import { fixedUpdate, startGame, update } from './myGame.js'
+import { fixedUpdate, startGame } from './myGame.js'
 import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
 import { Plane } from './objects/Plane.js'
@@ -380,25 +380,6 @@ function runFixedUpdateLoop (now) {
     deltaTimeSum = 0
     lastUpdateTime = start
   }
-}
-
-/**
- *
- * @param {number} lastTickTime
- */
-function runUpdateLoop (lastTickTime) {
-  const start = window.performance.now()
-  calcTimeStats(updateTimeStats, lastTickTime)
-  // update the overlay
-  state.updateTimeTextElement.innerText =
-    'Average update time: ' + updateTimeStats.averageTime.toFixed(6) + 'ms'
-
-  if (document.visibilityState === 'visible') {
-    update(state) // constantly call our game loop
-  }
-
-  const elapsed = window.performance.now() - start
-  window.setTimeout(runUpdateLoop, 0, elapsed)
 }
 
 /**

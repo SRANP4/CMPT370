@@ -1,10 +1,15 @@
 // @ts-check
 'use strict'
 
+import { Cube } from "./objects/Cube.js"
+import { Model } from "./objects/Model.js"
+import { Plane } from "./objects/Plane.js"
+
 /**
  *
  * @param {import("./types").AppState} state
  * @param {string} name
+ * @returns {Model | Cube | Plane}
  */
 export function getObject (state, name) {
   let objectToFind = null

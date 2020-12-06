@@ -3,13 +3,13 @@
 
 import { vec3 } from '../lib/gl-matrix/index.js'
 import { updateCameraEulerLookDir } from './cameraFunctions.js'
+import { Cannonball } from './cannonball.js'
 import {
-  createRigidbody,
-  createSphere,
-  updateRigidbodies as updateRigidbodySimulation,
-  getBoundingBoxFromModelVertices,
+  updateRigidbodySimulation,
   initRigidbodySimulation
 } from './collisionFunctions.js'
+import { EnemyShip } from './enemyShip.js'
+import { GameObject } from './gameObject.js'
 import {
   keysDown,
   keysPressed,
@@ -21,22 +21,14 @@ import {
 import { containsObject, getObject } from './sceneFunctions.js'
 import { updateSimulationStatusIndicator } from './uiSetup.js'
 
-/*
-  TODO add debug object markers
-  TODO add debug grid
-*/
-
-// If you want to use globals here you can. Initialize them in startGame then update/change them in gameLoop
 let flyCamEnabled = false
 let simulationEnabled = false
-const rigidbodies = []
-let sphereColliding = false
-let shipObj = null
-let sphereObj = null
-let health = { Ship1: 15, Ship2: 15, Ship3: 15 }
-let collidedShip = null
-let collidedSphere = null
-let spheres = [
+
+/** @type { Array<GameObject> } */
+const gameObjects = []
+
+// cannonball and ship names as they are in the scene.json file
+const spheres = [
   'sphere1',
   'sphere2',
   'sphere3',
@@ -59,22 +51,7 @@ let movespheres = [
   'sphere9'
 ]
 let moveSphere = null
-let ships = ['Ship1', 'Ship2', 'Ship3']
-
-// function createCannonball() {
-//  // object init code here
-//
-//   const cannonball = {
-//     onStart: () => {}, // called after all other objects are initialized
-//     onUpdate: () => {}, // called each update
-//     onIntersection: () => {}, // called each time this object's rigidbody intersects with an object
-//     drawingObject: undefined,
-//     rigidbody: undefined,
-//     otherVar: 2313
-//   }
-
-//   return cannonball
-// }
+const ships = ['Ship1', 'Ship2', 'Ship3']
 
 /**
  *
@@ -85,74 +62,21 @@ export function startGame (state) {
   setupInputEvents(state.canvas)
   initRigidbodySimulation()
 
+  // create enemy ship objects
   for (let i = 0; i < ships.length; i++) {
-    shipObj = getObject(state, ships[i])
-    const shipRb = createRigidbody(
-      shipObj,
-      getBoundingBoxFromModelVertices(shipObj),
-      /**
-       *
-       * @param {import('./types.js').Rigidbody} rb
-       * @param {import('./types.js').Rigidbody} otherRb
-       */
-      function (rb, otherRb) {
-        // If two ships collide
-        if (
-          containsObject(rb.drawingObj.name, ships) &&
-          containsObject(otherRb.drawingObj.name, ships)
-        ) {
-          health[rb.drawingObj.name] = 0
-          health[otherRb.drawingObj.name] = 0
-          rb.gravityStrength = 9.81
-          otherRb.gravityStrength = 9.81
-          rb.drawingObj.material.diffuse = [1.0, 0, 0]
-          otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
-        }
-      }
-    )
-    shipRb.gravityStrength = 0
+    const gameObj = new EnemyShip(state, ships[i])
+    gameObjects.push(gameObj)
   }
 
+  // create cannonball objects
   for (let i = 0; i < spheres.length; i++) {
-    sphereObj = getObject(state, spheres[i])
-    const sphereRb = createRigidbody(
-      sphereObj,
-      createSphere(vec3.create(), 0.25),
-      /**
-       *
-       * @param {import('./types.js').Rigidbody} rb
-       * @param {import('./types.js').Rigidbody} otherRb
-       */
-      function (rb, otherRb) {
-        if (
-          containsObject(otherRb.drawingObj.name, spheres) &&
-          containsObject(rb.drawingObj.name, spheres)
-        ) {
-          sphereColliding = false
-          rb.gravityStrength = 9.81
-          otherRb.gravityStrength = 9.81
-          movespheres = movespheres.filter(
-            sphere => sphere !== rb.drawingObj.name
-          )
-          movespheres = movespheres.filter(
-            sphere => sphere !== otherRb.drawingObj.name
-          )
-        } else {
-          sphereColliding = true
-          if (
-            !(collidedSphere === rb.drawingObj.name) &&
-            !(collidedShip === otherRb.drawingObj.name)
-          ) {
-            collidedSphere = rb.drawingObj
-            collidedShip = otherRb.drawingObj
-            movespheres = movespheres.filter(sphere => sphere !== moveSphere)
-          }
-        }
-      }
-    )
-
-    sphereRb.gravityStrength = 0
+    const gameObj = new Cannonball(state, spheres[i])
+    gameObjects.push(gameObj)
   }
+
+  gameObjects.forEach(go => {
+    go.onStart(state)
+  })
 }
 
 /**
@@ -169,10 +93,13 @@ export function fixedUpdate (state, deltaTime) {
   if (simulationEnabled) {
     // handle physics here
     // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
-    sphereColliding = false
-
     updateRigidbodySimulation(deltaTime)
 
+    gameObjects.forEach(go => {
+      go.onUpdate(state, deltaTime)
+    })
+
+    // misc stuff that doesn't fit in an object
     if (keysPressed.get('f')) {
       if (movespheres.length > 0) {
         if (containsObject(moveSphere, movespheres)) {
@@ -187,29 +114,6 @@ export function fixedUpdate (state, deltaTime) {
           rb.velocity[2] = 20
           rb.gravityStrength = 10
         }
-      }
-    }
-
-    if (sphereColliding) {
-      // change color of ship
-      collidedShip.material.diffuse = [1.0, 0, 0]
-
-      // change color of sphere
-      collidedSphere.material.diffuse = [1.0, 0, 0]
-
-      // reduce health of ship
-      health[collidedShip.name] -= 1
-
-      for (let i = 0; i < rigidbodies.length; i++) {
-        if (rigidbodies[i].drawingObj.name === collidedShip.name) {
-          if (health[collidedShip.name] <= 0) {
-            rigidbodies[i].gravityStrength = 9.81
-          }
-        }
-      }
-    } else {
-      if (collidedShip != null) {
-        collidedShip.material.diffuse = [0, 0, 1.0]
       }
     }
   }
@@ -353,4 +257,3 @@ function updateFlyCam (state, deltaTime) {
     }
   }
 }
-
