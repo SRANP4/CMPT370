@@ -519,7 +519,7 @@ function drawScene (gl, state) {
 
     if (object.parent) {
       const parent = getObject(state, object.parent)
-      if (parent.model && parent.model.modelMatrix) {
+      if (parent != null && parent.model && parent.model.modelMatrix) {
         mat4.multiply(modelMatrix, parent.model.modelMatrix, modelMatrix)
       }
     }
