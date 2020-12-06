@@ -157,28 +157,9 @@ export function startGame (state) {
  */
 export function fixedUpdate (state, deltaTime) {
   updateInput()
-
-  if (keysPressed.get('-')) {
-    state.selectedObjIndex = (state.selectedObjIndex - 1) % state.objectCount
-    if (state.selectedObjIndex < 0) {
-      state.selectedObjIndex = state.objectCount - 1
-    }
-  }
-
-  if (keysPressed.get('=')) {
-    state.selectedObjIndex = (state.selectedObjIndex + 1) % state.objectCount
-  }
-
-  updateFlyCam(state)
-
-  if (keysPressed.get('p')) {
-    simulationEnabled = !simulationEnabled
-    if (simulationEnabled) {
-      updateSimulationStatusIndicator('Simulation running')
-    } else {
-      updateSimulationStatusIndicator('Simulation paused')
-    }
-  }
+  updateDebugSelectedObject(state)
+  updateFlyCam(state, deltaTime)
+  updateSimulationEnabled()
 
   if (simulationEnabled) {
     // handle physics here
@@ -229,18 +210,49 @@ export function fixedUpdate (state, deltaTime) {
   }
 }
 
+function updateSimulationEnabled () {
+  if (keysPressed.get('p')) {
+    simulationEnabled = !simulationEnabled
+    if (simulationEnabled) {
+      updateSimulationStatusIndicator('Simulation running')
+    } else {
+      updateSimulationStatusIndicator('Simulation paused')
+    }
+  }
+}
+
 /**
  *
  * @param {import('./types.js').AppState} state
  */
-function updateFlyCam (state) {
+function updateDebugSelectedObject (state) {
+  if (keysPressed.get('-')) {
+    state.selectedObjIndex = (state.selectedObjIndex - 1) % state.objectCount
+    if (state.selectedObjIndex < 0) {
+      state.selectedObjIndex = state.objectCount - 1
+    }
+  }
+
+  if (keysPressed.get('=')) {
+    state.selectedObjIndex = (state.selectedObjIndex + 1) % state.objectCount
+  }
+}
+
+/**
+ *
+ * @param {import('./types.js').AppState} state
+ * @param {number} deltaTime deltaTime in ms
+ */
+function updateFlyCam (state, deltaTime) {
+  const secondsDeltaTime = deltaTime / 1000
+
   if (keysPressed.get('`')) {
     flyCamEnabled = !flyCamEnabled
     console.log('fly cam: ' + flyCamEnabled)
   }
 
   if (flyCamEnabled) {
-    const moveSpeed = 0.05
+    const moveSpeed = 7
     const pitchLookLimit = 1.57 // pi / 2, but a bit less
 
     // mouse look
@@ -259,52 +271,52 @@ function updateFlyCam (state) {
     // move relative to current look direction
     if (keysDown.get('a')) {
       const positionTranslate = vec3.create()
-      vec3.scale(positionTranslate, state.camera.right, -moveSpeed)
+      vec3.scale(positionTranslate, state.camera.right, -moveSpeed * secondsDeltaTime)
       vec3.add(state.camera.position, state.camera.position, positionTranslate)
 
       const centerTranslate = vec3.create()
-      vec3.scale(centerTranslate, state.camera.right, -moveSpeed)
+      vec3.scale(centerTranslate, state.camera.right, -moveSpeed * secondsDeltaTime)
       vec3.add(state.camera.center, state.camera.center, centerTranslate)
     }
 
     if (keysDown.get('d')) {
       const positionTranslate = vec3.create()
-      vec3.scale(positionTranslate, state.camera.right, moveSpeed)
+      vec3.scale(positionTranslate, state.camera.right, moveSpeed * secondsDeltaTime)
       vec3.add(state.camera.position, state.camera.position, positionTranslate)
 
       const centerTranslate = vec3.create()
-      vec3.scale(centerTranslate, state.camera.right, moveSpeed)
+      vec3.scale(centerTranslate, state.camera.right, moveSpeed * secondsDeltaTime)
       vec3.add(state.camera.center, state.camera.center, centerTranslate)
     }
 
     if (keysDown.get('w')) {
       const positionTranslate = vec3.create()
-      vec3.scale(positionTranslate, state.camera.at, moveSpeed)
+      vec3.scale(positionTranslate, state.camera.at, moveSpeed * secondsDeltaTime)
       vec3.add(state.camera.position, state.camera.position, positionTranslate)
 
       const centerTranslate = vec3.create()
-      vec3.scale(centerTranslate, state.camera.at, moveSpeed)
+      vec3.scale(centerTranslate, state.camera.at, moveSpeed * secondsDeltaTime)
       vec3.add(state.camera.center, state.camera.center, centerTranslate)
     }
 
     if (keysDown.get('s')) {
       const positionTranslate = vec3.create()
-      vec3.scale(positionTranslate, state.camera.at, -moveSpeed)
+      vec3.scale(positionTranslate, state.camera.at, -moveSpeed * secondsDeltaTime)
       vec3.add(state.camera.position, state.camera.position, positionTranslate)
 
       const centerTranslate = vec3.create()
-      vec3.scale(centerTranslate, state.camera.at, -moveSpeed)
+      vec3.scale(centerTranslate, state.camera.at, -moveSpeed * secondsDeltaTime)
       vec3.add(state.camera.center, state.camera.center, centerTranslate)
     }
 
     if (keysDown.get(' ')) {
-      state.camera.position[1] += moveSpeed
-      state.camera.center[1] += moveSpeed
+      state.camera.position[1] += moveSpeed * secondsDeltaTime
+      state.camera.center[1] += moveSpeed * secondsDeltaTime
     }
 
     if (keysDown.get('shift')) {
-      state.camera.position[1] -= moveSpeed
-      state.camera.center[1] -= moveSpeed
+      state.camera.position[1] -= moveSpeed * secondsDeltaTime
+      state.camera.center[1] -= moveSpeed * secondsDeltaTime
     }
   }
 }
