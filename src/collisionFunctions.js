@@ -12,11 +12,18 @@ const GRAVITY_STRENGTH = 9.81
 const GRAVITY_DIRECTION = vec3.fromValues(0, -1, 0)
 const VELOCITY_CAP = vec3.fromValues(30, 30, 30)
 
+/** @type { Array<import('./types.js').Rigidbody> }  */
+const rigidbodies = []
+
+export function initRigidbodySimulation () {
+  // just a placeholder for now
+}
+
 /**
  *
- * @param {Array<import('./types.js').Rigidbody>} rigidbodies
+ * @param {number} deltaTime
  */
-export function updateRigidbodies (rigidbodies, deltaTime) {
+export function updateRigidbodies (deltaTime) {
   const deltaTimeSeconds = deltaTime / 1000
 
   // TODO add callbacks for intersection enter and exit
@@ -142,6 +149,7 @@ export function createRigidbody (drawingObject, collider, collisionCallback) {
     gravityStrength: GRAVITY_STRENGTH
   }
   drawingObject.rigidbody = rb
+  rigidbodies.push(rb)
   return rb
 }
 

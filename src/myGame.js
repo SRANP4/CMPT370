@@ -6,8 +6,9 @@ import { updateCameraEulerLookDir } from './cameraFunctions.js'
 import {
   createRigidbody,
   createSphere,
-  updateRigidbodies,
-  getBoundingBoxFromModelVertices
+  updateRigidbodies as updateRigidbodySimulation,
+  getBoundingBoxFromModelVertices,
+  initRigidbodySimulation
 } from './collisionFunctions.js'
 import {
   keysDown,
@@ -60,22 +61,27 @@ let movespheres = [
 let moveSphere = null
 let ships = ['Ship1', 'Ship2', 'Ship3']
 
+// function createCannonball() {
+//   const cannonball = {
+//     onStart: () => {},
+//     onUpdate: () => {},
+//     onIntersection: () => {},
+//     drawingObject: undefined,
+//     rigidbody: undefined,
+//     otherVar: 2313
+//   }
+
+//   return cannonball
+// }
+
 /**
  *
  * @param { import("./types").AppState } state Game state
  * @usage Use this function for initializing any in game values in our state or adding event listeners
  */
 export function startGame (state) {
-  // this just prevents right click from opening up the context menu :)
-  document.addEventListener(
-    'contextmenu',
-    e => {
-      e.preventDefault()
-    },
-    false
-  )
-
   setupInputEvents(state.canvas)
+  initRigidbodySimulation()
 
   for (let i = 0; i < ships.length; i++) {
     shipObj = getObject(state, ships[i])
@@ -104,7 +110,6 @@ export function startGame (state) {
       }
     )
     shipRb.gravityStrength = 0
-    rigidbodies.push(shipRb)
   }
 
   for (let i = 0; i < spheres.length; i++) {
@@ -146,7 +151,6 @@ export function startGame (state) {
     )
 
     sphereRb.gravityStrength = 0
-    rigidbodies.push(sphereRb)
   }
 }
 
@@ -166,21 +170,21 @@ export function fixedUpdate (state, deltaTime) {
     // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
     sphereColliding = false
 
-    updateRigidbodies(rigidbodies, deltaTime)
+    updateRigidbodySimulation(deltaTime)
 
     if (keysPressed.get('f')) {
       if (movespheres.length > 0) {
         if (containsObject(moveSphere, movespheres)) {
           movespheres = movespheres.filter(sphere => sphere !== moveSphere)
         }
-        moveSphere =
-          movespheres[Math.floor(Math.random() * (movespheres.length - 0) + 0)]
-        for (let i = 0; i < rigidbodies.length; i++) {
-          if (rigidbodies[i].drawingObj.name === moveSphere) {
-            rigidbodies[i].velocity[1] = 5
-            rigidbodies[i].velocity[2] = 20
-            rigidbodies[i].gravityStrength = 10
-          }
+        moveSphere = movespheres[Math.floor(Math.random() * movespheres.length)]
+
+        const obj = getObject(state, moveSphere)
+        if (obj !== null) {
+          const rb = obj.rigidbody
+          rb.velocity[1] = 5
+          rb.velocity[2] = 20
+          rb.gravityStrength = 10
         }
       }
     }
@@ -271,27 +275,47 @@ function updateFlyCam (state, deltaTime) {
     // move relative to current look direction
     if (keysDown.get('a')) {
       const positionTranslate = vec3.create()
-      vec3.scale(positionTranslate, state.camera.right, -moveSpeed * secondsDeltaTime)
+      vec3.scale(
+        positionTranslate,
+        state.camera.right,
+        -moveSpeed * secondsDeltaTime
+      )
       vec3.add(state.camera.position, state.camera.position, positionTranslate)
 
       const centerTranslate = vec3.create()
-      vec3.scale(centerTranslate, state.camera.right, -moveSpeed * secondsDeltaTime)
+      vec3.scale(
+        centerTranslate,
+        state.camera.right,
+        -moveSpeed * secondsDeltaTime
+      )
       vec3.add(state.camera.center, state.camera.center, centerTranslate)
     }
 
     if (keysDown.get('d')) {
       const positionTranslate = vec3.create()
-      vec3.scale(positionTranslate, state.camera.right, moveSpeed * secondsDeltaTime)
+      vec3.scale(
+        positionTranslate,
+        state.camera.right,
+        moveSpeed * secondsDeltaTime
+      )
       vec3.add(state.camera.position, state.camera.position, positionTranslate)
 
       const centerTranslate = vec3.create()
-      vec3.scale(centerTranslate, state.camera.right, moveSpeed * secondsDeltaTime)
+      vec3.scale(
+        centerTranslate,
+        state.camera.right,
+        moveSpeed * secondsDeltaTime
+      )
       vec3.add(state.camera.center, state.camera.center, centerTranslate)
     }
 
     if (keysDown.get('w')) {
       const positionTranslate = vec3.create()
-      vec3.scale(positionTranslate, state.camera.at, moveSpeed * secondsDeltaTime)
+      vec3.scale(
+        positionTranslate,
+        state.camera.at,
+        moveSpeed * secondsDeltaTime
+      )
       vec3.add(state.camera.position, state.camera.position, positionTranslate)
 
       const centerTranslate = vec3.create()
@@ -301,11 +325,19 @@ function updateFlyCam (state, deltaTime) {
 
     if (keysDown.get('s')) {
       const positionTranslate = vec3.create()
-      vec3.scale(positionTranslate, state.camera.at, -moveSpeed * secondsDeltaTime)
+      vec3.scale(
+        positionTranslate,
+        state.camera.at,
+        -moveSpeed * secondsDeltaTime
+      )
       vec3.add(state.camera.position, state.camera.position, positionTranslate)
 
       const centerTranslate = vec3.create()
-      vec3.scale(centerTranslate, state.camera.at, -moveSpeed * secondsDeltaTime)
+      vec3.scale(
+        centerTranslate,
+        state.camera.at,
+        -moveSpeed * secondsDeltaTime
+      )
       vec3.add(state.camera.center, state.camera.center, centerTranslate)
     }
 

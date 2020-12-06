@@ -447,9 +447,9 @@ const callbackQueue = new Map()
 /**
  *
  * @param {string} objFileURL
- * @param {CallableFunction} cb
+ * @param {CallableFunction} cb returns Mesh object via the callback
  */
-export function parseOBJFileToJSON (objFileURL, cb) {
+export function loadMeshFromOBJUrl (objFileURL, cb) {
   if (loadedMeshes[objFileURL] !== undefined) {
     cb(loadedMeshes[objFileURL])
     return

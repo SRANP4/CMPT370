@@ -3,7 +3,7 @@
 'use strict'
 
 import { mat4, vec3 } from '../lib/gl-matrix/index.js'
-import { parseOBJFileToJSON, parseSceneFile } from './commonFunctions.js'
+import { loadMeshFromOBJUrl, parseSceneFile } from './commonFunctions.js'
 import { fixedUpdate, startGame, update } from './myGame.js'
 import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
@@ -261,7 +261,7 @@ function main () {
   // iterate through the level's objects and add them
   state.loadObjects.forEach(loadObject => {
     if (loadObject.type === 'mesh') {
-      parseOBJFileToJSON(loadObject.model, function (mesh) {
+      loadMeshFromOBJUrl(loadObject.model, function (mesh) {
         createMesh(mesh, loadObject)
       })
     } else if (loadObject.type === 'cube') {
