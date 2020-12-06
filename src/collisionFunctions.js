@@ -2,6 +2,7 @@
 'use strict'
 
 import { vec3 } from '../lib/gl-matrix/index.js'
+import { GameObject } from './gameObject.js'
 import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
 import { Plane } from './objects/Plane.js'
@@ -12,11 +13,18 @@ const GRAVITY_STRENGTH = 9.81
 const GRAVITY_DIRECTION = vec3.fromValues(0, -1, 0)
 const VELOCITY_CAP = vec3.fromValues(30, 30, 30)
 
+/** @type { Array<import('./types.js').Rigidbody> }  */
+const rigidbodies = []
+
+export function initRigidbodySimulation () {
+  // just a placeholder for now
+}
+
 /**
  *
- * @param {Array<import('./types.js').Rigidbody>} rigidbodies
+ * @param {number} deltaTime
  */
-export function updateRigidbodies (rigidbodies, deltaTime) {
+export function updateRigidbodySimulation (deltaTime) {
   const deltaTimeSeconds = deltaTime / 1000
 
   // TODO add callbacks for intersection enter and exit
@@ -122,14 +130,16 @@ export function updateRigidbodies (rigidbodies, deltaTime) {
 /**
  *
  * @param {Model | Cube | Plane} drawingObject
+ * @param {GameObject} gameObject
  * @param {import('./types').Sphere | import('./types').BoundingBox} collider
  * @param {CallableFunction} collisionCallback is passed (rb, otherRb)
  * @return {import('./types').Rigidbody}
  */
-export function createRigidbody (drawingObject, collider, collisionCallback) {
+export function createRigidbody (drawingObject, gameObject, collider, collisionCallback) {
   const rb = {
     pos: drawingObject.model.position,
     drawingObj: drawingObject,
+    gameObject: gameObject,
     collider: collider,
     collisionCallback: collisionCallback,
     velocity: vec3.create(),
@@ -142,6 +152,7 @@ export function createRigidbody (drawingObject, collider, collisionCallback) {
     gravityStrength: GRAVITY_STRENGTH
   }
   drawingObject.rigidbody = rb
+  rigidbodies.push(rb)
   return rb
 }
 
@@ -263,7 +274,7 @@ export function translateBoundingBox (box, pos) {
  * @returns {import("./types").BoundingBox}
  */
 export function getBoundingBoxFromModelVertices (drawingObj) {
-  const vertices = drawingObj.model.vertices.flat()
+  const vertices = drawingObj.model.vertices
   const xoffset = drawingObj.model.position[0]
   const yoffset = drawingObj.model.position[1]
   const zoffset = drawingObj.model.position[2]

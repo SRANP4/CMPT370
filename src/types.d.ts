@@ -1,11 +1,13 @@
 // adding references to outside classes makes it so that we have to add
 // import('./types') to everything and I hate it
-import { Cube } from "./objects/Cube";
-import { CustomObject } from "./objects/CustomObject";
-import { Model } from "./objects/Model";
-import { Plane } from "./objects/Plane";
+import { GameObject } from "./gameObject.js";
+import { Cube } from "./objects/Cube.js";
+import { CustomObject } from "./objects/CustomObject.js";
+import { Model } from "./objects/Model.js";
+import { Plane } from "./objects/Plane.js";
 
 declare type AppState = {
+    simulationStatusTextElement: HTMLElement;
     tickTimeTextElement: HTMLElement;
     renderTimeTextElement: HTMLElement;
     tickDeltaTimeTextElement: HTMLElement;
@@ -139,6 +141,13 @@ declare type OBJMesh = {
     normals: Array<number>;
 }
 
+declare type Mesh = {
+    vertices: Float32Array;
+    uvs: Float32Array;
+    normals: Float32Array;
+    centroid: vec3;
+}
+
 declare type Material = {
     diffuse: vec3;
     ambient: vec3;
@@ -180,6 +189,7 @@ declare type ProgramInfo = {
 declare type Rigidbody = {
     pos: vec3
     drawingObj: Model | Cube | Plane
+    gameObject: GameObject
     collisionCallback: CallableFunction
     velocity: vec3
     drag: vec3
@@ -203,3 +213,4 @@ declare type Sphere = {
     pos: vec3
     radius: number
 }
+

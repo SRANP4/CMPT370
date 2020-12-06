@@ -39,7 +39,7 @@ export class Cube {
     this.buffers = null
     this.programInfo = null
     this.model = {
-      vertices: [
+      vertices: new Float32Array([
         0.5,
         -0.5,
         -0.5,
@@ -148,8 +148,8 @@ export class Cube {
         -0.5,
         0.5,
         -0.5
-      ],
-      triangles: [
+      ]),
+      triangles: new Uint16Array([
         0,
         1,
         3,
@@ -186,8 +186,8 @@ export class Cube {
         33,
         34,
         35
-      ],
-      uvs: [
+      ]),
+      uvs: new Float32Array([
         0.375,
         0,
         0.625,
@@ -260,8 +260,8 @@ export class Cube {
         0.75,
         0.625,
         0.75
-      ],
-      normals: [
+      ]),
+      normals: new Float32Array([
         1,
         0,
         0,
@@ -370,8 +370,8 @@ export class Cube {
         0,
         1,
         0
-      ],
-      bitangents: [],
+      ]),
+      bitangents: new Float32Array([]),
       position: vec3.fromValues(0.0, 0.0, 0.0),
       rotation: mat4.create(),
       scale: vec3.fromValues(1.0, 1.0, 1.0),
@@ -490,11 +490,11 @@ export class Cube {
 
   initBuffers () {
     // create vertices, normal and indices arrays
-    const positions = new Float32Array(this.model.vertices.flat())
-    const normals = new Float32Array(this.model.normals.flat())
-    const indices = new Uint16Array(this.model.triangles.flat())
-    const textureCoords = new Float32Array(this.model.uvs.flat())
-    // const bitangents = new Float32Array(this.model.bitangents.flat())
+    const positions = this.model.vertices
+    const normals = this.model.normals
+    const indices = this.model.triangles
+    const textureCoords = this.model.uvs
+    // const bitangents = this.model.bitangents
 
     const vertexArrayObject = this.gl.createVertexArray()
     this.gl.bindVertexArray(vertexArrayObject)
@@ -516,7 +516,7 @@ export class Cube {
   }
 
   setup () {
-    this.centroid = calculateCentroid(this.model.vertices.flat())
+    this.centroid = calculateCentroid(this.model.vertices)
     this.lightingShader()
     this.scale(this.initialTransform.scale)
     this.translate(this.initialTransform.position)

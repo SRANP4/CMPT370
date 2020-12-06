@@ -32,6 +32,15 @@ let gatheredMouseYMovement = 0
  * @param {HTMLCanvasElement} canvas
  */
 export function setupInputEvents (canvas) {
+  // this just prevents right click from opening up the context menu :)
+  document.addEventListener(
+    'contextmenu',
+    e => {
+      e.preventDefault()
+    },
+    false
+  )
+
   // button / key press events
 
   window.addEventListener('keydown', event => {

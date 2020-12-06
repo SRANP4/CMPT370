@@ -3,8 +3,8 @@
 'use strict'
 
 import { mat4, vec3 } from '../lib/gl-matrix/index.js'
-import { parseOBJFileToJSON, parseSceneFile } from './commonFunctions.js'
-import { fixedUpdate, startGame, update } from './myGame.js'
+import { loadMeshFromOBJUrl, parseSceneFile } from './commonFunctions.js'
+import { fixedUpdate, startGame } from './myGame.js'
 import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
 import { Plane } from './objects/Plane.js'
@@ -87,7 +87,7 @@ window.onload = async () => {
 
 /**
  *
- * @param {import('./types').OBJMesh} mesh contains vertex, normal, uv information for the mesh to be made
+ * @param {import('./types').Mesh} mesh contains vertex, normal, uv information for the mesh to be made
  * @param {import('./types').StateFileObject} loadObject the game object that will use the mesh information
  * @purpose - Helper function called as a callback function when the mesh is done loading for the object
  */
@@ -261,7 +261,9 @@ function main () {
   // iterate through the level's objects and add them
   state.loadObjects.forEach(loadObject => {
     if (loadObject.type === 'mesh') {
-      parseOBJFileToJSON(loadObject.model, createMesh, loadObject)
+      loadMeshFromOBJUrl(loadObject.model, function (mesh) {
+        createMesh(mesh, loadObject)
+      })
     } else if (loadObject.type === 'cube') {
       const tempCube = new Cube(gl, loadObject)
       tempCube.vertShader = vertShaderSample
@@ -378,25 +380,6 @@ function runFixedUpdateLoop (now) {
     deltaTimeSum = 0
     lastUpdateTime = start
   }
-}
-
-/**
- *
- * @param {number} lastTickTime
- */
-function runUpdateLoop (lastTickTime) {
-  const start = window.performance.now()
-  calcTimeStats(updateTimeStats, lastTickTime)
-  // update the overlay
-  state.updateTimeTextElement.innerText =
-    'Average update time: ' + updateTimeStats.averageTime.toFixed(6) + 'ms'
-
-  if (document.visibilityState === 'visible') {
-    update(state) // constantly call our game loop
-  }
-
-  const elapsed = window.performance.now() - start
-  window.setTimeout(runUpdateLoop, 0, elapsed)
 }
 
 /**

@@ -1,10 +1,15 @@
 // @ts-check
 'use strict'
 
+import { Cube } from "./objects/Cube.js"
+import { Model } from "./objects/Model.js"
+import { Plane } from "./objects/Plane.js"
+
 /**
  *
  * @param {import("./types").AppState} state
  * @param {string} name
+ * @returns {Model | Cube | Plane}
  */
 export function getObject (state, name) {
   let objectToFind = null
@@ -17,6 +22,22 @@ export function getObject (state, name) {
   }
 
   return objectToFind
+}
+
+/**
+ * @template T
+ * @param {T} obj
+ * @param {Array<T>} list
+ */
+export function containsObject (obj, list) {
+  let i
+  for (i = 0; i < list.length; i++) {
+    if (list[i] === obj) {
+      return true
+    }
+  }
+
+  return false
 }
 
 export function scaleBoundingBox (boundingBox, scaleVec) {

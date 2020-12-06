@@ -19,7 +19,7 @@ export class Model {
    *
    * @param {WebGL2RenderingContext} glContext
    * @param {import('../types.js').StateFileObject} object
-   * @param {import('../types.js').OBJMesh} meshDetails
+   * @param {import('../types.js').Mesh} meshDetails
    */
   constructor (glContext, object, meshDetails) {
     this.gl = glContext
@@ -39,20 +39,13 @@ export class Model {
     this.material = { ...object.material }
     this.buffers = null
     this.programInfo = null
-    this.centroid =
-      object.preCalcCentroid != null
-        ? vec3.fromValues(
-            object.preCalcCentroid[0],
-            object.preCalcCentroid[1],
-            object.preCalcCentroid[2]
-          )
-        : null
+    this.centroid = meshDetails.centroid
     this.model = {
       vertices: meshDetails.vertices,
-      triangles: [], // no support for triangles atm
+      triangles: new Uint16Array(), // no support for triangles atm
       normals: meshDetails.normals,
       uvs: meshDetails.uvs,
-      bitangents: [], // models don't support bitangents atm, but we need model object data unified
+      bitangents: new Float32Array(), // models don't support bitangents atm, but we need model object data unified
       position: vec3.fromValues(0.0, 0.0, 0.0),
       rotation: mat4.create(),
       scale: vec3.fromValues(1.0, 1.0, 1.0),
@@ -172,10 +165,10 @@ export class Model {
 
   initBuffers () {
     // create vertices, normal and indices arrays
-    const positions = new Float32Array(this.model.vertices.flat())
-    const normals = new Float32Array(this.model.normals.flat())
-    const indices = new Uint16Array(this.model.triangles.flat())
-    const textureCoords = new Float32Array(this.model.uvs.flat())
+    const positions = this.model.vertices
+    const normals = this.model.normals
+    const indices = this.model.triangles
+    const textureCoords = this.model.uvs
     // const bitangents = new Float32Array(this.model.bitangents.flat())
 
     const vertexArrayObject = this.gl.createVertexArray()

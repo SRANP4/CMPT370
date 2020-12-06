@@ -73,8 +73,8 @@ export function loadShader (gl, type, source) {
 
 /**
  *
- * @param {Array<number>} vertices array of x,y,z vertices (flattened)
- * @param {=} cb callback function (not passed any params)
+ * @param {Float32Array} vertices array of x,y,z vertices (flattened)
+ * @param {CallableFunction=} cb callback function (not passed any params)
  */
 export function calculateCentroid (vertices, cb) {
   const center = vec3.fromValues(0.0, 0.0, 0.0)
@@ -105,7 +105,7 @@ export function toRadians (angle) {
 }
 
 export function toDegrees (radians) {
-  return radians * 180 / Math.PI
+  return (radians * 180) / Math.PI
 }
 /**
  *
@@ -438,26 +438,63 @@ export function getTextures (gl, imgPath) {
   }
 }
 
+// used in the parseOBJFileToJSON below, just caches loaded meshes to remove redundant mesh loading
+const loadedMeshes = {}
+
+/** @type {Map<string, Array<CallableFunction>> } */
+const callbackQueue = new Map()
+
 /**
  *
  * @param {string} objFileURL
- * @param {CallableFunction} cb
- * @param {import('./types').StateFileObject} loadObject
+ * @param {CallableFunction} cb returns Mesh object via the callback
  */
-export function parseOBJFileToJSON (objFileURL, cb, loadObject) {
-  window
-    .fetch('/models/' + objFileURL)
-    .then(data => {
-      return data.text()
-    })
-    .then(text => {
-      /** @type {import('./types.js').OBJMesh} */
-      const mesh = OBJLoader.prototype.parse(text)
-      cb(mesh, loadObject)
-    })
-    .catch(err => {
-      console.error(err)
-    })
+export function loadMeshFromOBJUrl (objFileURL, cb) {
+  if (loadedMeshes[objFileURL] !== undefined) {
+    cb(loadedMeshes[objFileURL])
+    return
+  }
+
+  // make sure we're not already fetching the model
+  if (callbackQueue.get(objFileURL) !== undefined) {
+    callbackQueue.get(objFileURL).push(cb)
+  } else {
+    // create the queue, and add the callback to it
+    callbackQueue.set(objFileURL, [cb])
+
+    // start the fetch for this queue
+    window
+      .fetch('/models/' + objFileURL)
+      .then(data => {
+        return data.text()
+      })
+      .then(text => {
+        /** @type {import('./types.js').OBJMesh} */
+        const jsonMesh = OBJLoader.prototype.parse(text)
+        /** @type {import('./types.js').Mesh} */
+        const mesh = {
+          vertices: new Float32Array(jsonMesh.vertices.flat()),
+          normals: new Float32Array(jsonMesh.normals.flat()),
+          uvs: new Float32Array(jsonMesh.uvs.flat()),
+          centroid: undefined
+        }
+        mesh.centroid = calculateCentroid(mesh.vertices)
+
+        loadedMeshes[objFileURL] = mesh
+
+        // do all the callbacks that got queued for this fetch
+        callbackQueue.get(objFileURL).forEach(callback => {
+          callback(mesh)
+        })
+
+        // remove the queue so that we don't callback things that were already
+        // called back
+        callbackQueue.delete(objFileURL)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  }
 }
 
 /**
