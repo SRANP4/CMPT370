@@ -79,7 +79,8 @@ export class Cannonball extends GameObject {
       this.drawingObject.material.diffuse = [1.0, 0, 0];
 
       // reduce health of ship
-      /** @type {EnemyShip} */(this.collidedShip).health -= 1
+      const enemyShip = /** @type {EnemyShip} */(this.collidedShip)
+      enemyShip.health -= 1
     } else {
       if (this.collidedShip != null) {
         // will be set to the last ship intersecting with, so will become red
