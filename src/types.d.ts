@@ -7,6 +7,7 @@ import { Model } from "./objects/Model.js";
 import { Plane } from "./objects/Plane.js";
 
 declare type AppState = {
+    startTime: number;
     simulationStatusTextElement: HTMLElement;
     tickTimeTextElement: HTMLElement;
     renderTimeTextElement: HTMLElement;
