@@ -36,8 +36,8 @@ let simulationEnabled = false
 export const gameObjects = []
 
 // cannonball and ship names as they are in the scene.json file
-const spheres = ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12']
-let mySpheres = ['sphere1', 'sphere2', 'sphere3']
+const spheres = ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12', 'sphere13', 'sphere14', 'sphere15','sphere16', 'sphere17']
+let mySpheres = ['sphere1', 'sphere2', 'sphere3', 'sphere13', 'sphere14', 'sphere15', 'sphere16','sphere17']
 let mySphere = null
 let movespheres =  ['sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12']
 export let moveSphere = null

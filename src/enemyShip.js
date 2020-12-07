@@ -10,7 +10,7 @@ import { GameObject } from './gameObject.js'
 import { getGameTime } from './myGame.js'
 import { containsObject, getObject, getTime } from './sceneFunctions.js'
 
-const ships = ['Ship1', 'Ship2', 'Ship3']
+const ships = ['mainShip','Ship1', 'Ship2', 'Ship3']
 const health = { Ship1: 15, Ship2: 15, Ship3: 15 }
 
 export class EnemyShip extends GameObject {

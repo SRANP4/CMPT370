@@ -12,9 +12,9 @@ import { containsObject, getObject } from './sceneFunctions.js'
 import { EnemyShip } from './enemyShip.js'
 import { PlayerShip } from './playerShip.js'
 
-const spheres =  ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12']
+const spheres =  ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12', 'sphere13', 'sphere14', 'sphere15', 'sphere16', 'sphere17']
 
-const teams = {'sphere1':'mainShip', 'sphere2':'mainShip', 'sphere3':'mainShip', 'sphere4':'Ship1', 'sphere5':'Ship1', 'sphere6':'Ship1', 'sphere7':'Ship2', 'sphere8':'Ship2', 'sphere9':'Ship2', 'sphere10':'Ship3', 'sphere11':'Ship3','sphere12':'Ship3'}
+const teams = {'sphere1':'mainShip', 'sphere2':'mainShip', 'sphere3':'mainShip', 'sphere4':'Ship1', 'sphere5':'Ship1', 'sphere6':'Ship1', 'sphere7':'Ship2', 'sphere8':'Ship2', 'sphere9':'Ship2', 'sphere10':'Ship3', 'sphere11':'Ship3','sphere12':'Ship3', 'sphere13':'mainShip', 'sphere14':'mainShip', 'sphere15':'mainShip', 'sphere16':'mainShip', 'sphere17':'mainShip'}
 
 export class Cannonball extends GameObject {
   /**
@@ -29,7 +29,7 @@ export class Cannonball extends GameObject {
     const sphereRb = createRigidbody(
       sphereObj,
       this,
-      createSphere(vec3.create(), 0.25),
+      createSphere(vec3.create(), 0.125),
       this.onIntersection
     )
     sphereRb.gravityStrength = 0
