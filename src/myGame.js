@@ -2,7 +2,7 @@
 'use strict'
 
 import { vec3 } from '../lib/gl-matrix/index.js'
-import { updateCameraEulerLookDir } from './cameraFunctions.js'
+import { updateCameraEulerLookDir, rotateCameraAroundYAxis } from './cameraFunctions.js'
 import { Cannonball } from './cannonball.js'
 import {
   updateRigidbodySimulation,
@@ -21,6 +21,9 @@ import {
 import { PlayerShip } from './playerShip.js'
 import { containsObject, getObject } from './sceneFunctions.js'
 import { updateSimulationStatusIndicator } from './uiSetup.js'
+import { setRotationMatrixFromEuler } from './commonFunctions.js'
+import { toRadian } from '../lib/gl-matrix/common.js'
+
 
 let flyCamEnabled = false
 let playerCamEnabled = false
@@ -36,8 +39,7 @@ let movespheres =  ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphe
 let moveSphere = null
 const ships = ['mainShip','Ship1', 'Ship2', 'Ship3']
 let myShip = null
-
-
+let rotated = false
 let gameTime = 0
 
 /**
@@ -293,91 +295,42 @@ function updateCam (state, deltaTime) {
     }
   }
 
-  else{
-    const moveSpeed = 2
+  if(playerCamEnabled ||mainCamEnabled){
+    const moveSpeed = 3
+    myShip = getObject(state, 'mainShip')
 
     // move relative to current look direction
     if (keysDown.get('a')) {
-      const camPositionTranslate = vec3.create()
-      vec3.scale(
-        camPositionTranslate,
-        state.camera.right,
-        -moveSpeed * secondsDeltaTime
-      )
-      vec3.add(state.camera.position, state.camera.position, camPositionTranslate)
+      state.camera.position[2] += moveSpeed * secondsDeltaTime
+      state.camera.center[2] += moveSpeed * secondsDeltaTime
 
-      const camCenterTranslate = vec3.create()
-      vec3.scale(
-        camCenterTranslate,
-        state.camera.right,
-        -moveSpeed * secondsDeltaTime
-      )
-      vec3.add(state.camera.center, state.camera.center, camCenterTranslate)
-      myShip = getObject(state, 'mainShip')
       myShip.rigidbody.velocity[0]=0
       myShip.rigidbody.velocity[2]=moveSpeed
       updateRigidbodySimulation(deltaTime)
     }
 
     if (keysDown.get('d')) {
-      const camPositionTranslate = vec3.create()
-      vec3.scale(
-        camPositionTranslate,
-        state.camera.right,
-        moveSpeed * secondsDeltaTime
-      )
-      vec3.add(state.camera.position, state.camera.position, camPositionTranslate)
-
-      const camCenterTranslate = vec3.create()
-      vec3.scale(
-        camCenterTranslate,
-        state.camera.right,
-        moveSpeed * secondsDeltaTime
-      )
-      vec3.add(state.camera.center, state.camera.center, camCenterTranslate)
+      state.camera.position[2] -= moveSpeed * secondsDeltaTime
+      state.camera.center[2] -= moveSpeed * secondsDeltaTime
       
-      myShip = getObject(state, 'mainShip')
       myShip.rigidbody.velocity[0]=0
       myShip.rigidbody.velocity[2]=-moveSpeed
       updateRigidbodySimulation(deltaTime)
     }
 
     if (keysDown.get('w')) {
-      const camPositionTranslate = vec3.create()
-      vec3.scale(
-        camPositionTranslate,
-        state.camera.at,
-        moveSpeed * secondsDeltaTime
-      )
-      vec3.add(state.camera.position, state.camera.position, camPositionTranslate)
+      state.camera.position[0] -= moveSpeed * secondsDeltaTime
+      state.camera.center[0] -= moveSpeed * secondsDeltaTime
 
-      const camCenterTranslate = vec3.create()
-      vec3.scale(camCenterTranslate, state.camera.at, moveSpeed * secondsDeltaTime)
-      vec3.add(state.camera.center, state.camera.center, camCenterTranslate)
-
-      myShip = getObject(state, 'mainShip')
       myShip.rigidbody.velocity[0]=-moveSpeed
       myShip.rigidbody.velocity[2]=0
       updateRigidbodySimulation(deltaTime)
     }
 
     if (keysDown.get('s')) {
-      const positionTranslate = vec3.create()
-      vec3.scale(
-        positionTranslate,
-        state.camera.at,
-        -moveSpeed * secondsDeltaTime
-      )
-      vec3.add(state.camera.position, state.camera.position, positionTranslate)
+      state.camera.position[0] += moveSpeed * secondsDeltaTime
+      state.camera.center[0] += moveSpeed * secondsDeltaTime
 
-      const centerTranslate = vec3.create()
-      vec3.scale(
-        centerTranslate,
-        state.camera.at,
-        -moveSpeed * secondsDeltaTime
-      )
-      vec3.add(state.camera.center, state.camera.center, centerTranslate)
-      myShip = getObject(state, 'mainShip')
       myShip.rigidbody.velocity[0]=moveSpeed
       myShip.rigidbody.velocity[2]=0
       updateRigidbodySimulation(deltaTime)

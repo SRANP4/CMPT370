@@ -88,7 +88,7 @@ export class EnemyShip extends GameObject {
       // the default direction the ship faces
 
       this.rigidbody.velocity[0] = -this.speed
-      setRotationMatrixFromEuler(0, 0, 0, this.drawingObject.model.rotation)
+      //setRotationMatrixFromEuler(0, 0, 0, this.drawingObject.model.rotation)
 
     } else {
       // head west, young man
@@ -96,7 +96,7 @@ export class EnemyShip extends GameObject {
       // need to rotate the ship 180 for this direction
 
       this.rigidbody.velocity[0] = this.speed
-      setRotationMatrixFromEuler(180, 0, 0, this.drawingObject.model.rotation)
+      //setRotationMatrixFromEuler(180, 0, 0, this.drawingObject.model.rotation)
     }
   }
 
