@@ -5,7 +5,7 @@ import {
   createRigidbody,
   getBoundingBoxFromModelVertices
 } from './collisionFunctions.js'
-import { getRandomInt } from './commonFunctions.js'
+import { getRandomInt, setRotationMatrixFromEuler } from './commonFunctions.js'
 import { GameObject } from './gameObject.js'
 import { getGameTime } from './myGame.js'
 import { containsObject, getObject, getTime } from './sceneFunctions.js'
@@ -85,15 +85,17 @@ export class EnemyShip extends GameObject {
       // flee east, you coward
       // right, negative x
       // the default direction the ship faces
-      this.drawingObject.rotate()
+
       this.rigidbody.velocity[0] = -this.speed
-      
+      setRotationMatrixFromEuler(0, 0, 0, this.drawingObject.model.rotation)
+
     } else {
       // head west, young man
       // left, positive x
       // need to rotate the ship 180 for this direction
 
       this.rigidbody.velocity[0] = this.speed
+      setRotationMatrixFromEuler(180, 0, 0, this.drawingObject.model.rotation)
     }
   }
 

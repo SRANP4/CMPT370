@@ -105,7 +105,7 @@ export function toRadians (angle) {
 }
 
 export function toDegrees (radians) {
-  return (radians * 180) / Math.PI
+  return radians * (180 / Math.PI)
 }
 /**
  *
@@ -539,8 +539,21 @@ export function parseSceneFile (file, state) {
 }
 
 /**
+ * 
+ * @param {number} yaw yaw rotation (y axis) in degrees
+ * @param {number} pitch pitch rotation (x axis) in degrees
+ * @param {number} roll pitch rotation (z axis) in degrees
+ * @param {mat4} mat out matrix, the matrix to apply the rotation to
+ */
+export function setRotationMatrixFromEuler (yaw, pitch, roll, mat) {
+  let q = quat.create()
+  quat.fromEuler(q, pitch, yaw, roll)
+  mat4.fromQuat(mat, q)
+}
+
+/**
  * @param {mat4} rot
- * @returns {vec3} euler angles (yaw, pitch, roll)
+ * @returns {vec3} euler angles (pitch, yaw, roll)
  */
 export function rotationMatrixToEulerAngles (rot) {
   const out = vec3.create()
