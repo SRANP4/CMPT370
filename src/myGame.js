@@ -11,6 +11,7 @@ import {
 import { EnemyShip } from './enemyShip.js'
 import { GameObject } from './gameObject.js'
 import {
+  hasMouseLock,
   keysDown,
   keysPressed,
   mouseXDelta,
@@ -23,6 +24,7 @@ import { containsObject, getObject } from './sceneFunctions.js'
 import { updateSimulationStatusIndicator } from './uiSetup.js'
 import { setRotationMatrixFromEuler } from './commonFunctions.js'
 import { toRadian } from '../lib/gl-matrix/common.js'
+import { random } from '../lib/gl-matrix/vec3.js'
 
 
 let flyCamEnabled = false
@@ -31,16 +33,19 @@ let mainCamEnabled = false
 let simulationEnabled = false
 
 /** @type { Array<GameObject> } */
-const gameObjects = []
+export const gameObjects = []
 
 // cannonball and ship names as they are in the scene.json file
 const spheres = ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12']
-let movespheres =  ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12']
-let moveSphere = null
+let mySpheres = ['sphere1', 'sphere2', 'sphere3']
+let mySphere = null
+let movespheres =  ['sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12']
+export let moveSphere = null
 const ships = ['mainShip','Ship1', 'Ship2', 'Ship3']
 let myShip = null
 let rotated = false
 let gameTime = 0
+let sphere = null
 
 /**
  *
@@ -100,6 +105,16 @@ export function fixedUpdate(state, deltaTime) {
       myShip.rigidbody.velocity[0]=0
       myShip.rigidbody.velocity[1]=0
       myShip.rigidbody.velocity[2]=0
+
+      for (var i=0; i<mySpheres.length;i++){
+        if (mySpheres[i]!==mySphere){
+        sphere = getObject(state, mySpheres[i])
+        sphere.rigidbody.velocity[0]=0
+        sphere.rigidbody.velocity[1]=0
+        sphere.rigidbody.velocity[2]=0
+      }
+    }
+
     }
     updateRigidbodySimulation(deltaTime)
 
@@ -109,17 +124,34 @@ export function fixedUpdate(state, deltaTime) {
 
     // misc stuff that doesn't fit in an object
     if (keysPressed.get('f')) {
+      if (mySpheres.length > 0) {
+        if (containsObject(mySphere, mySpheres)) {
+          mySpheres = mySpheres.filter(sphere => sphere !== mySphere)
+        }
+        mySphere = mySpheres[Math.floor(Math.random() * mySpheres.length)]
+
+        const obj1 = getObject(state, mySphere)
+        if (obj1 !== null) {
+          const rb = obj1.rigidbody
+          rb.velocity[0]= -20
+          rb.velocity[1] = 5
+          rb.velocity[2] = 0
+          rb.gravityStrength = 10
+        }
+      }
+
       if (movespheres.length > 0) {
         if (containsObject(moveSphere, movespheres)) {
           movespheres = movespheres.filter(sphere => sphere !== moveSphere)
         }
         moveSphere = movespheres[Math.floor(Math.random() * movespheres.length)]
 
-        const obj = getObject(state, moveSphere)
-        if (obj !== null) {
-          const rb = obj.rigidbody
+        const obj2 = getObject(state, moveSphere)
+        if (obj2 !== null) {
+          const rb = obj2.rigidbody
+          rb.velocity[0] = 20
           rb.velocity[1] = 5
-          rb.velocity[2] = 20
+          rb.velocity[2] = 0
           rb.gravityStrength = 10
         }
       }
@@ -296,7 +328,7 @@ function updateCam (state, deltaTime) {
   }
 
   if(playerCamEnabled ||mainCamEnabled){
-    const moveSpeed = 3
+    const moveSpeed = 4
     myShip = getObject(state, 'mainShip')
 
     // move relative to current look direction
@@ -306,6 +338,15 @@ function updateCam (state, deltaTime) {
 
       myShip.rigidbody.velocity[0]=0
       myShip.rigidbody.velocity[2]=moveSpeed
+
+      for (var i=0; i<mySpheres.length;i++){
+        if (mySpheres[i]!==mySphere){
+        sphere = getObject(state, mySpheres[i])
+        sphere.rigidbody.velocity[0]=0
+        sphere.rigidbody.velocity[2]=moveSpeed
+        }
+      }
+
       updateRigidbodySimulation(deltaTime)
     }
 
@@ -315,6 +356,15 @@ function updateCam (state, deltaTime) {
       
       myShip.rigidbody.velocity[0]=0
       myShip.rigidbody.velocity[2]=-moveSpeed
+
+      for (var i=0; i<mySpheres.length;i++){
+        if (mySpheres[i]!==mySphere){
+        sphere = getObject(state, mySpheres[i])
+        sphere.rigidbody.velocity[0]=0
+        sphere.rigidbody.velocity[2]=-moveSpeed
+        }
+      }
+
       updateRigidbodySimulation(deltaTime)
     }
 
@@ -324,6 +374,15 @@ function updateCam (state, deltaTime) {
 
       myShip.rigidbody.velocity[0]=-moveSpeed
       myShip.rigidbody.velocity[2]=0
+
+      for (var i=0; i<mySpheres.length;i++){
+        if (mySpheres[i]!==mySphere){
+        sphere = getObject(state, mySpheres[i])
+        sphere.rigidbody.velocity[0]=-moveSpeed
+        sphere.rigidbody.velocity[2]=0
+        }
+      }
+
       updateRigidbodySimulation(deltaTime)
     }
 
@@ -333,6 +392,15 @@ function updateCam (state, deltaTime) {
 
       myShip.rigidbody.velocity[0]=moveSpeed
       myShip.rigidbody.velocity[2]=0
+
+      for (var i=0; i<mySpheres.length;i++){
+        if (mySpheres[i]!==mySphere){
+        sphere = getObject(state, mySpheres[i])
+        sphere.rigidbody.velocity[0]=moveSpeed
+        sphere.rigidbody.velocity[2]=0
+        }
+      }
+
       updateRigidbodySimulation(deltaTime)
     }
   }

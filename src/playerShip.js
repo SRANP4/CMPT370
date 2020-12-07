@@ -31,6 +31,10 @@ export class PlayerShip extends GameObject {
     this.drawingObject = shipObj
     this.rigidbody = shipRb
     this.health = 15
+    this.speed = 2
+    this.xDir = 0
+    this.lastChangeTime = 0
+    this.changeTime = (12 * 1000)
   }
 
   /**

@@ -19,6 +19,8 @@ export class GameObject {
     this.drawingObject = null
     /** @type {import('./types.js').Rigidbody} */
     this.rigidbody = null
+    this.xDir = null
+    this.health = 15
   }
 
   /**
