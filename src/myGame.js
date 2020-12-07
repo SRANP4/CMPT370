@@ -90,9 +90,11 @@ export function fixedUpdate (state, deltaTime) {
 
     // handle physics here
     // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
-    if (playerCamEnabled){
+    if (playerCamEnabled || mainCamEnabled){
       myShip = getObject(state, 'mainShip')
-      myShip.rigidbody.velocity= vec3.create(0,0,0)
+      myShip.rigidbody.velocity[0]=0
+      myShip.rigidbody.velocity[1]=0
+      myShip.rigidbody.velocity[2]=0
     }
     updateRigidbodySimulation(deltaTime)
 
@@ -280,7 +282,7 @@ function updateCam (state, deltaTime) {
     }
   }
 
-  else if (playerCamEnabled){
+  else{
     const moveSpeed = 2
 
     // move relative to current look direction
@@ -301,11 +303,9 @@ function updateCam (state, deltaTime) {
       )
       vec3.add(state.camera.center, state.camera.center, camCenterTranslate)
       myShip = getObject(state, 'mainShip')
-      myShip.rigidbody.velocity[0]=1.39
-      myShip.rigidbody.velocity[2]=1.39
+      myShip.rigidbody.velocity[0]=0
+      myShip.rigidbody.velocity[2]=moveSpeed
       updateRigidbodySimulation(deltaTime)
-
-
     }
 
     if (keysDown.get('d')) {
@@ -326,8 +326,8 @@ function updateCam (state, deltaTime) {
       vec3.add(state.camera.center, state.camera.center, camCenterTranslate)
       
       myShip = getObject(state, 'mainShip')
-      myShip.rigidbody.velocity[0]=-1.39
-      myShip.rigidbody.velocity[2]=-1.39
+      myShip.rigidbody.velocity[0]=0
+      myShip.rigidbody.velocity[2]=-moveSpeed
       updateRigidbodySimulation(deltaTime)
     }
 
@@ -343,11 +343,33 @@ function updateCam (state, deltaTime) {
       const camCenterTranslate = vec3.create()
       vec3.scale(camCenterTranslate, state.camera.at, moveSpeed * secondsDeltaTime)
       vec3.add(state.camera.center, state.camera.center, camCenterTranslate)
+
+      myShip = getObject(state, 'mainShip')
+      myShip.rigidbody.velocity[0]=-moveSpeed
+      myShip.rigidbody.velocity[2]=0
+      updateRigidbodySimulation(deltaTime)
+    }
+
+    if (keysDown.get('s')) {
+      const positionTranslate = vec3.create()
+      vec3.scale(
+        positionTranslate,
+        state.camera.at,
+        -moveSpeed * secondsDeltaTime
+      )
+      vec3.add(state.camera.position, state.camera.position, positionTranslate)
+
+      const centerTranslate = vec3.create()
+      vec3.scale(
+        centerTranslate,
+        state.camera.at,
+        -moveSpeed * secondsDeltaTime
+      )
+      vec3.add(state.camera.center, state.camera.center, centerTranslate)
+      myShip = getObject(state, 'mainShip')
+      myShip.rigidbody.velocity[0]=moveSpeed
+      myShip.rigidbody.velocity[2]=0
+      updateRigidbodySimulation(deltaTime)
     }
   }
-
-  else if (mainCamEnabled){
-
-  }
-
 }
