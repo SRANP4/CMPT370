@@ -7,8 +7,8 @@ import {
 import { GameObject } from './gameObject.js'
 import { containsObject, getObject } from './sceneFunctions.js'
 
-const ships = ['Ship1', 'Ship2', 'Ship3']
-const health = { Ship1: 15, Ship2: 15, Ship3: 15 }
+const ships = ['mainShip']
+const health = {mainShip:15}
 
 export class playerShip extends GameObject {
   /**
@@ -63,15 +63,5 @@ export class playerShip extends GameObject {
    * @param {import('./types.js').Rigidbody} otherRb
    */
   onIntersection(rb, otherRb) {
-    // If two ships collide
-    if (containsObject(otherRb.drawingObj.name, ships)) {
-      const otherShip = /** @type {EnemyShip} */(otherRb.gameObject)
-      this.health = 0
-      otherShip.health = 0
-      rb.gravityStrength = 9.81
-      otherRb.gravityStrength = 9.81
-      rb.drawingObj.material.diffuse = [1.0, 0, 0]
-      otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
-    }
   }
 }
