@@ -38,12 +38,14 @@ const ships = ['mainShip','Ship1', 'Ship2', 'Ship3']
 let myShip = null
 
 
+let gameTime = 0
+
 /**
  *
  * @param { import("./types").AppState } state Game state
  * @usage Use this function for initializing any in game values in our state or adding event listeners
  */
-export function startGame (state) {
+export function startGame(state) {
   setupInputEvents(state.canvas)
   initRigidbodySimulation()
 
@@ -77,13 +79,14 @@ export function startGame (state) {
  * @param { import("./types").AppState } state Game state
  * @param { number } deltaTime time difference between the previous frame that was drawn and the current frame
  */
-export function fixedUpdate (state, deltaTime) {
+export function fixedUpdate(state, deltaTime) {
   updateInput()
   updateDebugSelectedObject(state)
   updateCam(state, deltaTime)
   updateSimulationEnabled()
 
   if (simulationEnabled) {
+    gameTime += deltaTime
     gameObjects.forEach(go => {
       go.onEarlyUpdate(state, deltaTime)
     })
@@ -122,8 +125,14 @@ export function fixedUpdate (state, deltaTime) {
   }
 }
 
+/**
+ * @returns {number} time simulation has been running for in milliseconds
+ */
+export function getGameTime() {
+  return gameTime
+}
 
-function updateSimulationEnabled () {
+function updateSimulationEnabled() {
   if (keysPressed.get('p')) {
     simulationEnabled = !simulationEnabled
     if (simulationEnabled) {
@@ -138,7 +147,7 @@ function updateSimulationEnabled () {
  *
  * @param {import('./types.js').AppState} state
  */
-function updateDebugSelectedObject (state) {
+function updateDebugSelectedObject(state) {
   if (keysPressed.get('-')) {
     state.selectedObjIndex = (state.selectedObjIndex - 1) % state.objectCount
     if (state.selectedObjIndex < 0) {
@@ -156,7 +165,9 @@ function updateDebugSelectedObject (state) {
  * @param {import('./types.js').AppState} state
  * @param {number} deltaTime deltaTime in ms
  */
+
 function updateCam (state, deltaTime) {
+
   const secondsDeltaTime = deltaTime / 1000
 
   if (keysPressed.get('`')) {

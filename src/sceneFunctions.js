@@ -67,3 +67,10 @@ export function scaleBoundingBox (boundingBox, scaleVec) {
   }
   return newBox
 }
+
+/**
+ * @returns {number} milliseconds since app started
+ */
+export function getTime () {
+  return window.performance.now()
+}

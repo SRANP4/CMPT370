@@ -50,9 +50,9 @@ export function updateRigidbodySimulation (deltaTime) {
     rb.velocity[2] = Math.min(rb.velocity[2], VELOCITY_CAP[2])
 
     // update the rigidbody's position
-    const vel = vec3.fromValues(rb.velocity[0], rb.velocity[1], rb.velocity[2])
-    vec3.scale(vel, vel, deltaTimeSeconds)
-    vec3.add(rb.pos, rb.pos, vel)
+    const deltaTimeScaledVelocity = vec3.fromValues(rb.velocity[0], rb.velocity[1], rb.velocity[2])
+    vec3.scale(deltaTimeScaledVelocity, deltaTimeScaledVelocity, deltaTimeSeconds)
+    vec3.add(rb.pos, rb.pos, deltaTimeScaledVelocity)
 
     // update drawingObjects with new position
     rb.drawingObj.model.position = rb.pos
@@ -64,7 +64,7 @@ export function updateRigidbodySimulation (deltaTime) {
     } else {
       translateBoundingBox(
         /** @type {import('./types.js').BoundingBox} */ (rb.collider),
-        rb.velocity
+        deltaTimeScaledVelocity
       )
     }
   }
