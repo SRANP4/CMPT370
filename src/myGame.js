@@ -23,16 +23,20 @@ import { containsObject, getObject } from './sceneFunctions.js'
 import { updateSimulationStatusIndicator } from './uiSetup.js'
 
 let flyCamEnabled = false
+let playerCamEnabled = false
+let mainCamEnabled = false
 let simulationEnabled = false
 
 /** @type { Array<GameObject> } */
 const gameObjects = []
 
 // cannonball and ship names as they are in the scene.json file
-const spheres = ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12', 'sphere13', 'sphere14', 'sphere15', 'sphere16', 'sphere17', 'sphere18', 'sphere19','sphere20','sphere21', 'sphere22', 'sphere23', 'sphere24']
-let movespheres = ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12', 'sphere13', 'sphere14', 'sphere15', 'sphere16', 'sphere17', 'sphere18', 'sphere19','sphere20','sphere21', 'sphere22', 'sphere23', 'sphere24']
+const spheres = ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12']
+let movespheres =  ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12']
 let moveSphere = null
 const ships = ['mainShip','Ship1', 'Ship2', 'Ship3']
+let myShip = null
+
 
 /**
  *
@@ -76,7 +80,7 @@ export function startGame (state) {
 export function fixedUpdate (state, deltaTime) {
   updateInput()
   updateDebugSelectedObject(state)
-  updateFlyCam(state, deltaTime)
+  updateCam(state, deltaTime)
   updateSimulationEnabled()
 
   if (simulationEnabled) {
@@ -86,6 +90,10 @@ export function fixedUpdate (state, deltaTime) {
 
     // handle physics here
     // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
+    if (playerCamEnabled){
+      myShip = getObject(state, 'mainShip')
+      myShip.rigidbody.velocity= vec3.create(0,0,0)
+    }
     updateRigidbodySimulation(deltaTime)
 
     gameObjects.forEach(go => {
@@ -146,12 +154,33 @@ function updateDebugSelectedObject (state) {
  * @param {import('./types.js').AppState} state
  * @param {number} deltaTime deltaTime in ms
  */
-function updateFlyCam (state, deltaTime) {
+function updateCam (state, deltaTime) {
   const secondsDeltaTime = deltaTime / 1000
 
   if (keysPressed.get('`')) {
-    flyCamEnabled = !flyCamEnabled
-    console.log('fly cam: ' + flyCamEnabled)
+    if (state.camera.name === 'flyCamera'){
+      flyCamEnabled = !flyCamEnabled
+      if (flyCamEnabled){
+        playerCamEnabled = false
+        mainCamEnabled = false
+      }
+      console.log('fly cam: ' + flyCamEnabled)
+    } 
+    else if (state.camera.name === 'playerCamera'){
+      playerCamEnabled = !playerCamEnabled
+      if (playerCamEnabled){
+        flyCamEnabled = false
+        mainCamEnabled = false
+      }
+      console.log('player cam: ' + playerCamEnabled)
+    } else if (state.camera.name === 'mainCamera'){
+      mainCamEnabled = !mainCamEnabled
+      if (mainCamEnabled){
+        flyCamEnabled = false
+        playerCamEnabled = false
+      }
+      console.log('main cam: ' + mainCamEnabled)
+    }
   }
 
   if (flyCamEnabled) {
@@ -250,4 +279,75 @@ function updateFlyCam (state, deltaTime) {
       state.camera.center[1] -= moveSpeed * secondsDeltaTime
     }
   }
+
+  else if (playerCamEnabled){
+    const moveSpeed = 2
+
+    // move relative to current look direction
+    if (keysDown.get('a')) {
+      const camPositionTranslate = vec3.create()
+      vec3.scale(
+        camPositionTranslate,
+        state.camera.right,
+        -moveSpeed * secondsDeltaTime
+      )
+      vec3.add(state.camera.position, state.camera.position, camPositionTranslate)
+
+      const camCenterTranslate = vec3.create()
+      vec3.scale(
+        camCenterTranslate,
+        state.camera.right,
+        -moveSpeed * secondsDeltaTime
+      )
+      vec3.add(state.camera.center, state.camera.center, camCenterTranslate)
+      myShip = getObject(state, 'mainShip')
+      myShip.rigidbody.velocity[0]=1.39
+      myShip.rigidbody.velocity[2]=1.39
+      updateRigidbodySimulation(deltaTime)
+
+
+    }
+
+    if (keysDown.get('d')) {
+      const camPositionTranslate = vec3.create()
+      vec3.scale(
+        camPositionTranslate,
+        state.camera.right,
+        moveSpeed * secondsDeltaTime
+      )
+      vec3.add(state.camera.position, state.camera.position, camPositionTranslate)
+
+      const camCenterTranslate = vec3.create()
+      vec3.scale(
+        camCenterTranslate,
+        state.camera.right,
+        moveSpeed * secondsDeltaTime
+      )
+      vec3.add(state.camera.center, state.camera.center, camCenterTranslate)
+      
+      myShip = getObject(state, 'mainShip')
+      myShip.rigidbody.velocity[0]=-1.39
+      myShip.rigidbody.velocity[2]=-1.39
+      updateRigidbodySimulation(deltaTime)
+    }
+
+    if (keysDown.get('w')) {
+      const camPositionTranslate = vec3.create()
+      vec3.scale(
+        camPositionTranslate,
+        state.camera.at,
+        moveSpeed * secondsDeltaTime
+      )
+      vec3.add(state.camera.position, state.camera.position, camPositionTranslate)
+
+      const camCenterTranslate = vec3.create()
+      vec3.scale(camCenterTranslate, state.camera.at, moveSpeed * secondsDeltaTime)
+      vec3.add(state.camera.center, state.camera.center, camCenterTranslate)
+    }
+  }
+
+  else if (mainCamEnabled){
+
+  }
+
 }
