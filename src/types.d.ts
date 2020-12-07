@@ -118,6 +118,7 @@ declare type StateFileMaterial = {
 }
 
 declare type Camera = {
+    name: String;
     position: vec3;
     center: vec3;
     up: vec3;

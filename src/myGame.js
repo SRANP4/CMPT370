@@ -2,7 +2,7 @@
 'use strict'
 
 import { vec3 } from '../lib/gl-matrix/index.js'
-import { updateCameraEulerLookDir } from './cameraFunctions.js'
+import { updateCameraEulerLookDir, rotateCameraAroundYAxis } from './cameraFunctions.js'
 import { Cannonball } from './cannonball.js'
 import {
   updateRigidbodySimulation,
@@ -11,6 +11,7 @@ import {
 import { EnemyShip } from './enemyShip.js'
 import { GameObject } from './gameObject.js'
 import {
+  hasMouseLock,
   keysDown,
   keysPressed,
   mouseXDelta,
@@ -18,42 +19,33 @@ import {
   setupInputEvents,
   updateInput
 } from './inputHelper.js'
+import { PlayerShip } from './playerShip.js'
 import { containsObject, getObject } from './sceneFunctions.js'
 import { updateSimulationStatusIndicator } from './uiSetup.js'
+import { setRotationMatrixFromEuler } from './commonFunctions.js'
+import { toRadian } from '../lib/gl-matrix/common.js'
+import { random } from '../lib/gl-matrix/vec3.js'
+
 
 let flyCamEnabled = false
+let playerCamEnabled = false
+let mainCamEnabled = false
 let simulationEnabled = false
 
 /** @type { Array<GameObject> } */
-const gameObjects = []
+export const gameObjects = []
 
 // cannonball and ship names as they are in the scene.json file
-const spheres = [
-  'sphere1',
-  'sphere2',
-  'sphere3',
-  'sphere4',
-  'sphere5',
-  'sphere6',
-  'sphere7',
-  'sphere8',
-  'sphere9'
-]
-let movespheres = [
-  'sphere1',
-  'sphere2',
-  'sphere3',
-  'sphere4',
-  'sphere5',
-  'sphere6',
-  'sphere7',
-  'sphere8',
-  'sphere9'
-]
-let moveSphere = null
-const ships = ['Ship1', 'Ship2', 'Ship3']
-
+const spheres = ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12', 'sphere13', 'sphere14', 'sphere15','sphere16', 'sphere17']
+let mySpheres = ['sphere1', 'sphere2', 'sphere3', 'sphere13', 'sphere14', 'sphere15', 'sphere16','sphere17']
+let mySphere = null
+let movespheres =  ['sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12']
+export let moveSphere = null
+const ships = ['mainShip','Ship1', 'Ship2', 'Ship3']
+let myShip = null
+let rotated = false
 let gameTime = 0
+let sphere = null
 
 /**
  *
@@ -64,8 +56,12 @@ export function startGame(state) {
   setupInputEvents(state.canvas)
   initRigidbodySimulation()
 
+  //create main ship object
+  const gameObj = new PlayerShip(state,ships[0])
+  gameObjects.push(gameObj)
+  
   // create enemy ship objects
-  for (let i = 0; i < ships.length; i++) {
+  for (let i = 1; i < ships.length; i++) {
     const gameObj = new EnemyShip(state, ships[i])
     gameObjects.push(gameObj)
   }
@@ -93,7 +89,7 @@ export function startGame(state) {
 export function fixedUpdate(state, deltaTime) {
   updateInput()
   updateDebugSelectedObject(state)
-  updateFlyCam(state, deltaTime)
+  updateCam(state, deltaTime)
   updateSimulationEnabled()
 
   if (simulationEnabled) {
@@ -104,6 +100,22 @@ export function fixedUpdate(state, deltaTime) {
 
     // handle physics here
     // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
+    if (playerCamEnabled || mainCamEnabled){
+      myShip = getObject(state, 'mainShip')
+      myShip.rigidbody.velocity[0]=0
+      myShip.rigidbody.velocity[1]=0
+      myShip.rigidbody.velocity[2]=0
+
+      for (var i=0; i<mySpheres.length;i++){
+        if (mySpheres[i]!==mySphere){
+        sphere = getObject(state, mySpheres[i])
+        sphere.rigidbody.velocity[0]=0
+        sphere.rigidbody.velocity[1]=0
+        sphere.rigidbody.velocity[2]=0
+      }
+    }
+
+    }
     updateRigidbodySimulation(deltaTime)
 
     gameObjects.forEach(go => {
@@ -112,17 +124,34 @@ export function fixedUpdate(state, deltaTime) {
 
     // misc stuff that doesn't fit in an object
     if (keysPressed.get('f')) {
+      if (mySpheres.length > 0) {
+        if (containsObject(mySphere, mySpheres)) {
+          mySpheres = mySpheres.filter(sphere => sphere !== mySphere)
+        }
+        mySphere = mySpheres[Math.floor(Math.random() * mySpheres.length)]
+
+        const obj1 = getObject(state, mySphere)
+        if (obj1 !== null) {
+          const rb = obj1.rigidbody
+          rb.velocity[0]= -20
+          rb.velocity[1] = 5
+          rb.velocity[2] = 0
+          rb.gravityStrength = 10
+        }
+      }
+
       if (movespheres.length > 0) {
         if (containsObject(moveSphere, movespheres)) {
           movespheres = movespheres.filter(sphere => sphere !== moveSphere)
         }
         moveSphere = movespheres[Math.floor(Math.random() * movespheres.length)]
 
-        const obj = getObject(state, moveSphere)
-        if (obj !== null) {
-          const rb = obj.rigidbody
+        const obj2 = getObject(state, moveSphere)
+        if (obj2 !== null) {
+          const rb = obj2.rigidbody
+          rb.velocity[0] = 20
           rb.velocity[1] = 5
-          rb.velocity[2] = 20
+          rb.velocity[2] = 0
           rb.gravityStrength = 10
         }
       }
@@ -170,12 +199,35 @@ function updateDebugSelectedObject(state) {
  * @param {import('./types.js').AppState} state
  * @param {number} deltaTime deltaTime in ms
  */
-function updateFlyCam(state, deltaTime) {
+
+function updateCam (state, deltaTime) {
+
   const secondsDeltaTime = deltaTime / 1000
 
   if (keysPressed.get('`')) {
-    flyCamEnabled = !flyCamEnabled
-    console.log('fly cam: ' + flyCamEnabled)
+    if (state.camera.name === 'flyCamera'){
+      flyCamEnabled = !flyCamEnabled
+      if (flyCamEnabled){
+        playerCamEnabled = false
+        mainCamEnabled = false
+      }
+      console.log('fly cam: ' + flyCamEnabled)
+    } 
+    else if (state.camera.name === 'playerCamera'){
+      playerCamEnabled = !playerCamEnabled
+      if (playerCamEnabled){
+        flyCamEnabled = false
+        mainCamEnabled = false
+      }
+      console.log('player cam: ' + playerCamEnabled)
+    } else if (state.camera.name === 'mainCamera'){
+      mainCamEnabled = !mainCamEnabled
+      if (mainCamEnabled){
+        flyCamEnabled = false
+        playerCamEnabled = false
+      }
+      console.log('main cam: ' + mainCamEnabled)
+    }
   }
 
   if (flyCamEnabled) {
@@ -272,6 +324,84 @@ function updateFlyCam(state, deltaTime) {
     if (keysDown.get('shift')) {
       state.camera.position[1] -= moveSpeed * secondsDeltaTime
       state.camera.center[1] -= moveSpeed * secondsDeltaTime
+    }
+  }
+
+  if(playerCamEnabled ||mainCamEnabled){
+    const moveSpeed = 4
+    myShip = getObject(state, 'mainShip')
+
+    // move relative to current look direction
+    if (keysDown.get('a')) {
+      state.camera.position[2] += moveSpeed * secondsDeltaTime
+      state.camera.center[2] += moveSpeed * secondsDeltaTime
+
+      myShip.rigidbody.velocity[0]=0
+      myShip.rigidbody.velocity[2]=moveSpeed
+
+      for (var i=0; i<mySpheres.length;i++){
+        if (mySpheres[i]!==mySphere){
+        sphere = getObject(state, mySpheres[i])
+        sphere.rigidbody.velocity[0]=0
+        sphere.rigidbody.velocity[2]=moveSpeed
+        }
+      }
+
+      updateRigidbodySimulation(deltaTime)
+    }
+
+    if (keysDown.get('d')) {
+      state.camera.position[2] -= moveSpeed * secondsDeltaTime
+      state.camera.center[2] -= moveSpeed * secondsDeltaTime
+      
+      myShip.rigidbody.velocity[0]=0
+      myShip.rigidbody.velocity[2]=-moveSpeed
+
+      for (var i=0; i<mySpheres.length;i++){
+        if (mySpheres[i]!==mySphere){
+        sphere = getObject(state, mySpheres[i])
+        sphere.rigidbody.velocity[0]=0
+        sphere.rigidbody.velocity[2]=-moveSpeed
+        }
+      }
+
+      updateRigidbodySimulation(deltaTime)
+    }
+
+    if (keysDown.get('w')) {
+      state.camera.position[0] -= moveSpeed * secondsDeltaTime
+      state.camera.center[0] -= moveSpeed * secondsDeltaTime
+
+      myShip.rigidbody.velocity[0]=-moveSpeed
+      myShip.rigidbody.velocity[2]=0
+
+      for (var i=0; i<mySpheres.length;i++){
+        if (mySpheres[i]!==mySphere){
+        sphere = getObject(state, mySpheres[i])
+        sphere.rigidbody.velocity[0]=-moveSpeed
+        sphere.rigidbody.velocity[2]=0
+        }
+      }
+
+      updateRigidbodySimulation(deltaTime)
+    }
+
+    if (keysDown.get('s')) {
+      state.camera.position[0] += moveSpeed * secondsDeltaTime
+      state.camera.center[0] += moveSpeed * secondsDeltaTime
+
+      myShip.rigidbody.velocity[0]=moveSpeed
+      myShip.rigidbody.velocity[2]=0
+
+      for (var i=0; i<mySpheres.length;i++){
+        if (mySpheres[i]!==mySphere){
+        sphere = getObject(state, mySpheres[i])
+        sphere.rigidbody.velocity[0]=moveSpeed
+        sphere.rigidbody.velocity[2]=0
+        }
+      }
+
+      updateRigidbodySimulation(deltaTime)
     }
   }
 }

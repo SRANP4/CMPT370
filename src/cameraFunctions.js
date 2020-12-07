@@ -94,6 +94,8 @@ function updateCameraUpVec (cam) {
 export function initCameraFromStatefile (statefileCamera) {
   /** @type { import('./types.js').Camera } */
   const cam = {
+    // @ts-ignore
+    name: statefileCamera.name,
     at: vec3.create(),
     up: new Float32Array(statefileCamera.up),
     position: new Float32Array(statefileCamera.position),

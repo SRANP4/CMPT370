@@ -10,7 +10,7 @@ import { GameObject } from './gameObject.js'
 import { getGameTime } from './myGame.js'
 import { containsObject, getObject, getTime } from './sceneFunctions.js'
 
-const ships = ['Ship1', 'Ship2', 'Ship3']
+const ships = ['mainShip','Ship1', 'Ship2', 'Ship3']
 const health = { Ship1: 15, Ship2: 15, Ship3: 15 }
 
 export class EnemyShip extends GameObject {
@@ -33,6 +33,7 @@ export class EnemyShip extends GameObject {
 
     this.drawingObject = shipObj
     this.rigidbody = shipRb
+
     this.health = 5
     this.speed = 2
     this.xDir = 0
@@ -87,7 +88,7 @@ export class EnemyShip extends GameObject {
       // the default direction the ship faces
 
       this.rigidbody.velocity[0] = -this.speed
-      setRotationMatrixFromEuler(0, 0, 0, this.drawingObject.model.rotation)
+      //setRotationMatrixFromEuler(0, 0, 0, this.drawingObject.model.rotation)
 
     } else {
       // head west, young man
@@ -95,7 +96,7 @@ export class EnemyShip extends GameObject {
       // need to rotate the ship 180 for this direction
 
       this.rigidbody.velocity[0] = this.speed
-      setRotationMatrixFromEuler(180, 0, 0, this.drawingObject.model.rotation)
+      //setRotationMatrixFromEuler(180, 0, 0, this.drawingObject.model.rotation)
     }
   }
 
