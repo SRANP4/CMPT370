@@ -103,6 +103,7 @@ function createMesh (mesh, loadObject) {
  * Main function that gets called when the DOM loads
  */
 function main () {
+  state.startTime = window.performance.now()
   // document.body.appendChild( stats.dom );
 
   /** @type { HTMLCanvasElement } */
