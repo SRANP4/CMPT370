@@ -590,3 +590,15 @@ export function getEuler (out, quat) {
   // TODO: Return them as degrees and not as radians
   return out
 }
+
+/**
+ * Gets a random int between (inclusive) the min and max values given
+ * @param {number} min integer value smaller than the max value
+ * @param {number} max integer value larger than the min value
+ * @returns {number}
+ */
+export function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive 
+}

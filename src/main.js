@@ -3,7 +3,7 @@
 'use strict'
 
 import { mat4, vec3 } from '../lib/gl-matrix/index.js'
-import { loadMeshFromOBJUrl, parseSceneFile } from './commonFunctions.js'
+import { getRandomInt, loadMeshFromOBJUrl, parseSceneFile } from './commonFunctions.js'
 import { fixedUpdate, startGame } from './myGame.js'
 import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
@@ -104,6 +104,7 @@ function createMesh (mesh, loadObject) {
  */
 function main () {
   state.startTime = window.performance.now()
+  
   // document.body.appendChild( stats.dom );
 
   /** @type { HTMLCanvasElement } */
