@@ -9,6 +9,7 @@ import { createRigidbody, createSphere } from './collisionFunctions.js'
 import { GameObject } from './gameObject.js'
 import { containsObject, getObject } from './sceneFunctions.js'
 import { EnemyShip } from './enemyShip.js'
+import { PlayerShip } from './playerShip.js'
 
 const spheres = ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12', 'sphere13', 'sphere14', 'sphere15', 'sphere16', 'sphere17', 'sphere18', 'sphere19','sphere20','sphere21', 'sphere22', 'sphere23', 'sphere24']
 

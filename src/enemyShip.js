@@ -31,7 +31,7 @@ export class EnemyShip extends GameObject {
 
     this.drawingObject = shipObj
     this.rigidbody = shipRb
-    this.health = 5
+    this.health = 15
   }
 
   /**

@@ -18,7 +18,7 @@ import {
   setupInputEvents,
   updateInput
 } from './inputHelper.js'
-import { playerShip } from './playerShip.js'
+import { PlayerShip } from './playerShip.js'
 import { containsObject, getObject } from './sceneFunctions.js'
 import { updateSimulationStatusIndicator } from './uiSetup.js'
 
@@ -44,7 +44,7 @@ export function startGame (state) {
   initRigidbodySimulation()
 
   //create main ship object
-  const gameObj = new playerShip(state,ships[0])
+  const gameObj = new PlayerShip(state,ships[0])
   gameObjects.push(gameObj)
   
   // create enemy ship objects

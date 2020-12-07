@@ -5,12 +5,12 @@ import {
   getBoundingBoxFromModelVertices
 } from './collisionFunctions.js'
 import { GameObject } from './gameObject.js'
-import { containsObject, getObject } from './sceneFunctions.js'
+import { getObject } from './sceneFunctions.js'
 
 const ships = ['mainShip']
 const health = {mainShip:15}
 
-export class playerShip extends GameObject {
+export class PlayerShip extends GameObject {
   /**
    *
    * @param {import('./types.js').AppState} state
@@ -30,7 +30,7 @@ export class playerShip extends GameObject {
 
     this.drawingObject = shipObj
     this.rigidbody = shipRb
-    this.health = 5
+    this.health = 15
   }
 
   /**
