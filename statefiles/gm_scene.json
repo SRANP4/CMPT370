@@ -21,6 +21,44 @@
         "model": null
       },
       {
+        "name": "mainShip",
+        "material": {
+          "diffuse": [0.0, 0.0, 1.0],
+          "ambient": [0.3, 0.3, 0.3],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 25.000002,
+          "shaderType": 1,
+          "alpha": 1
+        },
+        "type": "mesh",
+        "position": [15.65, 1, -11.22],
+        "scale": [1, 1, 1],
+        "diffuseTexture": "ship.jpg",
+        "normalTexture": "ship.jpg",
+        "rotation":[0.7071076035499573,-1.0739483968791319e-8,-0.7071059346199036,0,0,1,-1.518794157107095e-8,0,0.7071059346199036,1.073950972596549e-8,0.7071076035499573,0,0,0,0,1],
+        "parent": null,
+        "model": "pirate_ship_fixed.obj"
+      },
+      {
+        "name": "mainCannon",
+        "material": {
+          "diffuse": [0.5882, 0.5882, 0.5882],
+          "ambient": [0.3, 0.3, 0.3],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 10.000002,
+          "shaderType": 1,
+          "alpha": 1
+        },
+        "type": "mesh",
+        "position": [-2.9, -1, 0],
+        "scale": [1, 1, 1],
+        "diffuseTexture": "cannon.jpg",
+        "normalTexture": "cannon.jpg",
+        "rotation": [0.000002357255425522453, 1.5187978874564578e-8, 1, 0, -1.518794157107095e-8, 1, -1.518794157107095e-8, 0, -1, -1.5187907820291002e-8, 0.000002357255425522453, 0, 0, 0, 0, 1],
+        "parent": "mainShip",
+        "model": "artillery_cannon_fixed.obj"
+      },
+      {
         "name": "Ship1",
         "material": {
           "diffuse": [0.0, 0.0, 1.0],
@@ -33,8 +71,8 @@
         "type": "mesh",
         "position": [0, 1, 7],
         "scale": [1, 1, 1],
-        "diffuseTexture": "default.jpg",
-        "normalTexture": "defaultNorm.jpg",
+        "diffuseTexture": "ship.jpg",
+        "normalTexture": "ship.jpg",
         "rotation": [1, 0, -1.518794157107095e-8, 0, 0, 1, 0, 0, 1.518794157107095e-8, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
         "model": "pirate_ship_fixed.obj"
@@ -52,8 +90,8 @@
         "type": "mesh",
         "position": [-2.9, -1, 0],
         "scale": [1, 1, 1],
-        "diffuseTexture": "default.jpg",
-        "normalTexture": "defaultNorm.jpg",
+        "diffuseTexture": "cannon.jpg",
+        "normalTexture": "cannon.jpg",
         "rotation": [0.000002357255425522453, 1.5187978874564578e-8, 1, 0, -1.518794157107095e-8, 1, -1.518794157107095e-8, 0, -1, -1.5187907820291002e-8, 0.000002357255425522453, 0, 0, 0, 0, 1],
         "parent": "Ship1",
         "model": "artillery_cannon_fixed.obj"
@@ -71,8 +109,8 @@
         "type": "mesh",
         "position": [10, 1, 17],
         "scale": [1, 1, 1],
-        "diffuseTexture": "default.jpg",
-        "normalTexture": "defaultNorm.jpg",
+        "diffuseTexture": "ship.jpg",
+        "normalTexture": "ship.jpg",
         "rotation": [1, 0, -1.518794157107095e-8, 0, 0, 1, 0, 0, 1.518794157107095e-8, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
         "model": "pirate_ship_fixed.obj"
@@ -90,8 +128,8 @@
         "type": "mesh",
         "position": [-2.9, -1, 0],
         "scale": [1, 1, 1],
-        "diffuseTexture": "default.jpg",
-        "normalTexture": "defaultNorm.jpg",
+        "diffuseTexture": "cannon.jpg",
+        "normalTexture": "cannon.jpg",
         "rotation": [0.000002357255425522453, 1.5187978874564578e-8, 1, 0, -1.518794157107095e-8, 1, -1.518794157107095e-8, 0, -1, -1.5187907820291002e-8, 0.000002357255425522453, 0, 0, 0, 0, 1],
         "parent": "Ship2",
         "model": "artillery_cannon_fixed.obj"
@@ -109,8 +147,8 @@
         "type": "mesh",
         "position": [0, 1, 30],
         "scale": [1, 1, 1],
-          "diffuseTexture": "default.jpg",
-          "normalTexture": "defaultNorm.jpg",
+          "diffuseTexture": "ship.jpg",
+          "normalTexture": "ship.jpg",
           "rotation": [1, 0, -1.518794157107095e-8, 0, 0, 1, 0, 0, 1.518794157107095e-8, 0, 1, 0, 0, 0, 0, 1],
           "parent": null,
           "model": "pirate_ship_fixed.obj"
@@ -128,8 +166,8 @@
         "type": "mesh",
         "position": [-2.9, -1, 0],
         "scale": [1, 1, 1],
-        "diffuseTexture": "default.jpg",
-        "normalTexture": "defaultNorm.jpg",
+        "diffuseTexture": "cannon.jpg",
+        "normalTexture": "cannon.jpg",
         "rotation": [0.000002357255425522453, 1.5187978874564578e-8, 1, 0, -1.518794157107095e-8, 1, -1.518794157107095e-8, 0, -1, -1.5187907820291002e-8, 0.000002357255425522453, 0, 0, 0, 0, 1],
         "parent": "Ship3",
         "model": "artillery_cannon_fixed.obj"
@@ -145,12 +183,12 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [0, 0.5, 2],
-        "scale": [1, 1, 1],
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        "parent": null,
+        "parent": "mainShip",
         "model": "sphere.obj"
       },
       {
@@ -164,12 +202,12 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [0, 0.5, 5],
-        "scale": [1, 1, 1],
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        "parent": null,
+        "parent": "mainShip",
         "model": "sphere.obj"
       },
       {
@@ -183,12 +221,12 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [0, 0.5, 10],
-        "scale": [1, 1, 1],
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        "parent": null,
+        "parent": "mainShip",
         "model": "sphere.obj"
       },
       {
@@ -202,12 +240,12 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [-20, 0.5, 0],
-        "scale": [1, 1, 1],
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        "parent": null,
+        "parent": "mainShip",
         "model": "sphere.obj"
       },
       {
@@ -221,12 +259,12 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [-15, 0.5, 0],
-        "scale": [1, 1, 1],
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        "parent": null,
+        "parent": "mainShip",
         "model": "sphere.obj"
       },
       {
@@ -240,12 +278,12 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [-10, 0.5, 0],
-        "scale": [1, 1, 1],
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        "parent": null,
+        "parent": "mainShip",
         "model": "sphere.obj"
       },
       {
@@ -259,12 +297,12 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [-10, 0.5, 10],
-        "scale": [1, 1, 1],
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        "parent": null,
+        "parent": "Ship1",
         "model": "sphere.obj"
       },
       {
@@ -278,12 +316,12 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [-10, 0.5, 15],
-        "scale": [1, 1, 1],
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        "parent": null,
+        "parent": "Ship1",
         "model": "sphere.obj"
       },
       {
@@ -297,12 +335,296 @@
           "shaderType": 3
         },
         "type": "mesh",
-        "position": [-10, 0.5, 20],
-        "scale": [1, 1, 1],
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
         "diffuseTexture": "Asphalt.jpg",
         "normalTexture": "defaultNorm.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        "parent": null,
+        "parent": "Ship1",
+        "model": "sphere.obj"
+      },
+      {
+        "name": "sphere10",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship1",
+        "model": "sphere.obj"
+      },
+      {
+        "name": "sphere11",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship1",
+        "model": "sphere.obj"
+      },
+      {
+        "name": "sphere12",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship1",
+        "model": "sphere.obj"
+      },
+      {
+        "name": "sphere13",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship2",
+        "model": "sphere.obj"
+      },
+      {
+        "name": "sphere14",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship2",
+        "model": "sphere.obj"
+      },
+      {
+        "name": "sphere15",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship2",
+        "model": "sphere.obj"
+      },
+      {
+        "name": "sphere16",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship2",
+        "model": "sphere.obj"
+      },
+      {
+        "name": "sphere17",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship2",
+        "model": "sphere.obj"
+      },
+      {
+        "name": "sphere18",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship2",
+        "model": "sphere.obj"
+      },
+      {
+        "name": "sphere19",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship3",
+        "model": "sphere.obj"
+      },{
+        "name": "sphere20",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship3",
+        "model": "sphere.obj"
+      },
+      {
+        "name": "sphere21",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship3",
+        "model": "sphere.obj"
+      },
+      {
+        "name": "sphere22",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship3",
+        "model": "sphere.obj"
+      },
+      {
+        "name": "sphere23",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship3",
+        "model": "sphere.obj"
+      },
+      {
+        "name": "sphere24",
+        "material": {
+          "diffuse": [0.5, 0.5, 0.5],
+          "ambient": [0.5, 0.5, 0.5],
+          "specular": [0.5, 0.5, 0.5],
+          "n": 3,
+          "alpha": 1,
+          "shaderType": 3
+        },
+        "type": "mesh",
+        "position": [-5, 0.5, 0],
+        "scale": [0.5, 0.5, 0.5],
+        "diffuseTexture": "Asphalt.jpg",
+        "normalTexture": "defaultNorm.jpg",
+        "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "parent": "Ship3",
         "model": "sphere.obj"
       }
     ],
@@ -323,45 +645,124 @@
     ],
     "settings": {
       "backgroundColor": [1.0, 1.0, 1.0],
-      "camera": {
-        "name": "mainCamera",
-        "position": [15.65, 4.12, -11.22],
-        "front": [0, 0, 1],
-        "up": [0, 1, 0],
-        "pitch": -10.02,
-        "yaw": 127.72,
-        "roll": 0,
-        "moveSpeed": 10,
-        "move": false,
-        "canvasFocused": false,
-        "rateX": 0,
-        "rateY": 0,
-        "keyboard": {
-          "s": false,
-          "a": false,
-          "d": false,
-          "w": false
+      "camera": [
+        {
+          "name": "flyCamera",
+          "position": [15.65, 4.12, -11.22],
+          "front": [0, 0, 1],
+          "up": [0, 1, 0],
+          "pitch": -10.02,
+          "yaw": 127.72,
+          "roll": 0,
+          "moveSpeed": 10,
+          "move": false,
+          "canvasFocused": false,
+          "rateX": 0,
+          "rateY": 0,
+          "keyboard": {
+            "s": false,
+            "a": false,
+            "d": false,
+            "w": false
+          },
+          "viewMatrix": {
+            "0": -1,
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "4": 0,
+            "5": 1,
+            "6": 0,
+            "7": 0,
+            "8": 0,
+            "9": 0,
+            "10": -1,
+            "11": 0,
+            "12": -0.15559963881969452,
+            "13": -0.5,
+            "14": -6.002475261688232,
+           "15": 1
+          },
+          "sensitivity": 0.4
         },
-        "viewMatrix": {
-          "0": -1,
-          "1": 0,
-          "2": 0,
-          "3": 0,
-          "4": 0,
-          "5": 1,
-          "6": 0,
-          "7": 0,
-          "8": 0,
-          "9": 0,
-          "10": -1,
-          "11": 0,
-          "12": -0.15559963881969452,
-          "13": -0.5,
-          "14": -6.002475261688232,
-          "15": 1
-        },
-        "sensitivity": 0.4
-      }
+        {
+          "name": "playerCamera",
+          "position": [15.76, 4.5, -11.28],
+          "front": [0, 0, 1],
+          "up": [0, 1, 0],
+          "pitch": -22.35,
+          "yaw": 132.02,
+          "roll": 0,
+          "moveSpeed": 10,
+          "move": false,
+          "canvasFocused": false,
+          "rateX": 0,
+          "rateY": 0,
+          "keyboard": {
+            "s": false,
+            "a": false,
+            "d": false,
+            "w": false
+          },
+          "viewMatrix": {
+            "0": -1,
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "4": 0,
+            "5": 1,
+            "6": 0,
+            "7": 0,
+            "8": 0,
+            "9": 0,
+            "10": -1,
+            "11": 0,
+            "12": 0.15105246007442474,
+            "13": -0.5,
+            "14": -0.17650693655014038,
+            "15": 1
+          },
+          "sensitivity": 0.4
+        },{
+          "name": "mainCamera",
+          "position": [15.65, 40, -11.22],
+          "front": [1, 0, 1],
+          "up": [0, 1, 0],
+          "pitch": -72.19,
+          "yaw": -222.93,
+          "roll": 0,
+          "moveSpeed": 10,
+          "move": false,
+          "canvasFocused": false,
+          "rateX": 0,
+          "rateY": 0,
+          "keyboard": {
+            "s": false,
+            "a": false,
+            "d": false,
+            "w": false
+          },
+          "viewMatrix": {
+            "0": -1,
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "4": 0,
+            "5": 1,
+            "6": 0,
+            "7": 0,
+            "8": 0,
+            "9": 0,
+            "10": -1,
+            "11": 0,
+            "12": -0.15559963881969452,
+            "13": -0.5,
+            "14": -6.002475261688232,
+           "15": 1
+          },
+          "sensitivity": 0.4
+        }
+      ]
     }
   }
 ]

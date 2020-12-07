@@ -10,17 +10,7 @@ import { GameObject } from './gameObject.js'
 import { containsObject, getObject } from './sceneFunctions.js'
 import { EnemyShip } from './enemyShip.js'
 
-const spheres = [
-  'sphere1',
-  'sphere2',
-  'sphere3',
-  'sphere4',
-  'sphere5',
-  'sphere6',
-  'sphere7',
-  'sphere8',
-  'sphere9'
-]
+const spheres = ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12', 'sphere13', 'sphere14', 'sphere15', 'sphere16', 'sphere17', 'sphere18', 'sphere19','sphere20','sphere21', 'sphere22', 'sphere23', 'sphere24']
 
 export class Cannonball extends GameObject {
   /**
@@ -78,6 +68,7 @@ export class Cannonball extends GameObject {
       // change color of this sphere
       this.drawingObject.material.diffuse = [1.0, 0, 0];
 
+      console.log(this.collidedShip.name)
       // reduce health of ship
       const enemyShip = /** @type {EnemyShip} */(this.collidedShip)
       enemyShip.health -= 1
@@ -98,9 +89,12 @@ export class Cannonball extends GameObject {
     // if both objects are spheres
     if (containsObject(otherRb.drawingObj.name, spheres)) {
       this.sphereColliding = false
+    } else if (rb.drawingObj.parent === otherRb.drawingObj.name) {
+      this.sphereColliding = false
     } else {
       // we'll assume the other is a ship
       this.sphereColliding = true
+      console.log(rb.drawingObj.name)
       this.collidedShip = otherRb.gameObject
     }
   }
