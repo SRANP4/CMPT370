@@ -77,6 +77,10 @@ export function startGame (state) {
   gameObjects.forEach(go => {
     go.onStart(state)
   })
+
+  // state.startTime is set at the very beginning of the game's main() function
+  const startupTime = (window.performance.now() - state.startTime) / 1000
+  console.log("start up time: " + startupTime.toFixed(3) + " sec")
 }
 
 /**
