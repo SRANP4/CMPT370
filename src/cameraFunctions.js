@@ -3,8 +3,10 @@
 
 // // Camera helper funcs // //
 
+/* eslint-disable */
 import { vec3 } from '../lib/gl-matrix/index.js'
 import { toRadians } from './commonFunctions.js'
+/* eslint-enable */
 
 const DEFAULT_NEAR_CLIP = 0.1
 const DEFAULT_FAR_CLIP = 1000000.0

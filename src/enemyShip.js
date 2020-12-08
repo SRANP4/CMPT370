@@ -1,6 +1,7 @@
 // @ts-check
 'use strict'
 
+/* eslint-disable */
 import {
   createRigidbody,
   getBoundingBoxFromModelVertices
@@ -9,8 +10,9 @@ import { getRandomInt, setRotationMatrixFromEuler } from './commonFunctions.js'
 import { GameObject } from './gameObject.js'
 import { getGameTime } from './myGame.js'
 import { containsObject, getObject, getTime } from './sceneFunctions.js'
+/* eslint-enable */
 
-const ships = ['mainShip','Ship1', 'Ship2', 'Ship3']
+const ships = ['mainShip', 'Ship1', 'Ship2', 'Ship3']
 const health = { Ship1: 15, Ship2: 15, Ship3: 15 }
 
 export class EnemyShip extends GameObject {
@@ -19,7 +21,7 @@ export class EnemyShip extends GameObject {
    * @param {import('./types.js').AppState} state
    * @param {string} name
    */
-  constructor(state, name) {
+  constructor (state, name) {
     super(name)
 
     const shipObj = getObject(state, name)
@@ -38,14 +40,14 @@ export class EnemyShip extends GameObject {
     this.speed = 2
     this.xDir = 0
     this.lastChangeTime = 0
-    this.changeTime = (12 * 1000)
+    this.changeTime = 12 * 1000
   }
 
   /**
    * called after all other objects are initialized
    * @param {import('./types.js').AppState} state
    */
-  onStart(state) {
+  onStart (state) {
     // pick a left/right direction randomly (no rotation cuz I don't wanna deal with updating
     // the bounding box)
     // pick 0 or 1, then mafths it to be -1 or 1
@@ -61,14 +63,14 @@ export class EnemyShip extends GameObject {
    * @param {import('./types.js').AppState} state
    * @param {number} deltaTime
    */
-  onEarlyUpdate(state, deltaTime) { }
+  onEarlyUpdate (state, deltaTime) {}
 
   /**
    * Called each update
    * @param {import('./types.js').AppState} state
    * @param {number} deltaTime
    */
-  onUpdate(state, deltaTime) {
+  onUpdate (state, deltaTime) {
     // sink the ship if it has no health
     if (this.health <= 0) {
       this.rigidbody.gravityStrength = 9.81
@@ -89,7 +91,6 @@ export class EnemyShip extends GameObject {
 
       this.rigidbody.velocity[0] = -this.speed
       //setRotationMatrixFromEuler(0, 0, 0, this.drawingObject.model.rotation)
-
     } else {
       // head west, young man
       // left, positive x
@@ -98,6 +99,8 @@ export class EnemyShip extends GameObject {
       this.rigidbody.velocity[0] = this.speed
       //setRotationMatrixFromEuler(180, 0, 0, this.drawingObject.model.rotation)
     }
+
+    // TODO shoot sometimes
   }
 
   /**
@@ -105,10 +108,10 @@ export class EnemyShip extends GameObject {
    * @param {import('./types.js').Rigidbody} rb
    * @param {import('./types.js').Rigidbody} otherRb
    */
-  onIntersection(rb, otherRb) {
+  onIntersection (rb, otherRb) {
     // If two ships collide
     if (containsObject(otherRb.drawingObj.name, ships)) {
-      const otherShip = /** @type {EnemyShip} */(otherRb.gameObject)
+      const otherShip = /** @type {EnemyShip} */ (otherRb.gameObject)
       this.health = 0
       otherShip.health = 0
       rb.gravityStrength = 9.81

@@ -1,11 +1,13 @@
 // @ts-check
 'use strict'
 
+/* eslint-disable */
 import { vec3 } from '../lib/gl-matrix/index.js'
 import { GameObject } from './gameObject.js'
 import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
 import { Plane } from './objects/Plane.js'
+/* eslint-enable */
 
 export const COLLIDER_TYPE_SPHERE = 0
 export const COLLIDER_TYPE_BOX = 1

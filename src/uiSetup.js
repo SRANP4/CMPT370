@@ -1,9 +1,11 @@
 // @ts-check
 'use strict'
 
+/* eslint-disable */
 import { COLLIDER_TYPE_SPHERE } from './collisionFunctions.js'
 import { rotationMatrixToEulerAngles, toDegrees } from './commonFunctions.js'
 import { keysPressed } from './inputHelper.js'
+/* eslint-enable */
 
 /**
  *

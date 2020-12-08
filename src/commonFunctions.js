@@ -1,10 +1,12 @@
 // @ts-check
 'use strict'
 
+/* eslint-disable */
 import { printError } from './uiSetup.js'
 import { mat4, quat, vec3 } from '../lib/gl-matrix/index.js'
 import { OBJLoader } from '../lib/three-object-loader.js'
 import { initCameraFromStatefile } from './cameraFunctions.js'
+/* eslint-enable */
 
 /**
  * @param  {WebGL2RenderingContext} gl WebGL2 Context

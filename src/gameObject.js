@@ -1,9 +1,11 @@
 // @ts-check
 'use strict'
 
+/* eslint-disable */
 import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
 import { Plane } from './objects/Plane.js'
+/* eslint-enable */
 
 /**
  * @abstract

@@ -1,7 +1,7 @@
 // @ts-check
-
 'use strict'
 
+/* eslint-disable */
 import { mat4, vec3 } from '../lib/gl-matrix/index.js'
 import { getRandomInt, loadMeshFromOBJUrl, parseSceneFile } from './commonFunctions.js'
 import { fixedUpdate, startGame } from './myGame.js'
@@ -15,15 +15,9 @@ import {
   printError,
   updateDebugStats
 } from './uiSetup.js'
+/* eslint-enable */
 
 /*
-
-  TODO correct rendering with rotation and position
-
-  TODO enemy ship that moves back and forth, rotates in direction it is moving
-
-  TODO add fire cannonball mechanic, log when collision detected with ship
-
   TODO transparent rendering as a layer on top of opaque rendering pass (basically just for water)
 
   TODO load shaders from glsl files, per object shaders
@@ -32,6 +26,8 @@ import {
   TODO cannonball fire visual effect, cannonball impact visual effect
 
   TODO game mechanics lul
+
+  todo pre-parse obj model and store as binary data to be quick loaded
 */
 
 /** @type { import('./types').AppState } */

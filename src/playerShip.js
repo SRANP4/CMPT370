@@ -1,14 +1,17 @@
+// @ts-check
 'use strict'
 
+/* eslint-disable */
 import {
   createRigidbody,
   getBoundingBoxFromModelVertices
 } from './collisionFunctions.js'
 import { GameObject } from './gameObject.js'
 import { getObject } from './sceneFunctions.js'
+/* eslint-enable */
 
 const ships = ['mainShip']
-const health = {mainShip:15}
+const health = { mainShip: 15 }
 
 export class PlayerShip extends GameObject {
   /**

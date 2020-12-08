@@ -1,6 +1,7 @@
 // @ts-check
 'use strict'
 
+/* eslint-disable */
 import { mat4, vec3 } from '../../lib/gl-matrix/index.js'
 import {
   getTextures,
@@ -13,6 +14,7 @@ import {
   calculateCentroid
 } from '../commonFunctions.js'
 import { shaderValuesErrorCheck } from '../uiSetup.js'
+/* eslint-enable */
 
 export class Model {
   /**
