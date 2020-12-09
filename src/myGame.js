@@ -26,6 +26,7 @@ import { updateSimulationStatusIndicator } from './uiSetup.js'
 import { setRotationMatrixFromEuler } from './commonFunctions.js'
 import { toRadian } from '../lib/gl-matrix/common.js'
 import { random } from '../lib/gl-matrix/vec3.js'
+import { GameObjectPool } from 'gameObjectPool.js'
 /* eslint-enable */
 
 let flyCamEnabled = false
@@ -67,6 +68,9 @@ let myShip = null
 let gameTime = 0
 let sphere = null
 
+/** @type {GameObjectPool<Cannonball>} */
+const cannonballPool = new GameObjectPool()
+
 /**
  *
  * @param { import('./types.js').AppState } state Game state
@@ -90,10 +94,13 @@ export function startGame (state) {
   for (let i = 0; i < spheres.length; i++) {
     const gameObj = new Cannonball(state, spheres[i])
     gameObjects.push(gameObj)
+    cannonballPool.add(gameObj, state)
   }
 
   gameObjects.forEach(go => {
-    go.activate(state)
+    if (go.activateOnStart) {
+      go.activate(state)
+    }
     go.onStart(state)
   })
 
@@ -112,6 +119,7 @@ export function fixedUpdate (state, deltaTime) {
   updateDebugSelectedObject(state)
   updateCam(state, deltaTime)
   updateSimulationEnabled()
+  cannonballPool.checkForInactives(state)
 
   if (simulationEnabled) {
     gameTime += deltaTime

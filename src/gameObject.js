@@ -17,6 +17,8 @@ export class GameObject {
    */
   constructor (name) {
     this.name = name
+    // after initialization, determines if this object is activated or not at startup
+    this.activateOnStart = true
     /** @type {Model | Cube | Plane} */
     this.drawingObject = null
     /** @type {import('./types.js').Rigidbody} */
