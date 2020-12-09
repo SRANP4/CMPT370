@@ -1,6 +1,7 @@
 // @ts-check
 'use strict'
 
+import { vec3 } from '../lib/gl-matrix/index.js'
 /* eslint-disable */
 import {
   createRigidbody,
@@ -8,7 +9,8 @@ import {
 } from './collisionFunctions.js'
 import { getRandomInt, setRotationMatrixFromEuler } from './commonFunctions.js'
 import { GameObject } from './gameObject.js'
-import { getGameTime } from './myGame.js'
+import { keysPressed } from './inputHelper.js'
+import { cannonballPool, getGameTime } from './myGame.js'
 import { containsObject, getObject, getTime } from './sceneFunctions.js'
 /* eslint-enable */
 
@@ -112,10 +114,37 @@ export class EnemyShip extends GameObject {
       // need to rotate the ship 180 for this direction
 
       this.rigidbody.velocity[0] = this.speed
-      // setRotationMatrixFromEuler(180, 0, 0, this.drawingObject.model.rotation)
+      setRotationMatrixFromEuler(180, 0, 0, this.drawingObject.model.rotation)
     }
 
     // TODO shoot sometimes
+    if (keysPressed.get('j')) {
+      const ball = cannonballPool.get(state)
+      if (ball !== null) {
+      // we take an offset from the model's center then multiply it by the model matrix
+      // this will take position and rotation into consideration for us
+        const launchPos = vec3.fromValues(-4, -0.5, 0)
+        vec3.transformMat4(launchPos, launchPos, this.drawingObject.model.modelMatrix)
+
+        // get a forward point from the center of the ship (-x is forward for us) in world coords
+        const forwardPoint = vec3.fromValues(-1, 0, 0)
+        vec3.transformMat4(forwardPoint, forwardPoint, this.drawingObject.model.modelMatrix)
+
+        // take forward point, calc direction, add some up to it, normalize, this is our
+        // firing vector now
+        const direction = vec3.create()
+        vec3.sub(direction, forwardPoint, this.rigidbody.pos)
+        // add some up
+        vec3.add(direction, direction, vec3.fromValues(0, 1, 0))
+        vec3.normalize(direction, direction)
+
+        ball.fire(
+          launchPos,
+          direction,
+          10,
+          this.name)
+      }
+    }
   }
 
   /**
