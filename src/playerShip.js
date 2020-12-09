@@ -10,16 +10,13 @@ import { GameObject } from './gameObject.js'
 import { getObject } from './sceneFunctions.js'
 /* eslint-enable */
 
-const ships = ['mainShip']
-const health = { mainShip: 15 }
-
 export class PlayerShip extends GameObject {
   /**
    *
    * @param {import('./types.js').AppState} state
    * @param {string} name
    */
-  constructor(state, name) {
+  constructor (state, name) {
     super(name)
 
     const shipObj = getObject(state, name)
@@ -37,28 +34,44 @@ export class PlayerShip extends GameObject {
     this.speed = 2
     this.xDir = 0
     this.lastChangeTime = 0
-    this.changeTime = (12 * 1000)
+    this.changeTime = 12 * 1000
+  }
+
+  /**
+   * Activate this GameObject (first activation is called before onStart)
+   * @param {import('./types.js').AppState} state
+   */
+  activate (state) {
+    super.activate(state)
+  }
+
+  /**
+   * Deactivate this GameObject
+   * @param {import('./types.js').AppState} state
+   */
+  deactivate (state) {
+    super.deactivate(state)
   }
 
   /**
    * called after all other objects are initialized
    * @param {import('./types.js').AppState} state
    */
-  onStart(state) { }
+  onStart (state) {}
 
   /**
    * Called each update (BEFORE physics runs)
    * @param {import('./types.js').AppState} state
    * @param {number} deltaTime
    */
-  onEarlyUpdate(state, deltaTime) { }
+  onEarlyUpdate (state, deltaTime) {}
 
   /**
    * Called each update
    * @param {import('./types.js').AppState} state
    * @param {number} deltaTime
    */
-  onUpdate(state, deltaTime) {
+  onUpdate (state, deltaTime) {
     if (this.health <= 0) {
       this.rigidbody.gravityStrength = 9.81
     }
@@ -69,6 +82,5 @@ export class PlayerShip extends GameObject {
    * @param {import('./types.js').Rigidbody} rb
    * @param {import('./types.js').Rigidbody} otherRb
    */
-  onIntersection(rb, otherRb) {
-  }
+  onIntersection (rb, otherRb) {}
 }

@@ -17,12 +17,37 @@ export class GameObject {
    */
   constructor (name) {
     this.name = name
+    // after initialization, determines if this object is activated or not at startup
+    this.activateOnStart = true
     /** @type {Model | Cube | Plane} */
     this.drawingObject = null
     /** @type {import('./types.js').Rigidbody} */
     this.rigidbody = null
-    this.xDir = null
-    this.health = 15
+    this._active = false // no way to declare private properties :(
+  }
+
+  /**
+   * Activate this GameObject (first activation is called before onStart)
+   * @param {import('./types.js').AppState} state
+   */
+  activate (state) {
+    this._active = true
+  }
+
+  /**
+   * Deactivate this GameObject
+   * @param {import('./types.js').AppState} state
+   */
+  deactivate (state) {
+    this._active = false
+  }
+
+  /**
+   * Get bool for GameObject active state
+   * @returns {boolean}
+   */
+  isActive () {
+    return this._active
   }
 
   /**
