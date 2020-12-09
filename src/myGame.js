@@ -23,8 +23,8 @@ import { GameObjectPool } from './gameObjectPool.js'
 let gameTime = 0
 
 let flyCamEnabled = false
-let playerCamEnabled = false
-let mainCamEnabled = false
+const playerCamEnabled = false
+const mainCamEnabled = false
 let simulationEnabled = false
 
 // cannonball and ship names as they are in the scene.json file
@@ -125,9 +125,9 @@ function updateSimulationEnabled () {
   if (keysPressed.get('p')) {
     simulationEnabled = !simulationEnabled
     if (simulationEnabled) {
-      updateSimulationStatusIndicator('Simulation running')
+      updateSimulationStatusIndicator('Simulation running', 'green')
     } else {
-      updateSimulationStatusIndicator('Simulation paused')
+      updateSimulationStatusIndicator('Simulation paused', 'yellow')
     }
   }
 }
@@ -176,31 +176,42 @@ function updateCam (state, deltaTime) {
   // TODO inside player class, update target camera position for player (consider offset and rotation)
 
   if (keysPressed.get('`')) {
-    if (state.camera.name === 'flyCamera') {
-      flyCamEnabled = !flyCamEnabled
-      if (flyCamEnabled) {
-        playerCamEnabled = false
-        mainCamEnabled = false
-      }
+    flyCamEnabled = !flyCamEnabled
+
+    if (flyCamEnabled) {
+      // pause the simulation
+      simulationEnabled = false
+      updateSimulationStatusIndicator('Simulation paused', 'yellow')
       console.log('fly cam: ' + flyCamEnabled)
-    } else if (state.camera.name === 'playerCamera') {
-      playerCamEnabled = !playerCamEnabled
-      if (playerCamEnabled) {
-        flyCamEnabled = false
-        mainCamEnabled = false
-      }
-      console.log('player cam: ' + playerCamEnabled)
-    } else if (state.camera.name === 'mainCamera') {
-      mainCamEnabled = !mainCamEnabled
-      if (mainCamEnabled) {
-        flyCamEnabled = false
-        playerCamEnabled = false
-      }
-      console.log('main cam: ' + mainCamEnabled)
     }
+
+    if (state.camera.name === 'flyCamera') {
+
+    }
+    // else if (state.camera.name === 'playerCamera') {
+    //   playerCamEnabled = !playerCamEnabled
+    //   if (playerCamEnabled) {
+    //     flyCamEnabled = false
+    //     mainCamEnabled = false
+    //   }
+    //   console.log('player cam: ' + playerCamEnabled)
+    // } else if (state.camera.name === 'mainCamera') {
+    //   mainCamEnabled = !mainCamEnabled
+    //   if (mainCamEnabled) {
+    //     flyCamEnabled = false
+    //     playerCamEnabled = false
+    //   }
+    //   console.log('main cam: ' + mainCamEnabled)
+    // }
   }
 
   if (flyCamEnabled) {
+    if (simulationEnabled) {
+      // disable fly cam if simulation is un-paused
+      flyCamEnabled = false
+      return
+    }
+
     const moveSpeed = 7
     const pitchLookLimit = 1.57 // pi / 2, but a bit less
 

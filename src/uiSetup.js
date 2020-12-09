@@ -87,9 +87,15 @@ export function initDebugStats (state) {
   state.objInfoTextElement.innerText = 'OBJ INFO'
 }
 
-export function updateSimulationStatusIndicator (message) {
+export function updateSimulationStatusIndicator (message, colour) {
+  /** @type {HTMLElement} */
+  const loadingContainer = document.querySelector(
+    '#loading_indicator_container'
+  )
+  loadingContainer.style.backgroundColor = colour
+
   const simulationStatusTextElement = /** @type {HTMLElement} */ (document.querySelector(
-    '#simulation_status'
+    '#status'
   ))
   simulationStatusTextElement.innerText = message
 }
@@ -99,15 +105,7 @@ export function updateSimulationStatusIndicator (message) {
  * @param {import('./types.js').AppState} state
  */
 export function uiOnLoaded (state) {
-  /** @type {HTMLElement} */
-  const loadingContainer = document.querySelector(
-    '#loading_indicator_container'
-  )
-  loadingContainer.style.backgroundColor = 'green'
-
-  /** @type {HTMLElement} */
-  const statusText = document.querySelector('#status')
-  statusText.innerText = 'Press P to start/pause the simulation'
+  updateSimulationStatusIndicator('Simulation loaded', 'yellow')
 }
 
 /**
@@ -120,8 +118,6 @@ export function updateDebugStats (state) {
   const pos = state.camera.position
   const pitch = state.camera.pitch
   const yaw = state.camera.yaw
-
-  
 
   // prettier-ignore
   state.camPosTextElement.innerText =
