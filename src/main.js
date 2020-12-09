@@ -25,7 +25,6 @@ import {
 // TODO load shaders from glsl files, per object shaders
 // TODO sound effects for cannon fire, cannon ball in air, cannon ball impact, ship sink
 // TODO cannonball fire visual effect, cannonball impact visual effect
-// TODO game mechanics lul
 // TODO pre-parse obj model and store as binary data to be quick loaded
 
 /** @type { import('./types').AppState } */
