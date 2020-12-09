@@ -77,6 +77,36 @@ export class PlayerShip extends GameObject {
    * @param {number} deltaTime
    */
   onUpdate (state, deltaTime) {
+    // update camera (must run BEFORE velocity changes that are for the NEXT frame)
+    // modelMatrix position information is from the last frame, so we need to compensate for
+    // the new position be applying any velocity changes
+    const camPos = vec3.create()
+    const camCenter = vec3.create()
+    // this is really gross and shouldn't be handled like this, but gotta finish for the deadline :(
+    vec3.copy(camPos, this.rigidbody.velocity)
+    vec3.copy(camCenter, this.rigidbody.velocity)
+    vec3.scale(camPos, camPos, deltaTime / 1000)
+    vec3.scale(camCenter, camCenter, deltaTime / 1000)
+
+    if (keysPressed.get('t')) {
+      this.topDownCam = !this.topDownCam
+    }
+    if (this.topDownCam) {
+      // bird's eye view over ship
+      vec3.add(camPos, camPos, vec3.fromValues(0, 60, 0))
+      vec3.add(camCenter, camCenter, vec3.fromValues(0, 59, 0))
+    } else {
+      // first person camera
+      vec3.add(camPos, camPos, vec3.fromValues(-2.5, -0.25, 0))
+      vec3.add(camCenter, camCenter, vec3.fromValues(-3.5, -0.25, 0))
+    }
+    setCameraLookAt(
+      state.camera,
+      camPos,
+      camCenter,
+      this.drawingObject.model.modelMatrix
+    )
+
     // sink the ship if health is 0 (or less)
     if (this.health <= 0) {
       this.rigidbody.gravityStrength = 9.81
@@ -130,28 +160,6 @@ export class PlayerShip extends GameObject {
 
     if (keysDown.get('s')) {
       this.rigidbody.velocity[0] += this.speed
-    }
-
-    // update camera
-    if (keysPressed.get('t')) {
-      this.topDownCam = !this.topDownCam
-    }
-    if (this.topDownCam) {
-      // bird's eye view over ship
-      setCameraLookAt(
-        state.camera,
-        vec3.fromValues(0, 60, 0),
-        vec3.fromValues(0.01, 59, 0), // slight x offset so that we don't aim directly down and gimble lock the camera
-        this.drawingObject.model.modelMatrix
-      )
-    } else {
-      // first person camera
-      setCameraLookAt(
-        state.camera,
-        vec3.fromValues(-2.5, -0.25, 0),
-        vec3.fromValues(-3.5, -0.25, 0),
-        this.drawingObject.model.modelMatrix
-      )
     }
   }
 
