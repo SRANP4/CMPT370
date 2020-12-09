@@ -23,8 +23,6 @@ import { GameObjectPool } from './gameObjectPool.js'
 let gameTime = 0
 
 let flyCamEnabled = false
-const playerCamEnabled = false
-const mainCamEnabled = false
 let simulationEnabled = false
 
 // cannonball and ship names as they are in the scene.json file
@@ -159,20 +157,8 @@ function updateDebugSelectedObject (state) {
  * @param {import('./types.js').AppState} state
  * @param {number} deltaTime deltaTime in ms
  */
-
 function updateCam (state, deltaTime) {
   const secondsDeltaTime = deltaTime / 1000
-  // TODO multi-cam system
-  // TODO 2 of 3 cameras are based on player's position / look direction
-  // TODO camera switch back to last camera when fly cam is disabled or game is resumed
-  // TODO add handling for multiple camera targets (fly cam, player fps, player top down)
-  // can use myShip (player ship reference)
-  // no mouse look on either the player cam or the top down cam
-  // TODO each camera angle has a target pos and at that gets, we just update the camera to these targets
-  // so updateFlyCam will become its own function that updates fly cam target numbers
-  // player camera and top down camera also this (could probably handle this in player ship)
-  // then updateCam will just set camera to currently active camera target
-  // TODO inside player class, update target camera position for player (consider offset and rotation)
 
   if (keysPressed.get('`')) {
     flyCamEnabled = !flyCamEnabled
@@ -183,25 +169,6 @@ function updateCam (state, deltaTime) {
       updateSimulationStatusIndicator('Simulation paused', 'yellow')
       console.log('fly cam: ' + flyCamEnabled)
     }
-
-    if (state.camera.name === 'flyCamera') {
-
-    }
-    // else if (state.camera.name === 'playerCamera') {
-    //   playerCamEnabled = !playerCamEnabled
-    //   if (playerCamEnabled) {
-    //     flyCamEnabled = false
-    //     mainCamEnabled = false
-    //   }
-    //   console.log('player cam: ' + playerCamEnabled)
-    // } else if (state.camera.name === 'mainCamera') {
-    //   mainCamEnabled = !mainCamEnabled
-    //   if (mainCamEnabled) {
-    //     flyCamEnabled = false
-    //     playerCamEnabled = false
-    //   }
-    //   console.log('main cam: ' + mainCamEnabled)
-    // }
   }
 
   if (flyCamEnabled) {
