@@ -11,6 +11,7 @@ import { keysDown, keysPressed } from './inputHelper.js'
 import { cannonballPool } from './myGame.js'
 import { getObject } from './sceneFunctions.js'
 import { vec3 } from '../lib/gl-matrix/index.js'
+import { setCameraLookAt } from './cameraFunctions.js'
 /* eslint-enable */
 
 export class PlayerShip extends GameObject {
@@ -38,6 +39,7 @@ export class PlayerShip extends GameObject {
     this.xDir = 0
     this.lastChangeTime = 0
     this.changeTime = 12 * 1000
+    this.topDownCam = false
   }
 
   /**
@@ -128,6 +130,28 @@ export class PlayerShip extends GameObject {
 
     if (keysDown.get('s')) {
       this.rigidbody.velocity[0] += this.speed
+    }
+
+    // update camera
+    if (keysPressed.get('t')) {
+      this.topDownCam = !this.topDownCam
+    }
+    if (this.topDownCam) {
+      // bird's eye view over ship
+      setCameraLookAt(
+        state.camera,
+        vec3.fromValues(0, 60, 0),
+        vec3.fromValues(0.01, 59, 0), // slight x offset so that we don't aim directly down and gimble lock the camera
+        this.drawingObject.model.modelMatrix
+      )
+    } else {
+      // first person camera
+      setCameraLookAt(
+        state.camera,
+        vec3.fromValues(-2.5, -0.25, 0),
+        vec3.fromValues(-3.5, -0.25, 0),
+        this.drawingObject.model.modelMatrix
+      )
     }
   }
 
