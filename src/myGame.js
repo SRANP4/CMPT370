@@ -164,7 +164,6 @@ function updateCam (state, deltaTime) {
   const secondsDeltaTime = deltaTime / 1000
   // TODO multi-cam system
   // TODO 2 of 3 cameras are based on player's position / look direction
-  // TODO pause game when switching to fly cam, switch out of fly cam if game is resumed
   // TODO camera switch back to last camera when fly cam is disabled or game is resumed
   // TODO add handling for multiple camera targets (fly cam, player fps, player top down)
   // can use myShip (player ship reference)

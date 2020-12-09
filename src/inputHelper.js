@@ -105,6 +105,7 @@ function gatherMouseMovement (mouseEvent) {
  *
  */
 export function updateInput () {
+  // BUG pressed keys are sometimes never released causing a spamming issue
   keysDown.forEach((_, key) => {
     if (keysDown.get(key) && !keysDownLast.get(key)) {
       console.log(key)
