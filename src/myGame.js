@@ -55,7 +55,7 @@ let myShip = null
 let gameTime = 0
 
 /** @type {GameObjectPool<Cannonball>} */
-const cannonballPool = new GameObjectPool()
+export const cannonballPool = new GameObjectPool()
 
 /**
  *
@@ -117,73 +117,11 @@ export function fixedUpdate (state, deltaTime) {
 
     // handle physics here
     // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
-    // if (playerCamEnabled || mainCamEnabled) {
-    //   myShip = getObject(state, 'mainShip')
-    //   myShip.rigidbody.velocity[0] = 0
-    //   myShip.rigidbody.velocity[1] = 0
-    //   myShip.rigidbody.velocity[2] = 0
-
-    //   for (let i = 0; i < mySpheres.length; i++) {
-    //     if (mySpheres[i] !== mySphere) {
-    //       sphere = getObject(state, mySpheres[i])
-    //       sphere.rigidbody.velocity[0] = 0
-    //       sphere.rigidbody.velocity[1] = 0
-    //       sphere.rigidbody.velocity[2] = 0
-    //     }
-    //   }
-    // }
     updateRigidbodySimulation(deltaTime)
 
     gameObjects.forEach(go => {
       go.onUpdate(state, deltaTime)
     })
-
-    // misc stuff that doesn't fit in an object
-    if (keysPressed.get('f')) {
-      // TODO cannonballs are fired from enemyShip and playerShip classes (each calling a function on the cannonball class)
-      // TODO pass shoot direction from ship to cannonball fire function so that it shoots in the correct direction
-
-      // player shoots a sphere
-      // if (mySpheres.length > 0) {
-      //   if (containsObject(mySphere, mySpheres)) {
-      //     mySpheres = mySpheres.filter(sphere => sphere !== mySphere)
-      //   }
-      //   mySphere = mySpheres[Math.floor(Math.random() * mySpheres.length)]
-
-      //   const obj1 = getObject(state, mySphere)
-      //   if (obj1 !== null) {
-      //     const rb = obj1.rigidbody
-      //     rb.velocity[0] = -20
-      //     rb.velocity[1] = 5
-      //     rb.velocity[2] = 0
-      //     rb.gravityStrength = 10
-      //   }
-      // }
-
-      const ball = cannonballPool.get(state)
-      if (ball !== null) {
-        ball.fire(vec3.fromValues(0, 10, 0),
-          vec3.fromValues(-1, 3, 0),
-          10)
-      }
-
-      // enemies shoot a sphere
-      // if (movespheres.length > 0) {
-      //   if (containsObject(moveSphere, movespheres)) {
-      //     movespheres = movespheres.filter(sphere => sphere !== moveSphere)
-      //   }
-      //   moveSphere = movespheres[Math.floor(Math.random() * movespheres.length)]
-
-      //   const obj2 = getObject(state, moveSphere)
-      //   if (obj2 !== null) {
-      //     const rb = obj2.rigidbody
-      //     rb.velocity[0] = 20
-      //     rb.velocity[1] = 5
-      //     rb.velocity[2] = 0
-      //     rb.gravityStrength = 10
-      //   }
-      // }
-    }
   }
 }
 
@@ -370,42 +308,4 @@ function updateCam (state, deltaTime) {
   // TODO inside player class, update target camera position for player (consider offset and rotation)
   // TODO inside player class, update sphere launch position and direction (consider offset and rotation)
   // probably only needs to be done before firing
-
-  if (playerCamEnabled || mainCamEnabled) {
-    const moveSpeed = 4
-    myShip = getObject(state, 'mainShip')
-
-    // move relative to current look direction
-    if (keysDown.get('a')) {
-      state.camera.position[2] += moveSpeed * secondsDeltaTime
-      state.camera.center[2] += moveSpeed * secondsDeltaTime
-
-      myShip.rigidbody.velocity[0] = 0
-      myShip.rigidbody.velocity[2] = moveSpeed
-    }
-
-    if (keysDown.get('d')) {
-      state.camera.position[2] -= moveSpeed * secondsDeltaTime
-      state.camera.center[2] -= moveSpeed * secondsDeltaTime
-
-      myShip.rigidbody.velocity[0] = 0
-      myShip.rigidbody.velocity[2] = -moveSpeed
-    }
-
-    if (keysDown.get('w')) {
-      state.camera.position[0] -= moveSpeed * secondsDeltaTime
-      state.camera.center[0] -= moveSpeed * secondsDeltaTime
-
-      myShip.rigidbody.velocity[0] = -moveSpeed
-      myShip.rigidbody.velocity[2] = 0
-    }
-
-    if (keysDown.get('s')) {
-      state.camera.position[0] += moveSpeed * secondsDeltaTime
-      state.camera.center[0] += moveSpeed * secondsDeltaTime
-
-      myShip.rigidbody.velocity[0] = moveSpeed
-      myShip.rigidbody.velocity[2] = 0
-    }
-  }
 }
