@@ -6,7 +6,7 @@ import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
 import { Plane } from './objects/Plane.js'
 import { vec3 } from '../lib/gl-matrix/index.js'
-import { createRigidbody, createSphere } from './collisionFunctions.js'
+import { createRigidbody, createSphere, setRigidbodyPosition } from './collisionFunctions.js'
 import { GameObject } from './gameObject.js'
 import { gameObjects, getGameTime, moveSphere } from './myGame.js'
 import { containsObject, getObject } from './sceneFunctions.js'
@@ -56,6 +56,8 @@ export class Cannonball extends GameObject {
       this.onIntersection
     )
     sphereRb.gravityStrength = 0
+    // we intend for cannonballs to be pooled, so we don't want them to be active at startup
+    this.activateOnStart = false
 
     this.drawingObject = sphereObj
     this.rigidbody = sphereRb
@@ -83,7 +85,9 @@ export class Cannonball extends GameObject {
    * Deactivate this GameObject
    * @param {import('./types.js').AppState} state
    */
-  deactivate (state) {}
+  deactivate (state) {
+    setRigidbodyPosition(this.rigidbody, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY)
+  }
 
   /**
    * called after all other objects are initialized
