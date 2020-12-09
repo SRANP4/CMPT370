@@ -79,7 +79,8 @@ export function updateCameraEulerLookDir (cam) {
   cam.at[2] = Math.sin(cam.yaw) * Math.cos(cam.pitch)
   vec3.normalize(cam.at, cam.at)
 
-  cam.center = vec3.add(cam.center, cam.position, cam.at)
+  vec3.add(cam.center, cam.position, cam.at)
+  vec3.set(cam.up, 0, 1, 0)
   updateCameraRightVec(cam)
 }
 
@@ -100,9 +101,7 @@ function updateCameraAtVec (cam) {
  * @param {import("./types").Camera} cam
  */
 function updateCameraRightVec (cam) {
-  const right = vec3.fromValues(cam.at[0], cam.at[1], cam.at[2])
-  vec3.cross(right, right, cam.up)
-  cam.right = right
+  vec3.cross(cam.right, cam.at, cam.up)
   vec3.normalize(cam.right, cam.right)
 }
 
@@ -111,9 +110,7 @@ function updateCameraRightVec (cam) {
  * @param {import("./types").Camera} cam
  */
 function updateCameraUpVec (cam) {
-  const up = vec3.fromValues(cam.right[0], cam.right[1], cam.right[2])
-  vec3.cross(up, up, cam.at)
-  cam.up = up
+  vec3.cross(cam.up, cam.right, cam.at)
 }
 
 /**
