@@ -144,6 +144,7 @@ export class Cannonball extends GameObject {
    * @param {number} velocity
    */
   fire (startPos, direction, velocity) {
+    // TODO set team this ball was fired by
     setRigidbodyPosition(this.rigidbody, startPos)
     vec3.normalize(direction, direction)
     vec3.scale(direction, direction, velocity)
