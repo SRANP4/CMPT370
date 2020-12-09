@@ -42,6 +42,7 @@ export class EnemyShip extends GameObject {
     this.xDir = 0
     this.lastChangeTime = 0
     this.changeTime = 12 * 1000
+    this.nextFireTime = 0
   }
 
   /**
@@ -73,6 +74,8 @@ export class EnemyShip extends GameObject {
     // offsetting this further back by half the changeTime so that the ship's
     // starting position is center on its move line
     this.lastChangeTime = getGameTime() - this.changeTime / 2
+
+    this.nextFireTime = getGameTime() + getRandomInt(0, 2000)
   }
 
   /**
@@ -107,7 +110,7 @@ export class EnemyShip extends GameObject {
       // the default direction the ship faces
 
       this.rigidbody.velocity[0] = -this.speed
-      // setRotationMatrixFromEuler(0, 0, 0, this.drawingObject.model.rotation)
+      setRotationMatrixFromEuler(0, 0, 0, this.drawingObject.model.rotation)
     } else {
       // head west, young man
       // left, positive x
@@ -117,8 +120,8 @@ export class EnemyShip extends GameObject {
       setRotationMatrixFromEuler(180, 0, 0, this.drawingObject.model.rotation)
     }
 
-    // TODO shoot sometimes
-    if (keysPressed.get('j')) {
+    // shoot sometimes
+    if (getGameTime() >= this.nextFireTime) {
       const ball = cannonballPool.get(state)
       if (ball !== null) {
       // we take an offset from the model's center then multiply it by the model matrix
@@ -144,6 +147,8 @@ export class EnemyShip extends GameObject {
           10,
           this.name)
       }
+
+      this.nextFireTime = getGameTime() + getRandomInt(0, 2000)
     }
   }
 
