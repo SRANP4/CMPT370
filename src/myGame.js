@@ -69,7 +69,7 @@ let sphere = null
 
 /**
  *
- * @param { import("./types").AppState } state Game state
+ * @param { import('./types.js').AppState } state Game state
  * @usage Use this function for initializing any in game values in our state or adding event listeners
  */
 export function startGame (state) {
