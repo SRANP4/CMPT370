@@ -30,13 +30,17 @@ export class GameObject {
    * Activate this GameObject (first activation is called before onStart)
    * @param {import('./types.js').AppState} state
    */
-  activate (state) {}
+  activate (state) {
+    this._active = true
+  }
 
   /**
    * Deactivate this GameObject
    * @param {import('./types.js').AppState} state
    */
-  deactivate (state) {}
+  deactivate (state) {
+    this._active = false
+  }
 
   /**
    * Get bool for GameObject active state

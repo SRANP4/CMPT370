@@ -33,6 +33,9 @@ export function updateRigidbodySimulation (deltaTime) {
   for (let index = 0; index < rigidbodies.length; index++) {
     const rb = rigidbodies[index]
 
+    // skip updating inactive objects
+    if (!rb.gameObject.isActive()) { continue }
+
     // update velocity (drag & gravity)
     const gravity = vec3.create()
     vec3.scale(
@@ -75,12 +78,18 @@ export function updateRigidbodySimulation (deltaTime) {
   for (let index = 0; index < rigidbodies.length; index++) {
     const rb = rigidbodies[index]
 
+    // skip updating inactive objects
+    if (!rb.gameObject.isActive()) { continue }
+
     for (
       let comparingIndex = index + 1;
       comparingIndex < rigidbodies.length;
       comparingIndex++
     ) {
       const otherRb = rigidbodies[comparingIndex]
+
+      // skip updating inactive objects
+      if (!otherRb.gameObject.isActive()) { continue }
 
       // check and fire callback
 
@@ -132,12 +141,10 @@ export function updateRigidbodySimulation (deltaTime) {
 /**
  * Updates all needed positions so that things will be correct
  * @param {import('./types.js').Rigidbody} rigidbody
- * @param {number} x
- * @param {number} y
- * @param {number} z
+ * @param {vec3} newPos
  */
-export function setRigidbodyPosition (rigidbody, x, y, z) {
-  const newPos = vec3.fromValues(x, y, z)
+export function setRigidbodyPosition (rigidbody, newPos) {
+  // const newPos = vec3.fromValues(x, y, z)
   rigidbody.pos = newPos
   rigidbody.drawingObj.model.position = newPos
 

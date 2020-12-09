@@ -52,10 +52,11 @@ export class Cannonball extends GameObject {
     const sphereRb = createRigidbody(
       sphereObj,
       this,
-      createSphere(vec3.create(), 0.125),
+      createSphere(vec3.create(), 0.5),
       this.onIntersection
     )
-    sphereRb.gravityStrength = 0
+    // sphereRb.gravityStrength = 0
+
     // we intend for cannonballs to be pooled, so we don't want them to be active at startup
     this.activateOnStart = false
 
@@ -68,9 +69,6 @@ export class Cannonball extends GameObject {
     /** @type {GameObject} */
     this.collidedShip = undefined
     this.team = teams[name]
-    this.health = 0
-    this.speed = 2
-    this.xDir = 0
     this.lastChangeTime = 0
     this.changeTime = 12 * 1000
   }
@@ -79,14 +77,22 @@ export class Cannonball extends GameObject {
    * Activate this GameObject (first activation is called before onStart)
    * @param {import('./types.js').AppState} state
    */
-  activate (state) {}
+  activate (state) {
+    super.activate(state)
+    // reset our velocity
+    this.rigidbody.velocity = vec3.fromValues(0, 0, 0)
+    // reset the ball so its not red
+    this.drawingObject.material.diffuse = [0.5, 0.5, 0.5]
+  }
 
   /**
    * Deactivate this GameObject
    * @param {import('./types.js').AppState} state
    */
   deactivate (state) {
-    setRigidbodyPosition(this.rigidbody, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY)
+    super.deactivate(state)
+    setRigidbodyPosition(this.rigidbody, vec3.fromValues(Number.POSITIVE_INFINITY,
+      Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY))
   }
 
   /**
@@ -94,13 +100,6 @@ export class Cannonball extends GameObject {
    * @param {import('./types.js').AppState} state
    */
   onStart (state) {
-    for (let i = 0; i < gameObjects.length; i++) {
-      if (gameObjects[i].name === this.team && !(this.team === 'mainShip')) {
-        const playerShip = /** @type {PlayerShip} */ (gameObjects[i])
-        this.xDir = playerShip.xDir
-        this.lastChangeTime = getGameTime() - this.changeTime / 2
-      }
-    }
   }
 
   /**
@@ -118,37 +117,12 @@ export class Cannonball extends GameObject {
    * @param {number} deltaTime
    */
   onUpdate (state, deltaTime) {
-    for (let i = 0; i < gameObjects.length; i++) {
-      if (gameObjects[i].name === this.team) {
-        const ship = /** @type {PlayerShip | EnemyShip} */ (gameObjects[i])
-        if (ship.health <= 0) {
-          this.rigidbody.gravityStrength = 10
-        }
-      }
+    // when the cannonball drops too far, deactivate it
+    if (this.rigidbody.pos[1] < -3) {
+      this.deactivate(state)
+      return
     }
-    if (this.team !== 'mainShip' && this.name !== moveSphere) {
-      if (getGameTime() - this.lastChangeTime >= this.changeTime) {
-        this.xDir *= -1
-        this.lastChangeTime = getGameTime()
-      }
 
-      // update rotation and velocity based on desired direction
-      if (this.xDir === 1) {
-        // flee east, you coward
-        // right, negative x
-        // the default direction the ship faces
-
-        this.rigidbody.velocity[0] = -this.speed
-        // setRotationMatrixFromEuler(0, 0, 0, this.drawingObject.model.rotation)
-      } else {
-        // head west, young man
-        // left, positive x
-        // need to rotate the ship 180 for this direction
-
-        this.rigidbody.velocity[0] = this.speed
-        // setRotationMatrixFromEuler(180, 0, 0, this.drawingObject.model.rotation)
-      }
-    }
     if (this.sphereColliding) {
       // change color of ship
       this.collidedShip.drawingObject.material.diffuse = [1.0, 0, 0]
@@ -166,6 +140,21 @@ export class Cannonball extends GameObject {
         this.collidedShip.drawingObject.material.diffuse = [0, 0, 1.0]
       }
     }
+  }
+
+  /**
+   *
+   * @param {vec3} startPos
+   * @param {vec3} direction
+   * @param {number} velocity
+   */
+  fire (startPos, direction, velocity) {
+    setRigidbodyPosition(this.rigidbody, startPos)
+    vec3.normalize(direction, direction)
+    vec3.scale(direction, direction, velocity)
+    this.rigidbody.velocity[0] = direction[0]
+    this.rigidbody.velocity[1] = direction[1]
+    this.rigidbody.velocity[2] = direction[2]
   }
 
   /**

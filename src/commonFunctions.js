@@ -530,7 +530,7 @@ export function parseSceneFile (file, state) {
         state.loadObjects = jData[0].objects
         state.pointLights = jData[0].pointLights
         state.settings = jData[0].settings
-        state.camera = initCameraFromStatefile(state.settings.camera[1])
+        state.camera = initCameraFromStatefile(state.settings.camera[0])
         state.numberOfObjectsToLoad = jData[0].objects.length
         resolve()
       })
