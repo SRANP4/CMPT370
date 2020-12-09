@@ -4,12 +4,40 @@
 // // Camera helper funcs // //
 
 /* eslint-disable */
-import { vec3 } from '../lib/gl-matrix/index.js'
+import { mat4, vec3 } from '../lib/gl-matrix/index.js'
 import { toRadians } from './commonFunctions.js'
 /* eslint-enable */
 
 const DEFAULT_NEAR_CLIP = 0.1
 const DEFAULT_FAR_CLIP = 1000000.0
+
+/**
+ *
+ * @param {import('./types.js').Camera} cam
+ * @param {vec3} position
+ * @param {vec3} center
+ * @param {mat4=} modelMatrix
+ */
+export function setCameraLookAt (cam, position, center, modelMatrix) {
+  if (modelMatrix !== undefined && modelMatrix !== null) {
+    vec3.transformMat4(position, position, modelMatrix)
+    vec3.transformMat4(center, center, modelMatrix)
+  }
+
+  cam.position = position
+  cam.center = center
+
+  // update at vector
+  vec3.sub(cam.at, center, position)
+  vec3.normalize(cam.at, cam.at)
+
+  // update up vector
+  vec3.cross(cam.up, cam.right, cam.at)
+
+  // update right vector
+  vec3.cross(cam.right, cam.at, cam.up)
+  vec3.normalize(cam.right, cam.right)
+}
 
 /**
  * "true" rotation, but probably not what you want
