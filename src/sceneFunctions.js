@@ -47,7 +47,10 @@ export function scaleBoundingBox (boundingBox, scaleVec) {
   const newBox = {
     xMin: boundingBox.xMin,
     yMin: boundingBox.yMin,
-    zMin: boundingBox.zMin
+    zMin: boundingBox.zMin,
+    xMax: 0,
+    yMax: 0,
+    zMax: 0
   }
 
   if (boundingBox.xMax === 0 && scaleVec[0] > 1) {

@@ -12,21 +12,20 @@ import { keysPressed } from './inputHelper.js'
  * @param {import("./types").ProgramInfo} programInfo
  */
 export function shaderValuesErrorCheck (programInfo) {
+  /** @type {string[]} */
   const missing = []
+
   // do attrib check
-  Object.keys(programInfo.attribLocations).map(attrib => {
+  Object.keys(programInfo.attribLocations).forEach(attrib => {
     if (programInfo.attribLocations[attrib] === -1) {
       missing.push(attrib)
     }
-    return null
   })
   // do uniform check
-  Object.keys(programInfo.uniformLocations).map(attrib => {
+  Object.keys(programInfo.uniformLocations).forEach(attrib => {
     if (!programInfo.uniformLocations[attrib]) {
       missing.push(attrib)
     }
-
-    return null
   })
 
   if (missing.length > 0) {
@@ -50,7 +49,8 @@ export function printError (tag, errorStr) {
   errorTag.innerHTML = '<strong>' + tag + '</strong><p>' + errorStr + '</p>'
 
   // Insert the tag into the HTML document
-  document.getElementById('webglError').appendChild(errorTag)
+  const webglErrorDiv = document.getElementById('webglError')
+  if (webglErrorDiv !== null) { webglErrorDiv.appendChild(errorTag) }
 
   // Print to the console as well
   console.error(tag + ': ' + errorStr)
@@ -92,7 +92,7 @@ export function initDebugStats (state) {
   state.objInfoTextElement.innerText = 'OBJ INFO'
 }
 
-export function updateSimulationStatusIndicator(message) {
+export function updateSimulationStatusIndicator (message) {
   const simulationStatusTextElement = /** @type {HTMLElement} */ (document.querySelector(
     '#simulation_status'
   ))
