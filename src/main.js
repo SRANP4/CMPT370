@@ -426,8 +426,8 @@ function drawScene (gl, state) {
   gl.enable(gl.DEPTH_TEST) // Enable depth testing
   gl.depthFunc(gl.LEQUAL) // Near things obscure far things
   gl.disable(gl.CULL_FACE) // Cull the backface of our objects to be more efficient
-  // gl.cullFace(gl.BACK);
-  // gl.frontFace(gl.CCW);
+  gl.cullFace(gl.BACK)
+  gl.frontFace(gl.CCW)
   gl.clearDepth(1.0) // Clear everything
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
