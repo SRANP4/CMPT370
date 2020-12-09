@@ -16,7 +16,7 @@ import {
   mouseYDelta, setupInputEvents, updateInput
 } from './inputHelper.js'
 import { PlayerShip } from './playerShip.js'
-import { updateSimulationStatusIndicator } from './uiSetup.js'
+import { updateDebugStats, updateSimulationStatusIndicator } from './uiSetup.js'
 import { GameObjectPool } from './gameObjectPool.js'
 /* eslint-enable */
 
@@ -142,10 +142,15 @@ function updateDebugSelectedObject (state) {
     if (state.selectedObjIndex < 0) {
       state.selectedObjIndex = state.objectCount - 1
     }
+    // since we're throttle how often stats are updated, we want to force an update so that
+    // the input stays responsive here
+    updateDebugStats(state)
   }
 
   if (keysPressed.get('=')) {
     state.selectedObjIndex = (state.selectedObjIndex + 1) % state.objectCount
+    // same reason as above
+    updateDebugStats(state)
   }
 }
 

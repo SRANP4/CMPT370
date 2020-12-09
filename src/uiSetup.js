@@ -76,11 +76,6 @@ export function initDebugStats (state) {
   ))
   state.tickDeltaTimeTextElement.innerText = 'TICK DELTA TIME'
 
-  state.updateTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
-    '#update_delta_time'
-  ))
-  state.updateTimeTextElement.innerText = 'UPDATE TIME'
-
   state.camPosTextElement = /** @type {HTMLElement} */ (document.querySelector(
     '#camera_position'
   ))
@@ -120,9 +115,13 @@ export function uiOnLoaded (state) {
  * @param {import('./types.js').AppState} state
  */
 export function updateDebugStats (state) {
+  // TODO add basic GameObject info (isActive, activateOnStart, has rigidbody, has drawingObject)
+  // TODO all this string concatenation is expensive, reduce to fixed labels and set number and string values
   const pos = state.camera.position
   const pitch = state.camera.pitch
   const yaw = state.camera.yaw
+
+  
 
   // prettier-ignore
   state.camPosTextElement.innerText =
@@ -144,7 +143,7 @@ export function updateDebugStats (state) {
     const rb = obj.rigidbody
 
     let colliderInfo = ''
-    if (rb.collider.colliderType == COLLIDER_TYPE_SPHERE) {
+    if (rb.collider.colliderType === COLLIDER_TYPE_SPHERE) {
       const col = /** @type {import('./types.js').Sphere} */ (rb.collider)
       // prettier-ignore
       colliderInfo =
