@@ -109,25 +109,25 @@ export class PlayerShip extends GameObject {
       }
     }
 
+    // reset for when key is up
+    this.rigidbody.velocity[0] = 0
+    this.rigidbody.velocity[2] = 0
+
     // move on fixed axis
     if (keysDown.get('a')) {
-      this.rigidbody.velocity[0] = 0
-      this.rigidbody.velocity[2] = this.speed
+      this.rigidbody.velocity[2] += this.speed
     }
 
     if (keysDown.get('d')) {
-      this.rigidbody.velocity[0] = 0
-      this.rigidbody.velocity[2] = -this.speed
+      this.rigidbody.velocity[2] += -this.speed
     }
 
     if (keysDown.get('w')) {
-      this.rigidbody.velocity[0] = -this.speed
-      this.rigidbody.velocity[2] = 0
+      this.rigidbody.velocity[0] += -this.speed
     }
 
     if (keysDown.get('s')) {
-      this.rigidbody.velocity[0] = this.speed
-      this.rigidbody.velocity[2] = 0
+      this.rigidbody.velocity[0] += this.speed
     }
   }
 
