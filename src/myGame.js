@@ -33,27 +33,37 @@ let playerCamEnabled = false
 let mainCamEnabled = false
 let simulationEnabled = false
 
+// TODO kill this export
 /** @type { Array<GameObject> } */
 export const gameObjects = []
 
 // cannonball and ship names as they are in the scene.json file
-// todo we should not be manually managing these kinds of lists in code!!
+// TODO we should not be manually managing these kinds of lists in code!!
 // prettier-ignore
-const spheres = ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7',
-  'sphere8', 'sphere9', 'sphere10', 'sphere11', 'sphere12', 'sphere13', 'sphere14', 'sphere15',
-  'sphere16', 'sphere17']
+const spheres = [
+  'sphere1', 'sphere2', 'sphere3', 'sphere4',
+  'sphere5', 'sphere6', 'sphere7', 'sphere8',
+  'sphere9', 'sphere10', 'sphere11', 'sphere12',
+  'sphere13', 'sphere14', 'sphere15', 'sphere16',
+  'sphere17'
+]
 // prettier-ignore
-let mySpheres = ['sphere1', 'sphere2', 'sphere3', 'sphere13', 'sphere14', 'sphere15', 'sphere16',
-  'sphere17']
+let mySpheres = [
+  'sphere1', 'sphere2', 'sphere3', 'sphere13',
+  'sphere14', 'sphere15', 'sphere16', 'sphere17'
+]
 let mySphere = null
 // prettier-ignore
-let movespheres = ['sphere4', 'sphere5', 'sphere6', 'sphere7', 'sphere8', 'sphere9', 'sphere10',
-  'sphere11', 'sphere12']
+let movespheres = [
+  'sphere4', 'sphere5', 'sphere6', 'sphere7',
+  'sphere8', 'sphere9', 'sphere10', 'sphere11',
+  'sphere12'
+]
 
+// TODO kill this dependency of cannonball on myGame (shouldn't be exporting this value)
 export let moveSphere = null
 const ships = ['mainShip', 'Ship1', 'Ship2', 'Ship3']
 let myShip = null
-let rotated = false
 let gameTime = 0
 let sphere = null
 
@@ -83,6 +93,7 @@ export function startGame (state) {
   }
 
   gameObjects.forEach(go => {
+    go.activate(state)
     go.onStart(state)
   })
 
@@ -116,7 +127,7 @@ export function fixedUpdate (state, deltaTime) {
       myShip.rigidbody.velocity[1] = 0
       myShip.rigidbody.velocity[2] = 0
 
-      for (var i = 0; i < mySpheres.length; i++) {
+      for (let i = 0; i < mySpheres.length; i++) {
         if (mySpheres[i] !== mySphere) {
           sphere = getObject(state, mySpheres[i])
           sphere.rigidbody.velocity[0] = 0
@@ -133,9 +144,9 @@ export function fixedUpdate (state, deltaTime) {
 
     // misc stuff that doesn't fit in an object
     if (keysPressed.get('f')) {
-      //TODO cannonballs are fired from enemyShip and playerShip classes (each calling a function on the cannonball class)
-      // todo pass shoot direction from ship to cannonball fire function so that it shoots in the correct direction
-      // todo pass a velocity to shoot with to the fire function
+      // TODO cannonballs are fired from enemyShip and playerShip classes (each calling a function on the cannonball class)
+      // TODO pass shoot direction from ship to cannonball fire function so that it shoots in the correct direction
+      // TODO pass a velocity to shoot with to the fire function
 
       // player shoots a sphere
       if (mySpheres.length > 0) {
@@ -219,12 +230,12 @@ function updateCam (state, deltaTime) {
   const secondsDeltaTime = deltaTime / 1000
   // TODO multi-cam system
   // TODO 2 of 3 cameras are based on player's position / look direction
-  // todo pause game when switching to fly cam, switch out of fly cam if game is resumed
-  // todo camera switch back to last camera when fly cam is disabled or game is resumed
-  // todo add handling for multiple camera targets (fly cam, player fps, player top down)
+  // TODO pause game when switching to fly cam, switch out of fly cam if game is resumed
+  // TODO camera switch back to last camera when fly cam is disabled or game is resumed
+  // TODO add handling for multiple camera targets (fly cam, player fps, player top down)
   // can use myShip (player ship reference)
   // no mouse look on either the player cam or the top down cam
-  // todo each camera angle has a target pos and at that gets, we just update the camera to these targets
+  // TODO each camera angle has a target pos and at that gets, we just update the camera to these targets
   // so updateFlyCam will become its own function that updates fly cam target numbers
   // player camera and top down camera also this (could probably handle this in player ship)
   // then updateCam will just set camera to currently active camera target
@@ -353,15 +364,15 @@ function updateCam (state, deltaTime) {
 
   // TODO sphere launch position (player position + offset vec3) or (offset * rotation matrix + player position)
   // TODO managing sphere pool better (ie actually manage it as a pool of inactive spheres and active)
-  // todo add onActivate and onDeactivate functions to gameobject, wire it up properly to everything
-  // todo inactive spheres are set to an infinity position so they're not visible (when inactive)
-  // todo reset spheres when they drop below the world
+  // TODO add onActivate and onDeactivate functions to gameobject, wire it up properly to everything
+  // TODO inactive spheres are set to an infinity position so they're not visible (when inactive)
+  // TODO reset spheres when they drop below the world
   // TODO in order to move objects, physics will need to be able to directly reposition objects
-  // todo add a fire function to cannonball (sphere) so that we're not manipulating the rigidbody in the global update loop
+  // TODO add a fire function to cannonball (sphere) so that we're not manipulating the rigidbody in the global update loop
 
-  // TODO moving player (FROM THE PLAYERSHIP CLASS!!!!)
-  // todo inside player class, update target camera position for player (consider offset and rotation)
-  // todo inside player class, update sphere launch position and direction (consider offset and rotation)
+  // TODO moving player (FROM THE PLAYER SHIP CLASS!!!!)
+  // TODO inside player class, update target camera position for player (consider offset and rotation)
+  // TODO inside player class, update sphere launch position and direction (consider offset and rotation)
   // probably only needs to be done before firing
 
   if (playerCamEnabled || mainCamEnabled) {
@@ -376,7 +387,7 @@ function updateCam (state, deltaTime) {
       myShip.rigidbody.velocity[0] = 0
       myShip.rigidbody.velocity[2] = moveSpeed
 
-      for (var i = 0; i < mySpheres.length; i++) {
+      for (let i = 0; i < mySpheres.length; i++) {
         if (mySpheres[i] !== mySphere) {
           sphere = getObject(state, mySpheres[i])
           sphere.rigidbody.velocity[0] = 0
@@ -392,7 +403,7 @@ function updateCam (state, deltaTime) {
       myShip.rigidbody.velocity[0] = 0
       myShip.rigidbody.velocity[2] = -moveSpeed
 
-      for (var i = 0; i < mySpheres.length; i++) {
+      for (let i = 0; i < mySpheres.length; i++) {
         if (mySpheres[i] !== mySphere) {
           sphere = getObject(state, mySpheres[i])
           sphere.rigidbody.velocity[0] = 0
@@ -408,7 +419,7 @@ function updateCam (state, deltaTime) {
       myShip.rigidbody.velocity[0] = -moveSpeed
       myShip.rigidbody.velocity[2] = 0
 
-      for (var i = 0; i < mySpheres.length; i++) {
+      for (let i = 0; i < mySpheres.length; i++) {
         if (mySpheres[i] !== mySphere) {
           sphere = getObject(state, mySpheres[i])
           sphere.rigidbody.velocity[0] = -moveSpeed
@@ -424,7 +435,7 @@ function updateCam (state, deltaTime) {
       myShip.rigidbody.velocity[0] = moveSpeed
       myShip.rigidbody.velocity[2] = 0
 
-      for (var i = 0; i < mySpheres.length; i++) {
+      for (let i = 0; i < mySpheres.length; i++) {
         if (mySpheres[i] !== mySphere) {
           sphere = getObject(state, mySpheres[i])
           sphere.rigidbody.velocity[0] = moveSpeed

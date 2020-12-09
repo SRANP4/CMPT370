@@ -3,7 +3,11 @@
 
 /* eslint-disable */
 import { mat4, vec3 } from '../lib/gl-matrix/index.js'
-import { getRandomInt, loadMeshFromOBJUrl, parseSceneFile } from './commonFunctions.js'
+import {
+  getRandomInt,
+  loadMeshFromOBJUrl,
+  parseSceneFile
+} from './commonFunctions.js'
 import { fixedUpdate, startGame } from './myGame.js'
 import { Cube } from './objects/Cube.js'
 import { Model } from './objects/Model.js'
@@ -17,18 +21,12 @@ import {
 } from './uiSetup.js'
 /* eslint-enable */
 
-/*
-  TODO transparent rendering as a layer on top of opaque rendering pass (basically just for water)
-
-  TODO load shaders from glsl files, per object shaders
-
-  TODO sound effects for cannon fire, cannon ball in air, cannon ball impact, ship sink
-  TODO cannonball fire visual effect, cannonball impact visual effect
-
-  TODO game mechanics lul
-
-  todo pre-parse obj model and store as binary data to be quick loaded
-*/
+// TODO transparent rendering as a layer on top of opaque rendering pass (basically just for water)
+// TODO load shaders from glsl files, per object shaders
+// TODO sound effects for cannon fire, cannon ball in air, cannon ball impact, ship sink
+// TODO cannonball fire visual effect, cannonball impact visual effect
+// TODO game mechanics lul
+// TODO pre-parse obj model and store as binary data to be quick loaded
 
 /** @type { import('./types').AppState } */
 // @ts-ignore
@@ -100,7 +98,7 @@ function createMesh (mesh, loadObject) {
  */
 function main () {
   state.startTime = window.performance.now()
-  
+
   // document.body.appendChild( stats.dom );
 
   /** @type { HTMLCanvasElement } */

@@ -13,7 +13,6 @@ import { containsObject, getObject, getTime } from './sceneFunctions.js'
 /* eslint-enable */
 
 const ships = ['mainShip', 'Ship1', 'Ship2', 'Ship3']
-const health = { Ship1: 15, Ship2: 15, Ship3: 15 }
 
 export class EnemyShip extends GameObject {
   /**
@@ -42,6 +41,18 @@ export class EnemyShip extends GameObject {
     this.lastChangeTime = 0
     this.changeTime = 12 * 1000
   }
+
+  /**
+   * Activate this GameObject (first activation is called before onStart)
+   * @param {import('./types.js').AppState} state
+   */
+  activate (state) {}
+
+  /**
+   * Deactivate this GameObject
+   * @param {import('./types.js').AppState} state
+   */
+  deactivate (state) {}
 
   /**
    * called after all other objects are initialized
@@ -84,20 +95,20 @@ export class EnemyShip extends GameObject {
     }
 
     // update rotation and velocity based on desired direction
-    if (this.xDir == 1) {
+    if (this.xDir === 1) {
       // flee east, you coward
       // right, negative x
       // the default direction the ship faces
 
       this.rigidbody.velocity[0] = -this.speed
-      //setRotationMatrixFromEuler(0, 0, 0, this.drawingObject.model.rotation)
+      // setRotationMatrixFromEuler(0, 0, 0, this.drawingObject.model.rotation)
     } else {
       // head west, young man
       // left, positive x
       // need to rotate the ship 180 for this direction
 
       this.rigidbody.velocity[0] = this.speed
-      //setRotationMatrixFromEuler(180, 0, 0, this.drawingObject.model.rotation)
+      // setRotationMatrixFromEuler(180, 0, 0, this.drawingObject.model.rotation)
     }
 
     // TODO shoot sometimes

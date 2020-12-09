@@ -16,7 +16,7 @@ import { PlayerShip } from './playerShip.js'
 
 // prettier-ignore
 const spheres = ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7',
-  'sphere8', 'sphere9', 'sphere10', 'sphere11','sphere12', 'sphere13', 'sphere14', 'sphere15',
+  'sphere8', 'sphere9', 'sphere10', 'sphere11', 'sphere12', 'sphere13', 'sphere14', 'sphere15',
   'sphere16', 'sphere17']
 
 const teams = {
@@ -64,7 +64,7 @@ export class Cannonball extends GameObject {
     // /** @type {GameObject} */
     // this.collidedSphere = null
     /** @type {GameObject} */
-    this.collidedShip = null
+    this.collidedShip = undefined
     this.team = teams[name]
     this.health = 0
     this.speed = 2
@@ -74,13 +74,26 @@ export class Cannonball extends GameObject {
   }
 
   /**
+   * Activate this GameObject (first activation is called before onStart)
+   * @param {import('./types.js').AppState} state
+   */
+  activate (state) {}
+
+  /**
+   * Deactivate this GameObject
+   * @param {import('./types.js').AppState} state
+   */
+  deactivate (state) {}
+
+  /**
    * called after all other objects are initialized
    * @param {import('./types.js').AppState} state
    */
   onStart (state) {
-    for (var i = 0; i < gameObjects.length; i++) {
+    for (let i = 0; i < gameObjects.length; i++) {
       if (gameObjects[i].name === this.team && !(this.team === 'mainShip')) {
-        this.xDir = gameObjects[i].xDir
+        const playerShip = /** @type {PlayerShip} */ (gameObjects[i])
+        this.xDir = playerShip.xDir
         this.lastChangeTime = getGameTime() - this.changeTime / 2
       }
     }
@@ -101,34 +114,35 @@ export class Cannonball extends GameObject {
    * @param {number} deltaTime
    */
   onUpdate (state, deltaTime) {
-    for (var i = 0; i < gameObjects.length; i++) {
+    for (let i = 0; i < gameObjects.length; i++) {
       if (gameObjects[i].name === this.team) {
-        if (gameObjects[i].health <= 0) {
+        const ship = /** @type {PlayerShip | EnemyShip} */ (gameObjects[i])
+        if (ship.health <= 0) {
           this.rigidbody.gravityStrength = 10
         }
       }
     }
-    if (this.team !== 'mainShip' && this.name != moveSphere) {
+    if (this.team !== 'mainShip' && this.name !== moveSphere) {
       if (getGameTime() - this.lastChangeTime >= this.changeTime) {
         this.xDir *= -1
         this.lastChangeTime = getGameTime()
       }
 
       // update rotation and velocity based on desired direction
-      if (this.xDir == 1) {
+      if (this.xDir === 1) {
         // flee east, you coward
         // right, negative x
         // the default direction the ship faces
 
         this.rigidbody.velocity[0] = -this.speed
-        //setRotationMatrixFromEuler(0, 0, 0, this.drawingObject.model.rotation)
+        // setRotationMatrixFromEuler(0, 0, 0, this.drawingObject.model.rotation)
       } else {
         // head west, young man
         // left, positive x
         // need to rotate the ship 180 for this direction
 
         this.rigidbody.velocity[0] = this.speed
-        //setRotationMatrixFromEuler(180, 0, 0, this.drawingObject.model.rotation)
+        // setRotationMatrixFromEuler(180, 0, 0, this.drawingObject.model.rotation)
       }
     }
     if (this.sphereColliding) {

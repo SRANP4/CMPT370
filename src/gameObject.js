@@ -21,8 +21,27 @@ export class GameObject {
     this.drawingObject = null
     /** @type {import('./types.js').Rigidbody} */
     this.rigidbody = null
-    this.xDir = null
-    this.health = 15
+    this._active = false // no way to declare private properties :(
+  }
+
+  /**
+   * Activate this GameObject (first activation is called before onStart)
+   * @param {import('./types.js').AppState} state
+   */
+  activate (state) {}
+
+  /**
+   * Deactivate this GameObject
+   * @param {import('./types.js').AppState} state
+   */
+  deactivate (state) {}
+
+  /**
+   * Get bool for GameObject active state
+   * @returns {boolean}
+   */
+  isActive () {
+    return this._active
   }
 
   /**
