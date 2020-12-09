@@ -1,7 +1,6 @@
 // @ts-check
 'use strict'
 
-import { glMatrix, mat4, vec3, vec4 } from '../lib/gl-matrix/index.js'
 /* eslint-disable */
 import {
   createRigidbody,
@@ -11,6 +10,7 @@ import { GameObject } from './gameObject.js'
 import { keysDown, keysPressed } from './inputHelper.js'
 import { cannonballPool } from './myGame.js'
 import { getObject } from './sceneFunctions.js'
+import { vec3 } from '../lib/gl-matrix/index.js'
 /* eslint-enable */
 
 export class PlayerShip extends GameObject {

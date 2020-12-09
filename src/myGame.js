@@ -3,10 +3,7 @@
 
 /* eslint-disable */
 import { vec3 } from '../lib/gl-matrix/index.js'
-import {
-  updateCameraEulerLookDir,
-  rotateCameraAroundYAxis
-} from './cameraFunctions.js'
+import { updateCameraEulerLookDir } from './cameraFunctions.js'
 import { Cannonball } from './cannonball.js'
 import {
   updateRigidbodySimulation,
@@ -14,29 +11,21 @@ import {
 } from './collisionFunctions.js'
 import { EnemyShip } from './enemyShip.js'
 import { GameObject } from './gameObject.js'
-// prettier-ignore
 import {
-  hasMouseLock,
   keysDown, keysPressed, mouseXDelta,
   mouseYDelta, setupInputEvents, updateInput
 } from './inputHelper.js'
 import { PlayerShip } from './playerShip.js'
-import { containsObject, getObject } from './sceneFunctions.js'
 import { updateSimulationStatusIndicator } from './uiSetup.js'
-import { setRotationMatrixFromEuler } from './commonFunctions.js'
-import { toRadian } from '../lib/gl-matrix/common.js'
-import { random } from '../lib/gl-matrix/vec3.js'
 import { GameObjectPool } from './gameObjectPool.js'
 /* eslint-enable */
+
+let gameTime = 0
 
 let flyCamEnabled = false
 let playerCamEnabled = false
 let mainCamEnabled = false
 let simulationEnabled = false
-
-// TODO kill this export
-/** @type { Array<GameObject> } */
-export const gameObjects = []
 
 // cannonball and ship names as they are in the scene.json file
 // TODO we should not be manually managing these kinds of lists in code!!
@@ -49,10 +38,10 @@ const spheres = [
   'sphere17'
 ]
 
-// TODO kill this dependency of cannonball on myGame (shouldn't be exporting this value)
 const ships = ['mainShip', 'Ship1', 'Ship2', 'Ship3']
-let myShip = null
-let gameTime = 0
+
+/** @type { Array<GameObject> } */
+const gameObjects = []
 
 /** @type {GameObjectPool<Cannonball>} */
 export const cannonballPool = new GameObjectPool()
@@ -179,6 +168,7 @@ function updateCam (state, deltaTime) {
   // so updateFlyCam will become its own function that updates fly cam target numbers
   // player camera and top down camera also this (could probably handle this in player ship)
   // then updateCam will just set camera to currently active camera target
+  // TODO inside player class, update target camera position for player (consider offset and rotation)
 
   if (keysPressed.get('`')) {
     if (state.camera.name === 'flyCamera') {
@@ -301,11 +291,4 @@ function updateCam (state, deltaTime) {
       state.camera.center[1] -= moveSpeed * secondsDeltaTime
     }
   }
-
-  // TODO sphere launch position (player position + offset vec3) or (offset * rotation matrix + player position)
-
-  // TODO moving player (FROM THE PLAYER SHIP CLASS!!!!)
-  // TODO inside player class, update target camera position for player (consider offset and rotation)
-  // TODO inside player class, update sphere launch position and direction (consider offset and rotation)
-  // probably only needs to be done before firing
 }
