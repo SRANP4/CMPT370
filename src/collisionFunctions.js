@@ -130,6 +130,29 @@ export function updateRigidbodySimulation (deltaTime) {
 }
 
 /**
+ * Updates all needed positions so that things will be correct
+ * @param {import('./types.js').Rigidbody} rigidbody
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ */
+export function setRigidbodyPosition (rigidbody, x, y, z) {
+  const newPos = vec3.fromValues(x, y, z)
+  rigidbody.pos = newPos
+  rigidbody.drawingObj.model.position = newPos
+
+  if (rigidbody.collider.colliderType === COLLIDER_TYPE_SPHERE) {
+    const sphereCol = /** @type {import('./types.js').Sphere} */ (rigidbody.collider)
+    sphereCol.pos = newPos
+  }
+
+  if (rigidbody.collider.colliderType === COLLIDER_TYPE_BOX) {
+    const boxCol = /** @type {import('./types.js').BoundingBox} */ (rigidbody.collider)
+    updateBoundingBoxPos(boxCol, newPos)
+  }
+}
+
+/**
  *
  * @param {Model | Cube | Plane} drawingObject
  * @param {GameObject} gameObject
@@ -254,6 +277,24 @@ export function createBoundingBox (pos, width, height, depth) {
   }
 
   return box
+}
+
+/**
+ *
+ * @param {import('./types.js').BoundingBox} box
+ * @param {vec3} pos
+ */
+export function updateBoundingBoxPos (box, pos) {
+  const halfWidth = (box.xMax - box.xMin) / 2
+  const halfHeight = (box.yMax - box.yMin) / 2
+  const halfDepth = (box.zMax - box.zMin) / 2
+
+  box.xMax = pos[0] + halfWidth
+  box.xMin = pos[0] - halfWidth
+  box.yMax = pos[1] + halfHeight
+  box.yMin = pos[1] - halfHeight
+  box.zMax = pos[2] + halfDepth
+  box.zMin = pos[2] - halfDepth
 }
 
 /**

@@ -48,6 +48,7 @@ export class Model {
       normals: meshDetails.normals,
       uvs: meshDetails.uvs,
       bitangents: new Float32Array(), // models don't support bitangents atm, but we need model object data unified
+      /** @type {vec3} */
       position: vec3.fromValues(0.0, 0.0, 0.0),
       rotation: mat4.create(),
       scale: vec3.fromValues(1.0, 1.0, 1.0),
