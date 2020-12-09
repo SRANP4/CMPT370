@@ -13,6 +13,9 @@ Plan for requirements: -
 - Using Standard JS
 - Using ts-check and typings (but not using typescript)
 
+- using typescript and eslint (still using standard JS)
+- using this config for typescript and javascript linting using standardjs https://github.com/standard/eslint-config-standard-with-typescript#readme
+
 # Running
 
 Requires a static http server, eg `python3 -m http.server` or something like

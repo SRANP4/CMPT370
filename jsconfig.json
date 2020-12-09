@@ -1,6 +1,8 @@
 {
     "compilerOptions": {
-        "target": "es2019",
-        "module": "es6",
-    }
+        "target": "es2020",
+        "module": "es2020",
+    },
+    "include": ["src/**/*", "types.d.ts"],
+    "exclude": ["node_modules", "lib", "materials", "models", "statefiles", ".vscode"],
 }
