@@ -48,25 +48,11 @@ const spheres = [
   'sphere13', 'sphere14', 'sphere15', 'sphere16',
   'sphere17'
 ]
-// prettier-ignore
-const mySpheres = [
-  'sphere1', 'sphere2', 'sphere3', 'sphere13',
-  'sphere14', 'sphere15', 'sphere16', 'sphere17'
-]
-const mySphere = null
-// prettier-ignore
-const movespheres = [
-  'sphere4', 'sphere5', 'sphere6', 'sphere7',
-  'sphere8', 'sphere9', 'sphere10', 'sphere11',
-  'sphere12'
-]
 
 // TODO kill this dependency of cannonball on myGame (shouldn't be exporting this value)
-export const moveSphere = null
 const ships = ['mainShip', 'Ship1', 'Ship2', 'Ship3']
 let myShip = null
 let gameTime = 0
-let sphere = null
 
 /** @type {GameObjectPool<Cannonball>} */
 const cannonballPool = new GameObjectPool()
@@ -156,7 +142,6 @@ export function fixedUpdate (state, deltaTime) {
     if (keysPressed.get('f')) {
       // TODO cannonballs are fired from enemyShip and playerShip classes (each calling a function on the cannonball class)
       // TODO pass shoot direction from ship to cannonball fire function so that it shoots in the correct direction
-      // TODO pass a velocity to shoot with to the fire function
 
       // player shoots a sphere
       // if (mySpheres.length > 0) {
@@ -380,12 +365,6 @@ function updateCam (state, deltaTime) {
   }
 
   // TODO sphere launch position (player position + offset vec3) or (offset * rotation matrix + player position)
-  // TODO managing sphere pool better (ie actually manage it as a pool of inactive spheres and active)
-  // TODO add onActivate and onDeactivate functions to gameobject, wire it up properly to everything
-  // TODO inactive spheres are set to an infinity position so they're not visible (when inactive)
-  // TODO reset spheres when they drop below the world
-  // TODO in order to move objects, physics will need to be able to directly reposition objects
-  // TODO add a fire function to cannonball (sphere) so that we're not manipulating the rigidbody in the global update loop
 
   // TODO moving player (FROM THE PLAYER SHIP CLASS!!!!)
   // TODO inside player class, update target camera position for player (consider offset and rotation)

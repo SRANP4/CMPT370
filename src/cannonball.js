@@ -2,16 +2,11 @@
 'use strict'
 
 /* eslint-disable */
-import { Cube } from './objects/Cube.js'
-import { Model } from './objects/Model.js'
-import { Plane } from './objects/Plane.js'
 import { vec3 } from '../lib/gl-matrix/index.js'
 import { createRigidbody, createSphere, setRigidbodyPosition } from './collisionFunctions.js'
 import { GameObject } from './gameObject.js'
-import { gameObjects, getGameTime, moveSphere } from './myGame.js'
 import { containsObject, getObject } from './sceneFunctions.js'
 import { EnemyShip } from './enemyShip.js'
-import { PlayerShip } from './playerShip.js'
 /* eslint-enable */
 
 // prettier-ignore
