@@ -183,7 +183,11 @@ function main () {
           vec3 lightDirection = normalize(uLightPositions - oFragPosition);
           vec3 cameraDirection = normalize(oCameraPosition - oFragPosition);
 
-          vec4 textureColor = texture(uTexture, oUV); // NOTE: This is where the texture is accessed
+          // idk why but the texture coordinates for the ship were flipped          
+          float u = 1.0 - oUV.x;
+          float v = 1.0 - oUV.y;
+          vec2 flippedUV = vec2(u, v);
+          vec4 textureColor = texture(uTexture, flippedUV); // NOTE: This is where the texture is accessed
 
           // calculate ambient term Ka * La * LightStrength
           vec3 Ka = ambientVal;
