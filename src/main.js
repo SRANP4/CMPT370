@@ -351,29 +351,30 @@ function runFixedUpdateLoop (now) {
   deltaTimeSum += now - lastUpdateTime
 
   if (deltaTimeSum >= TICK_RATE_MS) {
+    const ticksToDo = Math.trunc(deltaTimeSum / TICK_RATE_MS)
+
     const start = now
+    for (let index = 0; index < ticksToDo; index++) {
+      state.deltaTime = deltaTimeSum / ticksToDo
+      calcTimeStats(deltaTimeStats, deltaTimeSum)
 
-    state.deltaTime = deltaTimeSum
-    calcTimeStats(deltaTimeStats, deltaTimeSum)
+      // don't hog cpu if the page isn't visible (effectively pauses the game when it
+      // backgrounds)
+      // NOTE: For debugging it might be useful to use hasFocus instead,
+      // as the game will pause when you click into the F12 debug panel
+      if (document.visibilityState === 'visible') {
+        fixedUpdate(state, state.deltaTime) // constantly call our game loop
+      }
 
-    // don't hog cpu if the page isn't visible (effectively pauses the game when it
-    // backgrounds)
-    // NOTE: For debugging it might be useful to use hasFocus instead,
-    // as the game will pause when you click into the F12 debug panel
-    if (document.visibilityState === 'visible') {
-      fixedUpdate(state, deltaTimeSum) // constantly call our game loop
+      // always pass back to the browser, even if this means a janky tick rate,
+      // its more important to let the browser function properly
+      // ideally this will callback immediately if we're *redline* (taking up
+      // 16 ms or more per tick)
+      const timeLength = window.performance.now() - start
+      calcTimeStats(fixedUpdateTimeStats, timeLength)
     }
-
-    // always pass back to the browser, even if this means a janky tick rate,
-    // its more important to let the browser function properly
-    // ideally this will callback immediately if we're *redline* (taking up
-    // 16 ms or more per tick)
-    const timeLength = window.performance.now() - start
-
-    calcTimeStats(fixedUpdateTimeStats, timeLength)
-
-    deltaTimeSum = 0
     lastUpdateTime = start
+    deltaTimeSum = 0
   }
 }
 
