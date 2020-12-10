@@ -33,11 +33,11 @@
         "type": "mesh",
         "position": [20, 1, 15],
         "scale": [1, 1, 1],
-        "diffuseTexture": "ship.jpg",
-        "normalTexture": "ship.jpg",
+        "diffuseTexture": "low_poly_pirate.png",
+        "normalTexture": "low_poly_pirate.png",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         "parent": null,
-        "model": "pirate_ship_fixed.obj"
+        "model": "low_poly_pirate.obj"
       },
       {
         "name": "mainCannon",
@@ -71,11 +71,11 @@
         "type": "mesh",
         "position": [-10, 1, 0],
         "scale": [1, 1, 1],
-        "diffuseTexture": "old-barn-weathered-wood.jpg",
-        "normalTexture": "ship.jpg",
+        "diffuseTexture": "low_poly_pirate.png",
+        "normalTexture": "low_poly_pirate.png",
         "rotation": [-0.9999999403953552, -7.071517579403802e-14, -0.000004655586963053793, 0, 0, 1, -1.518794157107095e-8, 0, 0.000004655586963053793, -1.518794157107095e-8, -0.9999999403953552, 0, 0, 0, 0, 1],
         "parent": null,
-        "model": "pirate_ship_fixed.obj"
+        "model": "low_poly_pirate.obj"
       },
       {
         "name": "Cannon1",
@@ -109,11 +109,11 @@
         "type": "mesh",
         "position": [-10, 1, 15],
         "scale": [1, 1, 1],
-        "diffuseTexture": "old-barn-weathered-wood.jpg",
-        "normalTexture": "ship.jpg",
+        "diffuseTexture": "low_poly_pirate.png",
+        "normalTexture": "low_poly_pirate.png",
         "rotation": [-0.9999999403953552, -7.071517579403802e-14, -0.000004655586963053793, 0, 0, 1, -1.518794157107095e-8, 0, 0.000004655586963053793, -1.518794157107095e-8, -0.9999999403953552, 0, 0, 0, 0, 1],
         "parent": null,
-        "model": "pirate_ship_fixed.obj"
+        "model": "low_poly_pirate.obj"
       },
       {
         "name": "Cannon2",
@@ -147,11 +147,11 @@
         "type": "mesh",
         "position": [-10, 1, 30],
         "scale": [1, 1, 1],
-          "diffuseTexture": "old-barn-weathered-wood.jpg",
-          "normalTexture": "ship.jpg",
+          "diffuseTexture": "low_poly_pirate.png",
+          "normalTexture": "low_poly_pirate.png",
           "rotation": [-0.9999999403953552, -7.071517579403802e-14, -0.000004655586963053793, 0, 0, 1, -1.518794157107095e-8, 0, 0.000004655586963053793, -1.518794157107095e-8, -0.9999999403953552, 0, 0, 0, 0, 1],
           "parent": null,
-          "model": "pirate_ship_fixed.obj"
+          "model": "low_poly_pirate.obj"
       },
       {
         "name": "Cannon3",
