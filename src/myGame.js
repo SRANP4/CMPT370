@@ -16,7 +16,7 @@ import {
   mouseYDelta, setupInputEvents, updateInput
 } from './inputHelper.js'
 import { PlayerShip } from './playerShip.js'
-import { updateDebugStats, updateSimulationStatusIndicator } from './uiSetup.js'
+import { disableStats, enableStats, updateDebugStats, updateSimulationStatusIndicator } from './uiSetup.js'
 import { GameObjectPool } from './gameObjectPool.js'
 /* eslint-enable */
 
@@ -135,6 +135,16 @@ function updateSimulationEnabled () {
  * @param {import('./types.js').AppState} state
  */
 function updateDebugSelectedObject (state) {
+  // toggle stats
+  if (keysPressed.get('/')) {
+    state.statsEnabled = !state.statsEnabled
+    if (state.statsEnabled) {
+      enableStats()
+    } else {
+      disableStats()
+    }
+  }
+
   if (keysPressed.get('-')) {
     state.selectedObjIndex = (state.selectedObjIndex - 1) % state.objectCount
     if (state.selectedObjIndex < 0) {

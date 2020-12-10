@@ -249,7 +249,8 @@ function main () {
     constVal: 1,
     lights: [],
     objects: [],
-    selectedObjIndex: 0
+    selectedObjIndex: 0,
+    statsEnabled: false
   }
 
   state.numLights = state.pointLights.length
@@ -282,10 +283,12 @@ function main () {
 
   // update stats less frequently (the string operations are very expensive so we want to throttle that)
   function updateStatsOverlay (state) {
-    state.renderTimeTextElement.innerText = frameTimeStats.averageTime.toFixed(6)
-    state.tickDeltaTimeTextElement.innerText = deltaTimeStats.averageTime.toFixed(6)
-    state.tickTimeTextElement.innerText = fixedUpdateTimeStats.averageTime.toFixed(6)
-    updateDebugStats(state)
+    if (state.statsEnabled) {
+      state.renderTimeTextElement.innerText = frameTimeStats.averageTime.toFixed(6)
+      state.tickDeltaTimeTextElement.innerText = deltaTimeStats.averageTime.toFixed(6)
+      state.tickTimeTextElement.innerText = fixedUpdateTimeStats.averageTime.toFixed(6)
+      updateDebugStats(state)
+    }
   }
   window.setInterval(updateStatsOverlay, STAT_OVERLAY_UPDATE_RATE_MS, state)
 }
@@ -440,6 +443,10 @@ function drawScene (gl, state) {
     }
     lightStrengthArray.push(light.strength)
   })
+
+  // BUG children are being rendered first, this is a problem because at low frame rates (and therefore
+  // high position deltas) children objects are noticeably out of place, need to sort the render list
+  // so that parent's model matrices are being calculated FIRST before their children
 
   // iterate over each object and render them
   state.objects.forEach(object => {
