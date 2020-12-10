@@ -12,6 +12,7 @@ import { cannonballPool } from './myGame.js'
 import { getObject } from './sceneFunctions.js'
 import { vec3 } from '../lib/gl-matrix/index.js'
 import { setCameraLookAt } from './cameraFunctions.js'
+import { modelMatrixCalc } from './main.js'
 /* eslint-enable */
 
 export class PlayerShip extends GameObject {
@@ -80,13 +81,14 @@ export class PlayerShip extends GameObject {
     // update camera (must run BEFORE velocity changes that are for the NEXT frame)
     // modelMatrix position information is from the last frame, so we need to compensate for
     // the new position be applying any velocity changes
+
     const camPos = vec3.create()
     const camCenter = vec3.create()
-    // this is really gross and shouldn't be handled like this, but gotta finish for the deadline :(
-    vec3.copy(camPos, this.rigidbody.velocity)
-    vec3.copy(camCenter, this.rigidbody.velocity)
-    vec3.scale(camPos, camPos, deltaTime / 1000)
-    vec3.scale(camCenter, camCenter, deltaTime / 1000)
+    // this is shouldn't be handled like this, but gotta finish for the deadline :(
+    // gotta force the modelMatrix to calc so that we can use it to get the correct transform
+    // if we don't calc it here (after the physics has updated positions, but before render
+    // has done the calculation) our camera is off and we end up with some jittery frames
+    const modelMatrix = modelMatrixCalc(this.drawingObject, state)
 
     if (keysPressed.get('t')) {
       this.topDownCam = !this.topDownCam
@@ -104,7 +106,7 @@ export class PlayerShip extends GameObject {
       state.camera,
       camPos,
       camCenter,
-      this.drawingObject.model.modelMatrix
+      modelMatrix
     )
 
     // sink the ship if health is 0 (or less)

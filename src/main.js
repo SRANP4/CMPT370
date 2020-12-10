@@ -511,23 +511,7 @@ function drawScene (gl, state) {
     state.viewMatrix = viewMatrix
 
     // Model Matrix ....
-    const modelMatrix = mat4.create()
-    const negCentroid = vec3.fromValues(0.0, 0.0, 0.0)
-    vec3.negate(negCentroid, object.centroid)
-    mat4.translate(modelMatrix, modelMatrix, object.model.position)
-    mat4.translate(modelMatrix, modelMatrix, object.centroid)
-    mat4.mul(modelMatrix, modelMatrix, object.model.rotation)
-    mat4.scale(modelMatrix, modelMatrix, object.model.scale)
-    mat4.translate(modelMatrix, modelMatrix, negCentroid)
-
-    if (object.parent) {
-      const parent = getObject(state, object.parent)
-      if (parent != null && parent.model && parent.model.modelMatrix) {
-        mat4.multiply(modelMatrix, parent.model.modelMatrix, modelMatrix)
-      }
-    }
-
-    object.model.modelMatrix = modelMatrix
+    const modelMatrix = modelMatrixCalc(object, state)
     gl.uniformMatrix4fv(
       object.programInfo.uniformLocations.model,
       false,
@@ -641,4 +625,30 @@ function drawScene (gl, state) {
   // if (glError !== gl.NO_ERROR) {
   //   console.error('glError: ' + glError.toString())
   // }
+}
+
+/**
+ *
+ * @param {Plane | Cube | Model} object
+ * @param {import('./types.js').AppState} state
+ */
+export function modelMatrixCalc (object, state) {
+  const modelMatrix = mat4.create()
+  const negCentroid = vec3.fromValues(0.0, 0.0, 0.0)
+  vec3.negate(negCentroid, object.centroid)
+  mat4.translate(modelMatrix, modelMatrix, object.model.position)
+  mat4.translate(modelMatrix, modelMatrix, object.centroid)
+  mat4.mul(modelMatrix, modelMatrix, object.model.rotation)
+  mat4.scale(modelMatrix, modelMatrix, object.model.scale)
+  mat4.translate(modelMatrix, modelMatrix, negCentroid)
+
+  if (object.parent) {
+    const parent = getObject(state, object.parent)
+    if (parent != null && parent.model && parent.model.modelMatrix) {
+      mat4.multiply(modelMatrix, parent.model.modelMatrix, modelMatrix)
+    }
+  }
+
+  object.model.modelMatrix = modelMatrix
+  return modelMatrix
 }
