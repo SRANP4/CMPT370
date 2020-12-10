@@ -305,6 +305,8 @@ function addObjectToScene (state, object) {
 
   if (state.objectCount === state.loadObjects.length) {
     uiOnLoaded(state)
+    // sort objects so that parents render first
+    sortRenderOrderByParent(state)
     startGameLogic()
   }
 }
@@ -411,6 +413,28 @@ function startRendering (gl, state) {
 }
 
 /**
+ * Ensure that parents are first in the render order
+ * @param {import('./types.js').AppState} state
+ */
+function sortRenderOrderByParent (state) {
+  // ensure parents are being rendered first, this is a problem because at low frame rates (and therefore
+  // high position deltas) children objects are noticeably out of place, need to sort the render list
+  // so that parent's model matrices are being calculated FIRST before their children
+
+  state.objects.sort((objA, objB) => {
+    // if first object has no parent
+    const objANoParent = objA.parent === '' || objA.parent === null || objA.parent === undefined
+    const objBNoParent = objB.parent === '' || objB.parent === null || objB.parent === undefined
+
+    if (objANoParent === objBNoParent) { return 0 }
+
+    if (objANoParent && !objBNoParent) { return -1 }
+
+    if (!objANoParent && objBNoParent) { return 1 }
+  })
+}
+
+/**
  *
  * @param {WebGL2RenderingContext} gl
  * @param {import('./types').AppState} state contains the state for the scene
@@ -443,10 +467,6 @@ function drawScene (gl, state) {
     }
     lightStrengthArray.push(light.strength)
   })
-
-  // BUG children are being rendered first, this is a problem because at low frame rates (and therefore
-  // high position deltas) children objects are noticeably out of place, need to sort the render list
-  // so that parent's model matrices are being calculated FIRST before their children
 
   // iterate over each object and render them
   state.objects.forEach(object => {
