@@ -4,12 +4,40 @@
 // // Camera helper funcs // //
 
 /* eslint-disable */
-import { vec3 } from '../lib/gl-matrix/index.js'
+import { mat4, vec3 } from '../lib/gl-matrix/index.js'
 import { toRadians } from './commonFunctions.js'
 /* eslint-enable */
 
 const DEFAULT_NEAR_CLIP = 0.1
 const DEFAULT_FAR_CLIP = 1000000.0
+
+/**
+ *
+ * @param {import('./types.js').Camera} cam
+ * @param {vec3} position
+ * @param {vec3} center
+ * @param {mat4=} modelMatrix
+ */
+export function setCameraLookAt (cam, position, center, modelMatrix) {
+  if (modelMatrix !== undefined && modelMatrix !== null) {
+    vec3.transformMat4(position, position, modelMatrix)
+    vec3.transformMat4(center, center, modelMatrix)
+  }
+
+  cam.position = position
+  cam.center = center
+
+  // update at vector
+  vec3.sub(cam.at, center, position)
+  vec3.normalize(cam.at, cam.at)
+
+  // update up vector
+  vec3.cross(cam.up, cam.right, cam.at)
+
+  // update right vector
+  vec3.cross(cam.right, cam.at, cam.up)
+  vec3.normalize(cam.right, cam.right)
+}
 
 /**
  * "true" rotation, but probably not what you want
@@ -51,7 +79,8 @@ export function updateCameraEulerLookDir (cam) {
   cam.at[2] = Math.sin(cam.yaw) * Math.cos(cam.pitch)
   vec3.normalize(cam.at, cam.at)
 
-  cam.center = vec3.add(cam.center, cam.position, cam.at)
+  vec3.add(cam.center, cam.position, cam.at)
+  vec3.set(cam.up, 0, 1, 0)
   updateCameraRightVec(cam)
 }
 
@@ -72,9 +101,7 @@ function updateCameraAtVec (cam) {
  * @param {import("./types").Camera} cam
  */
 function updateCameraRightVec (cam) {
-  const right = vec3.fromValues(cam.at[0], cam.at[1], cam.at[2])
-  vec3.cross(right, right, cam.up)
-  cam.right = right
+  vec3.cross(cam.right, cam.at, cam.up)
   vec3.normalize(cam.right, cam.right)
 }
 
@@ -83,9 +110,7 @@ function updateCameraRightVec (cam) {
  * @param {import("./types").Camera} cam
  */
 function updateCameraUpVec (cam) {
-  const up = vec3.fromValues(cam.right[0], cam.right[1], cam.right[2])
-  vec3.cross(up, up, cam.at)
-  cam.up = up
+  vec3.cross(cam.up, cam.right, cam.at)
 }
 
 /**

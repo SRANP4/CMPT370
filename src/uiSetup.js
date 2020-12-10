@@ -76,11 +76,6 @@ export function initDebugStats (state) {
   ))
   state.tickDeltaTimeTextElement.innerText = 'TICK DELTA TIME'
 
-  state.updateTimeTextElement = /** @type {HTMLElement} */ (document.querySelector(
-    '#update_delta_time'
-  ))
-  state.updateTimeTextElement.innerText = 'UPDATE TIME'
-
   state.camPosTextElement = /** @type {HTMLElement} */ (document.querySelector(
     '#camera_position'
   ))
@@ -92,9 +87,15 @@ export function initDebugStats (state) {
   state.objInfoTextElement.innerText = 'OBJ INFO'
 }
 
-export function updateSimulationStatusIndicator (message) {
+export function updateSimulationStatusIndicator (message, colour) {
+  /** @type {HTMLElement} */
+  const loadingContainer = document.querySelector(
+    '#loading_indicator_container'
+  )
+  loadingContainer.style.backgroundColor = colour
+
   const simulationStatusTextElement = /** @type {HTMLElement} */ (document.querySelector(
-    '#simulation_status'
+    '#status'
   ))
   simulationStatusTextElement.innerText = message
 }
@@ -104,15 +105,7 @@ export function updateSimulationStatusIndicator (message) {
  * @param {import('./types.js').AppState} state
  */
 export function uiOnLoaded (state) {
-  /** @type {HTMLElement} */
-  const loadingContainer = document.querySelector(
-    '#loading_indicator_container'
-  )
-  loadingContainer.style.backgroundColor = 'green'
-
-  /** @type {HTMLElement} */
-  const statusText = document.querySelector('#status')
-  statusText.innerText = 'Press P to start/pause the simulation'
+  updateSimulationStatusIndicator('Simulation loaded', 'yellow')
 }
 
 /**
@@ -120,6 +113,8 @@ export function uiOnLoaded (state) {
  * @param {import('./types.js').AppState} state
  */
 export function updateDebugStats (state) {
+  // TODO add basic GameObject info (isActive, activateOnStart, has rigidbody, has drawingObject)
+  // TODO all this string concatenation is expensive, reduce to fixed labels and set number and string values
   const pos = state.camera.position
   const pitch = state.camera.pitch
   const yaw = state.camera.yaw
@@ -144,7 +139,7 @@ export function updateDebugStats (state) {
     const rb = obj.rigidbody
 
     let colliderInfo = ''
-    if (rb.collider.colliderType == COLLIDER_TYPE_SPHERE) {
+    if (rb.collider.colliderType === COLLIDER_TYPE_SPHERE) {
       const col = /** @type {import('./types.js').Sphere} */ (rb.collider)
       // prettier-ignore
       colliderInfo =

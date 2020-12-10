@@ -7,32 +7,13 @@ import { createRigidbody, createSphere, setRigidbodyPosition } from './collision
 import { GameObject } from './gameObject.js'
 import { containsObject, getObject } from './sceneFunctions.js'
 import { EnemyShip } from './enemyShip.js'
+import { PlayerShip } from './playerShip.js'
 /* eslint-enable */
 
 // prettier-ignore
 const spheres = ['sphere1', 'sphere2', 'sphere3', 'sphere4', 'sphere5', 'sphere6', 'sphere7',
   'sphere8', 'sphere9', 'sphere10', 'sphere11', 'sphere12', 'sphere13', 'sphere14', 'sphere15',
   'sphere16', 'sphere17']
-
-const teams = {
-  sphere1: 'mainShip',
-  sphere2: 'mainShip',
-  sphere3: 'mainShip',
-  sphere4: 'Ship1',
-  sphere5: 'Ship1',
-  sphere6: 'Ship1',
-  sphere7: 'Ship2',
-  sphere8: 'Ship2',
-  sphere9: 'Ship2',
-  sphere10: 'Ship3',
-  sphere11: 'Ship3',
-  sphere12: 'Ship3',
-  sphere13: 'mainShip',
-  sphere14: 'mainShip',
-  sphere15: 'mainShip',
-  sphere16: 'mainShip',
-  sphere17: 'mainShip'
-}
 
 export class Cannonball extends GameObject {
   /**
@@ -61,9 +42,9 @@ export class Cannonball extends GameObject {
     this.sphereColliding = false
     // /** @type {GameObject} */
     // this.collidedSphere = null
-    /** @type {GameObject} */
+    /** @type {EnemyShip | PlayerShip} */
     this.collidedShip = undefined
-    this.team = teams[name]
+    this.shooterName = ''
     this.lastChangeTime = 0
     this.changeTime = 12 * 1000
   }
@@ -119,20 +100,18 @@ export class Cannonball extends GameObject {
     }
 
     if (this.sphereColliding) {
-      // change color of ship
-      this.collidedShip.drawingObject.material.diffuse = [1.0, 0, 0]
+      // change color of ship to red to indicate impact
+      this.collidedShip.drawingObject.material.diffuse = [0.0, 0, 1.0]
 
       // change color of this sphere
       this.drawingObject.material.diffuse = [1.0, 0, 0]
 
-      console.log(this.collidedShip.name)
       // reduce health of ship
-      const enemyShip = /** @type {EnemyShip} */ (this.collidedShip)
-      enemyShip.health -= 1
+      this.collidedShip.health -= 1
     } else {
       if (this.collidedShip != null) {
-        // will be set to the last ship intersecting with, so will become red
-        this.collidedShip.drawingObject.material.diffuse = [0, 0, 1.0]
+        // will be set to the last ship intersecting with, so will become blue again
+        this.collidedShip.drawingObject.material.diffuse = [1.0, 0, 1.0]
       }
     }
   }
@@ -142,8 +121,9 @@ export class Cannonball extends GameObject {
    * @param {vec3} startPos
    * @param {vec3} direction
    * @param {number} velocity
+   * @param {string} shooterName name of the gameobject that shot the cannonball
    */
-  fire (startPos, direction, velocity) {
+  fire (startPos, direction, velocity, shooterName) {
     // TODO set team this ball was fired by
     setRigidbodyPosition(this.rigidbody, startPos)
     vec3.normalize(direction, direction)
@@ -151,6 +131,9 @@ export class Cannonball extends GameObject {
     this.rigidbody.velocity[0] = direction[0]
     this.rigidbody.velocity[1] = direction[1]
     this.rigidbody.velocity[2] = direction[2]
+
+    // this is how we stop the cannonball from damaging the ship that shot it
+    this.shooterName = shooterName
   }
 
   /**
@@ -167,8 +150,12 @@ export class Cannonball extends GameObject {
       this.sphereColliding = false
     } else {
       // we'll assume the other is a ship
-      this.sphereColliding = true
-      this.collidedShip = otherRb.gameObject
+      const ship = /** @type {EnemyShip | PlayerShip} */ (otherRb.gameObject)
+      // if the ship isn't the ship that shot this ball...
+      if (ship.name !== this.shooterName) {
+        this.sphereColliding = true
+        this.collidedShip = ship
+      }
     }
   }
 }

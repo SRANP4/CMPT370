@@ -12,7 +12,6 @@ declare type AppState = {
   tickTimeTextElement: HTMLElement
   renderTimeTextElement: HTMLElement
   tickDeltaTimeTextElement: HTMLElement
-  updateTimeTextElement: HTMLElement
   camPosTextElement: HTMLElement
   objInfoTextElement: HTMLElement
 

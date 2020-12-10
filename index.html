@@ -17,6 +17,8 @@
       #loading_indicator_container {
         width: 100%;
         background-color: red;
+        color: black;
+        font-weight: bold;
       }
     </style>
   </head>
@@ -29,13 +31,13 @@
 
     <div id="overlay">
       <div id="loading_indicator_container"><span id ="status">LOADING...</span></div>
-      <div><span id="simulation_status">Simulation paused</span></div>
-      <div>Use ` to toggle fly cam</div>
+      <div>Press P to start/pause the simulation</div>
+      <div>Use ` to toggle debug fly cam (will pause simulation)</div>
+      <div>Use WASD to move<br/>F to fire cannon<br/>T to toggle camera angle</div>
       <div>------------------------------------------------------</div>
-      <div><span id="update_delta_time">DEBUG TEXT</span></div>
-      <div><span id="tick_time">DEBUG TEXT</span></div>
-      <div><span id="tick_delta_time">DEBUG TEXT</span></div>
-      <div><span id="render_time">DEBUG TEXT</span></div>
+      <div>Average fixed update time: <span id="tick_time">DEBUG TEXT</span>ms</div>
+      <div>Average tick delta time: <span id="tick_delta_time">DEBUG TEXT</span>ms</div>
+      <div>Average frame time: <span id="render_time">DEBUG TEXT</span>ms</div>
       <div>------------------------------------------------------</div>
       <div>Camera info:</div>
       <div><span id="camera_position">DEBUG TEXT</span></div>

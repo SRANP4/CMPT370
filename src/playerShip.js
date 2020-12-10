@@ -7,7 +7,11 @@ import {
   getBoundingBoxFromModelVertices
 } from './collisionFunctions.js'
 import { GameObject } from './gameObject.js'
+import { keysDown, keysPressed } from './inputHelper.js'
+import { cannonballPool } from './myGame.js'
 import { getObject } from './sceneFunctions.js'
+import { vec3 } from '../lib/gl-matrix/index.js'
+import { setCameraLookAt } from './cameraFunctions.js'
 /* eslint-enable */
 
 export class PlayerShip extends GameObject {
@@ -35,6 +39,7 @@ export class PlayerShip extends GameObject {
     this.xDir = 0
     this.lastChangeTime = 0
     this.changeTime = 12 * 1000
+    this.topDownCam = false
   }
 
   /**
@@ -72,8 +77,89 @@ export class PlayerShip extends GameObject {
    * @param {number} deltaTime
    */
   onUpdate (state, deltaTime) {
+    // update camera (must run BEFORE velocity changes that are for the NEXT frame)
+    // modelMatrix position information is from the last frame, so we need to compensate for
+    // the new position be applying any velocity changes
+    const camPos = vec3.create()
+    const camCenter = vec3.create()
+    // this is really gross and shouldn't be handled like this, but gotta finish for the deadline :(
+    vec3.copy(camPos, this.rigidbody.velocity)
+    vec3.copy(camCenter, this.rigidbody.velocity)
+    vec3.scale(camPos, camPos, deltaTime / 1000)
+    vec3.scale(camCenter, camCenter, deltaTime / 1000)
+
+    if (keysPressed.get('t')) {
+      this.topDownCam = !this.topDownCam
+    }
+    if (this.topDownCam) {
+      // bird's eye view over ship
+      vec3.add(camPos, camPos, vec3.fromValues(0, 60, 0))
+      vec3.add(camCenter, camCenter, vec3.fromValues(0, 59, 0))
+    } else {
+      // first person camera
+      vec3.add(camPos, camPos, vec3.fromValues(-2.5, -0.25, 0))
+      vec3.add(camCenter, camCenter, vec3.fromValues(-3.5, -0.25, 0))
+    }
+    setCameraLookAt(
+      state.camera,
+      camPos,
+      camCenter,
+      this.drawingObject.model.modelMatrix
+    )
+
+    // sink the ship if health is 0 (or less)
     if (this.health <= 0) {
       this.rigidbody.gravityStrength = 9.81
+    }
+
+    // handle firing the cannon
+    if (keysPressed.get('f')) {
+      const ball = cannonballPool.get(state)
+      if (ball !== null) {
+        // we take an offset from the model's center then multiply it by the model matrix
+        // this will take position and rotation into consideration for us
+        const launchPos = vec3.fromValues(-4, -0.5, 0)
+        vec3.transformMat4(launchPos, launchPos, this.drawingObject.model.modelMatrix)
+
+        // get a forward point from the center of the ship (-x is forward for us) in world coords
+        const forwardPoint = vec3.fromValues(-1, 0, 0)
+        vec3.transformMat4(forwardPoint, forwardPoint, this.drawingObject.model.modelMatrix)
+
+        // take forward point, calc direction, add some up to it, normalize, this is our
+        // firing vector now
+        const direction = vec3.create()
+        vec3.sub(direction, forwardPoint, this.rigidbody.pos)
+        // add some up
+        vec3.add(direction, direction, vec3.fromValues(0, 1, 0))
+        vec3.normalize(direction, direction)
+
+        ball.fire(
+          launchPos,
+          direction,
+          10,
+          this.name)
+      }
+    }
+
+    // reset for when key is up
+    this.rigidbody.velocity[0] = 0
+    this.rigidbody.velocity[2] = 0
+
+    // move on fixed axis
+    if (keysDown.get('a')) {
+      this.rigidbody.velocity[2] += this.speed
+    }
+
+    if (keysDown.get('d')) {
+      this.rigidbody.velocity[2] += -this.speed
+    }
+
+    if (keysDown.get('w')) {
+      this.rigidbody.velocity[0] += -this.speed
+    }
+
+    if (keysDown.get('s')) {
+      this.rigidbody.velocity[0] += this.speed
     }
   }
 

@@ -3,10 +3,7 @@
 
 /* eslint-disable */
 import { vec3 } from '../lib/gl-matrix/index.js'
-import {
-  updateCameraEulerLookDir,
-  rotateCameraAroundYAxis
-} from './cameraFunctions.js'
+import { updateCameraEulerLookDir } from './cameraFunctions.js'
 import { Cannonball } from './cannonball.js'
 import {
   updateRigidbodySimulation,
@@ -14,29 +11,19 @@ import {
 } from './collisionFunctions.js'
 import { EnemyShip } from './enemyShip.js'
 import { GameObject } from './gameObject.js'
-// prettier-ignore
 import {
-  hasMouseLock,
   keysDown, keysPressed, mouseXDelta,
   mouseYDelta, setupInputEvents, updateInput
 } from './inputHelper.js'
 import { PlayerShip } from './playerShip.js'
-import { containsObject, getObject } from './sceneFunctions.js'
-import { updateSimulationStatusIndicator } from './uiSetup.js'
-import { setRotationMatrixFromEuler } from './commonFunctions.js'
-import { toRadian } from '../lib/gl-matrix/common.js'
-import { random } from '../lib/gl-matrix/vec3.js'
+import { updateDebugStats, updateSimulationStatusIndicator } from './uiSetup.js'
 import { GameObjectPool } from './gameObjectPool.js'
 /* eslint-enable */
 
-let flyCamEnabled = false
-let playerCamEnabled = false
-let mainCamEnabled = false
-let simulationEnabled = false
+let gameTime = 0
 
-// TODO kill this export
-/** @type { Array<GameObject> } */
-export const gameObjects = []
+let flyCamEnabled = false
+let simulationEnabled = false
 
 // cannonball and ship names as they are in the scene.json file
 // TODO we should not be manually managing these kinds of lists in code!!
@@ -49,13 +36,13 @@ const spheres = [
   'sphere17'
 ]
 
-// TODO kill this dependency of cannonball on myGame (shouldn't be exporting this value)
 const ships = ['mainShip', 'Ship1', 'Ship2', 'Ship3']
-let myShip = null
-let gameTime = 0
+
+/** @type { Array<GameObject> } */
+const gameObjects = []
 
 /** @type {GameObjectPool<Cannonball>} */
-const cannonballPool = new GameObjectPool()
+export const cannonballPool = new GameObjectPool()
 
 /**
  *
@@ -117,73 +104,11 @@ export function fixedUpdate (state, deltaTime) {
 
     // handle physics here
     // Here we can add game logic, like getting player objects, and moving them, detecting collisions, you name it. Examples of functions can be found in sceneFunctions
-    // if (playerCamEnabled || mainCamEnabled) {
-    //   myShip = getObject(state, 'mainShip')
-    //   myShip.rigidbody.velocity[0] = 0
-    //   myShip.rigidbody.velocity[1] = 0
-    //   myShip.rigidbody.velocity[2] = 0
-
-    //   for (let i = 0; i < mySpheres.length; i++) {
-    //     if (mySpheres[i] !== mySphere) {
-    //       sphere = getObject(state, mySpheres[i])
-    //       sphere.rigidbody.velocity[0] = 0
-    //       sphere.rigidbody.velocity[1] = 0
-    //       sphere.rigidbody.velocity[2] = 0
-    //     }
-    //   }
-    // }
     updateRigidbodySimulation(deltaTime)
 
     gameObjects.forEach(go => {
       go.onUpdate(state, deltaTime)
     })
-
-    // misc stuff that doesn't fit in an object
-    if (keysPressed.get('f')) {
-      // TODO cannonballs are fired from enemyShip and playerShip classes (each calling a function on the cannonball class)
-      // TODO pass shoot direction from ship to cannonball fire function so that it shoots in the correct direction
-
-      // player shoots a sphere
-      // if (mySpheres.length > 0) {
-      //   if (containsObject(mySphere, mySpheres)) {
-      //     mySpheres = mySpheres.filter(sphere => sphere !== mySphere)
-      //   }
-      //   mySphere = mySpheres[Math.floor(Math.random() * mySpheres.length)]
-
-      //   const obj1 = getObject(state, mySphere)
-      //   if (obj1 !== null) {
-      //     const rb = obj1.rigidbody
-      //     rb.velocity[0] = -20
-      //     rb.velocity[1] = 5
-      //     rb.velocity[2] = 0
-      //     rb.gravityStrength = 10
-      //   }
-      // }
-
-      const ball = cannonballPool.get(state)
-      if (ball !== null) {
-        ball.fire(vec3.fromValues(0, 10, 0),
-          vec3.fromValues(-1, 3, 0),
-          10)
-      }
-
-      // enemies shoot a sphere
-      // if (movespheres.length > 0) {
-      //   if (containsObject(moveSphere, movespheres)) {
-      //     movespheres = movespheres.filter(sphere => sphere !== moveSphere)
-      //   }
-      //   moveSphere = movespheres[Math.floor(Math.random() * movespheres.length)]
-
-      //   const obj2 = getObject(state, moveSphere)
-      //   if (obj2 !== null) {
-      //     const rb = obj2.rigidbody
-      //     rb.velocity[0] = 20
-      //     rb.velocity[1] = 5
-      //     rb.velocity[2] = 0
-      //     rb.gravityStrength = 10
-      //   }
-      // }
-    }
   }
 }
 
@@ -198,9 +123,9 @@ function updateSimulationEnabled () {
   if (keysPressed.get('p')) {
     simulationEnabled = !simulationEnabled
     if (simulationEnabled) {
-      updateSimulationStatusIndicator('Simulation running')
+      updateSimulationStatusIndicator('Simulation running', 'green')
     } else {
-      updateSimulationStatusIndicator('Simulation paused')
+      updateSimulationStatusIndicator('Simulation paused', 'yellow')
     }
   }
 }
@@ -215,10 +140,15 @@ function updateDebugSelectedObject (state) {
     if (state.selectedObjIndex < 0) {
       state.selectedObjIndex = state.objectCount - 1
     }
+    // since we're throttle how often stats are updated, we want to force an update so that
+    // the input stays responsive here
+    updateDebugStats(state)
   }
 
   if (keysPressed.get('=')) {
     state.selectedObjIndex = (state.selectedObjIndex + 1) % state.objectCount
+    // same reason as above
+    updateDebugStats(state)
   }
 }
 
@@ -227,47 +157,27 @@ function updateDebugSelectedObject (state) {
  * @param {import('./types.js').AppState} state
  * @param {number} deltaTime deltaTime in ms
  */
-
 function updateCam (state, deltaTime) {
   const secondsDeltaTime = deltaTime / 1000
-  // TODO multi-cam system
-  // TODO 2 of 3 cameras are based on player's position / look direction
-  // TODO pause game when switching to fly cam, switch out of fly cam if game is resumed
-  // TODO camera switch back to last camera when fly cam is disabled or game is resumed
-  // TODO add handling for multiple camera targets (fly cam, player fps, player top down)
-  // can use myShip (player ship reference)
-  // no mouse look on either the player cam or the top down cam
-  // TODO each camera angle has a target pos and at that gets, we just update the camera to these targets
-  // so updateFlyCam will become its own function that updates fly cam target numbers
-  // player camera and top down camera also this (could probably handle this in player ship)
-  // then updateCam will just set camera to currently active camera target
 
   if (keysPressed.get('`')) {
-    if (state.camera.name === 'flyCamera') {
-      flyCamEnabled = !flyCamEnabled
-      if (flyCamEnabled) {
-        playerCamEnabled = false
-        mainCamEnabled = false
-      }
+    flyCamEnabled = !flyCamEnabled
+
+    if (flyCamEnabled) {
+      // pause the simulation
+      simulationEnabled = false
+      updateSimulationStatusIndicator('Simulation paused', 'yellow')
       console.log('fly cam: ' + flyCamEnabled)
-    } else if (state.camera.name === 'playerCamera') {
-      playerCamEnabled = !playerCamEnabled
-      if (playerCamEnabled) {
-        flyCamEnabled = false
-        mainCamEnabled = false
-      }
-      console.log('player cam: ' + playerCamEnabled)
-    } else if (state.camera.name === 'mainCamera') {
-      mainCamEnabled = !mainCamEnabled
-      if (mainCamEnabled) {
-        flyCamEnabled = false
-        playerCamEnabled = false
-      }
-      console.log('main cam: ' + mainCamEnabled)
     }
   }
 
   if (flyCamEnabled) {
+    if (simulationEnabled) {
+      // disable fly cam if simulation is un-paused
+      flyCamEnabled = false
+      return
+    }
+
     const moveSpeed = 7
     const pitchLookLimit = 1.57 // pi / 2, but a bit less
 
@@ -361,51 +271,6 @@ function updateCam (state, deltaTime) {
     if (keysDown.get('shift')) {
       state.camera.position[1] -= moveSpeed * secondsDeltaTime
       state.camera.center[1] -= moveSpeed * secondsDeltaTime
-    }
-  }
-
-  // TODO sphere launch position (player position + offset vec3) or (offset * rotation matrix + player position)
-
-  // TODO moving player (FROM THE PLAYER SHIP CLASS!!!!)
-  // TODO inside player class, update target camera position for player (consider offset and rotation)
-  // TODO inside player class, update sphere launch position and direction (consider offset and rotation)
-  // probably only needs to be done before firing
-
-  if (playerCamEnabled || mainCamEnabled) {
-    const moveSpeed = 4
-    myShip = getObject(state, 'mainShip')
-
-    // move relative to current look direction
-    if (keysDown.get('a')) {
-      state.camera.position[2] += moveSpeed * secondsDeltaTime
-      state.camera.center[2] += moveSpeed * secondsDeltaTime
-
-      myShip.rigidbody.velocity[0] = 0
-      myShip.rigidbody.velocity[2] = moveSpeed
-    }
-
-    if (keysDown.get('d')) {
-      state.camera.position[2] -= moveSpeed * secondsDeltaTime
-      state.camera.center[2] -= moveSpeed * secondsDeltaTime
-
-      myShip.rigidbody.velocity[0] = 0
-      myShip.rigidbody.velocity[2] = -moveSpeed
-    }
-
-    if (keysDown.get('w')) {
-      state.camera.position[0] -= moveSpeed * secondsDeltaTime
-      state.camera.center[0] -= moveSpeed * secondsDeltaTime
-
-      myShip.rigidbody.velocity[0] = -moveSpeed
-      myShip.rigidbody.velocity[2] = 0
-    }
-
-    if (keysDown.get('s')) {
-      state.camera.position[0] += moveSpeed * secondsDeltaTime
-      state.camera.center[0] += moveSpeed * secondsDeltaTime
-
-      myShip.rigidbody.velocity[0] = moveSpeed
-      myShip.rigidbody.velocity[2] = 0
     }
   }
 }

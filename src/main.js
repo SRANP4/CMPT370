@@ -25,7 +25,6 @@ import {
 // TODO load shaders from glsl files, per object shaders
 // TODO sound effects for cannon fire, cannon ball in air, cannon ball impact, ship sink
 // TODO cannonball fire visual effect, cannonball impact visual effect
-// TODO game mechanics lul
 // TODO pre-parse obj model and store as binary data to be quick loaded
 
 /** @type { import('./types').AppState } */
@@ -33,6 +32,7 @@ import {
 let state = {}
 
 const TICK_RATE_MS = 16
+const STAT_OVERLAY_UPDATE_RATE_MS = 200
 
 // previousTicks is a circular array
 // initial second of data will be bunk due to a lot of 0s in the array
@@ -279,6 +279,15 @@ function main () {
   initDebugStats(state)
   initializeTimeStats()
   startRendering(state.gl, state) // now that scene is setup, start rendering it
+
+  // update stats less frequently (the string operations are very expensive so we want to throttle that)
+  function updateStatsOverlay (state) {
+    state.renderTimeTextElement.innerText = frameTimeStats.averageTime.toFixed(6)
+    state.tickDeltaTimeTextElement.innerText = deltaTimeStats.averageTime.toFixed(6)
+    state.tickTimeTextElement.innerText = fixedUpdateTimeStats.averageTime.toFixed(6)
+    updateDebugStats(state)
+  }
+  window.setInterval(updateStatsOverlay, STAT_OVERLAY_UPDATE_RATE_MS, state)
 }
 
 /**
@@ -300,9 +309,6 @@ function addObjectToScene (state, object) {
 function startGameLogic () {
   console.log('Models loaded, starting game logic')
   startGame(state)
-  // const now = window.performance.now()
-  // runFixedUpdateLoop(now, now)
-  // runUpdateLoop(now)
 }
 
 /**
@@ -349,8 +355,6 @@ function runFixedUpdateLoop (now) {
 
     state.deltaTime = deltaTimeSum
     calcTimeStats(deltaTimeStats, deltaTimeSum)
-    state.tickDeltaTimeTextElement.innerText =
-      'Average tick delta time: ' + deltaTimeStats.averageTime.toFixed(6) + 'ms'
 
     // don't hog cpu if the page isn't visible (effectively pauses the game when it
     // backgrounds)
@@ -367,11 +371,6 @@ function runFixedUpdateLoop (now) {
     const timeLength = window.performance.now() - start
 
     calcTimeStats(fixedUpdateTimeStats, timeLength)
-    // update the overlay
-    state.tickTimeTextElement.innerText =
-      'Average fixed update time: ' +
-      fixedUpdateTimeStats.averageTime.toFixed(6) +
-      'ms'
 
     deltaTimeSum = 0
     lastUpdateTime = start
@@ -397,9 +396,6 @@ function startRendering (gl, state) {
     // Draw our scene
     const drawStart = window.performance.now()
     calcTimeStats(frameTimeStats, lastFrameElapsed)
-    state.renderTimeTextElement.innerText =
-      'Average frame time: ' + frameTimeStats.averageTime.toFixed(6) + 'ms'
-    updateDebugStats(state)
     drawScene(gl, state)
 
     // Request another frame when this one is done
@@ -426,8 +422,8 @@ function drawScene (gl, state) {
   gl.enable(gl.DEPTH_TEST) // Enable depth testing
   gl.depthFunc(gl.LEQUAL) // Near things obscure far things
   gl.disable(gl.CULL_FACE) // Cull the backface of our objects to be more efficient
-  // gl.cullFace(gl.BACK);
-  // gl.frontFace(gl.CCW);
+  gl.cullFace(gl.BACK)
+  gl.frontFace(gl.CCW)
   gl.clearDepth(1.0) // Clear everything
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
@@ -613,8 +609,8 @@ function drawScene (gl, state) {
     }
   })
 
-  const glError = gl.getError()
-  if (glError !== gl.NO_ERROR) {
-    console.error('glError: ' + glError.toString())
-  }
+  // const glError = gl.getError()
+  // if (glError !== gl.NO_ERROR) {
+  //   console.error('glError: ' + glError.toString())
+  // }
 }
