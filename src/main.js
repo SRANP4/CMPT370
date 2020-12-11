@@ -183,7 +183,11 @@ function main () {
           vec3 lightDirection = normalize(uLightPositions - oFragPosition);
           vec3 cameraDirection = normalize(oCameraPosition - oFragPosition);
 
-          vec4 textureColor = texture(uTexture, oUV); // NOTE: This is where the texture is accessed
+          // idk why but the texture coordinates for the ship were flipped          
+          float u = 1.0 - oUV.x;
+          float v = 1.0 - oUV.y;
+          vec2 flippedUV = vec2(u, v);
+          vec4 textureColor = texture(uTexture, flippedUV); // NOTE: This is where the texture is accessed
 
           // calculate ambient term Ka * La * LightStrength
           vec3 Ka = ambientVal;
@@ -249,7 +253,8 @@ function main () {
     constVal: 1,
     lights: [],
     objects: [],
-    selectedObjIndex: 0
+    selectedObjIndex: 0,
+    statsEnabled: false
   }
 
   state.numLights = state.pointLights.length
@@ -282,10 +287,12 @@ function main () {
 
   // update stats less frequently (the string operations are very expensive so we want to throttle that)
   function updateStatsOverlay (state) {
-    state.renderTimeTextElement.innerText = frameTimeStats.averageTime.toFixed(6)
-    state.tickDeltaTimeTextElement.innerText = deltaTimeStats.averageTime.toFixed(6)
-    state.tickTimeTextElement.innerText = fixedUpdateTimeStats.averageTime.toFixed(6)
-    updateDebugStats(state)
+    if (state.statsEnabled) {
+      state.renderTimeTextElement.innerText = frameTimeStats.averageTime.toFixed(6)
+      state.tickDeltaTimeTextElement.innerText = deltaTimeStats.averageTime.toFixed(6)
+      state.tickTimeTextElement.innerText = fixedUpdateTimeStats.averageTime.toFixed(6)
+      updateDebugStats(state)
+    }
   }
   window.setInterval(updateStatsOverlay, STAT_OVERLAY_UPDATE_RATE_MS, state)
 }
@@ -302,6 +309,8 @@ function addObjectToScene (state, object) {
 
   if (state.objectCount === state.loadObjects.length) {
     uiOnLoaded(state)
+    // sort objects so that parents render first
+    sortRenderOrderByParent(state)
     startGameLogic()
   }
 }
@@ -351,29 +360,30 @@ function runFixedUpdateLoop (now) {
   deltaTimeSum += now - lastUpdateTime
 
   if (deltaTimeSum >= TICK_RATE_MS) {
+    const ticksToDo = Math.trunc(deltaTimeSum / TICK_RATE_MS)
+
     const start = now
+    for (let index = 0; index < ticksToDo; index++) {
+      state.deltaTime = deltaTimeSum / ticksToDo
+      calcTimeStats(deltaTimeStats, deltaTimeSum)
 
-    state.deltaTime = deltaTimeSum
-    calcTimeStats(deltaTimeStats, deltaTimeSum)
+      // don't hog cpu if the page isn't visible (effectively pauses the game when it
+      // backgrounds)
+      // NOTE: For debugging it might be useful to use hasFocus instead,
+      // as the game will pause when you click into the F12 debug panel
+      if (document.visibilityState === 'visible') {
+        fixedUpdate(state, state.deltaTime) // constantly call our game loop
+      }
 
-    // don't hog cpu if the page isn't visible (effectively pauses the game when it
-    // backgrounds)
-    // NOTE: For debugging it might be useful to use hasFocus instead,
-    // as the game will pause when you click into the F12 debug panel
-    if (document.visibilityState === 'visible') {
-      fixedUpdate(state, deltaTimeSum) // constantly call our game loop
+      // always pass back to the browser, even if this means a janky tick rate,
+      // its more important to let the browser function properly
+      // ideally this will callback immediately if we're *redline* (taking up
+      // 16 ms or more per tick)
+      const timeLength = window.performance.now() - start
+      calcTimeStats(fixedUpdateTimeStats, timeLength)
     }
-
-    // always pass back to the browser, even if this means a janky tick rate,
-    // its more important to let the browser function properly
-    // ideally this will callback immediately if we're *redline* (taking up
-    // 16 ms or more per tick)
-    const timeLength = window.performance.now() - start
-
-    calcTimeStats(fixedUpdateTimeStats, timeLength)
-
-    deltaTimeSum = 0
     lastUpdateTime = start
+    deltaTimeSum = 0
   }
 }
 
@@ -404,6 +414,28 @@ function startRendering (gl, state) {
   }
   // Draw the scene
   window.requestAnimationFrame(render)
+}
+
+/**
+ * Ensure that parents are first in the render order
+ * @param {import('./types.js').AppState} state
+ */
+function sortRenderOrderByParent (state) {
+  // ensure parents are being rendered first, this is a problem because at low frame rates (and therefore
+  // high position deltas) children objects are noticeably out of place, need to sort the render list
+  // so that parent's model matrices are being calculated FIRST before their children
+
+  state.objects.sort((objA, objB) => {
+    // if first object has no parent
+    const objANoParent = objA.parent === '' || objA.parent === null || objA.parent === undefined
+    const objBNoParent = objB.parent === '' || objB.parent === null || objB.parent === undefined
+
+    if (objANoParent === objBNoParent) { return 0 }
+
+    if (objANoParent && !objBNoParent) { return -1 }
+
+    if (!objANoParent && objBNoParent) { return 1 }
+  })
 }
 
 /**
@@ -483,23 +515,7 @@ function drawScene (gl, state) {
     state.viewMatrix = viewMatrix
 
     // Model Matrix ....
-    const modelMatrix = mat4.create()
-    const negCentroid = vec3.fromValues(0.0, 0.0, 0.0)
-    vec3.negate(negCentroid, object.centroid)
-    mat4.translate(modelMatrix, modelMatrix, object.model.position)
-    mat4.translate(modelMatrix, modelMatrix, object.centroid)
-    mat4.mul(modelMatrix, modelMatrix, object.model.rotation)
-    mat4.scale(modelMatrix, modelMatrix, object.model.scale)
-    mat4.translate(modelMatrix, modelMatrix, negCentroid)
-
-    if (object.parent) {
-      const parent = getObject(state, object.parent)
-      if (parent != null && parent.model && parent.model.modelMatrix) {
-        mat4.multiply(modelMatrix, parent.model.modelMatrix, modelMatrix)
-      }
-    }
-
-    object.model.modelMatrix = modelMatrix
+    const modelMatrix = modelMatrixCalc(object, state)
     gl.uniformMatrix4fv(
       object.programInfo.uniformLocations.model,
       false,
@@ -613,4 +629,30 @@ function drawScene (gl, state) {
   // if (glError !== gl.NO_ERROR) {
   //   console.error('glError: ' + glError.toString())
   // }
+}
+
+/**
+ *
+ * @param {Plane | Cube | Model} object
+ * @param {import('./types.js').AppState} state
+ */
+export function modelMatrixCalc (object, state) {
+  const modelMatrix = mat4.create()
+  const negCentroid = vec3.fromValues(0.0, 0.0, 0.0)
+  vec3.negate(negCentroid, object.centroid)
+  mat4.translate(modelMatrix, modelMatrix, object.model.position)
+  mat4.translate(modelMatrix, modelMatrix, object.centroid)
+  mat4.mul(modelMatrix, modelMatrix, object.model.rotation)
+  mat4.scale(modelMatrix, modelMatrix, object.model.scale)
+  mat4.translate(modelMatrix, modelMatrix, negCentroid)
+
+  if (object.parent) {
+    const parent = getObject(state, object.parent)
+    if (parent != null && parent.model && parent.model.modelMatrix) {
+      mat4.multiply(modelMatrix, parent.model.modelMatrix, modelMatrix)
+    }
+  }
+
+  object.model.modelMatrix = modelMatrix
+  return modelMatrix
 }

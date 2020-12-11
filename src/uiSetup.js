@@ -198,3 +198,15 @@ export function updateDebugStats (state) {
     '\nBitangent count: ' + obj.model.bitangents.length.toString() +
     rigidbodyInfo
 }
+
+export function enableStats () {
+  const statDiv = /** @type {HTMLElement} */ (document.querySelector('#stats'))
+  statDiv.style.visibility = 'visible'
+  statDiv.style.height = 'auto'
+}
+
+export function disableStats () {
+  const statDiv = /** @type {HTMLElement} */ (document.querySelector('#stats'))
+  statDiv.style.visibility = 'collapse'
+  statDiv.style.height = '0px'
+}

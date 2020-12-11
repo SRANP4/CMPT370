@@ -1,39 +1,43 @@
 <!DOCTYPE html>
 <html id="parent" style="width: 100%; height: 100%; margin: 0; padding: 0;">
-  <head>
-    <meta charset="utf-8" />
-    <title>Pirates</title>
-    <link rel="shortcut icon" href="favicon.ico" />
-    <style>
-      #overlay {
-        position: absolute;
-        left: 10px;
-        top: 10px;
-        background-color: rgba(0, 0, 0, 0.7);
-        color: white;
-        font-family: monospace;
-        padding: 1em;
-      }
-      #loading_indicator_container {
-        width: 100%;
-        background-color: red;
-        color: black;
-        font-weight: bold;
-      }
-    </style>
-  </head>
 
-  <body style="width: 100%; height: 100%; margin: 0; padding: 0">
-    <!-- This is the navigation bar at the top of the page -->
-    <!-- This is populated by loading the common functions script -->
-    <!---->
-    <div id="myNavBar"></div>
+<head>
+  <meta charset="utf-8" />
+  <title>Pirates</title>
+  <link rel="shortcut icon" href="favicon.ico" />
+  <style>
+    #overlay {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      font-family: monospace;
+      padding: 1em;
+    }
 
-    <div id="overlay">
-      <div id="loading_indicator_container"><span id ="status">LOADING...</span></div>
-      <div>Press P to start/pause the simulation</div>
-      <div>Use ` to toggle debug fly cam (will pause simulation)</div>
-      <div>Use WASD to move<br/>F to fire cannon<br/>T to toggle camera angle</div>
+    #loading_indicator_container {
+      width: 100%;
+      background-color: red;
+      color: black;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body style="width: 100%; height: 100%; margin: 0; padding: 0">
+  <!-- This is the navigation bar at the top of the page -->
+  <!-- This is populated by loading the common functions script -->
+  <!---->
+  <div id="myNavBar"></div>
+
+  <div id="overlay">
+    <div id="loading_indicator_container"><span id="status">LOADING...</span></div>
+    <div>Press P to start/pause the simulation</div>
+    <div>Use ` to toggle debug fly cam (will pause simulation)</div>
+    <div>Use WASD to move<br />F to fire cannon<br />T to toggle camera angle</div>
+    <div>Press ? to toggle stats</div>
+    <div id="stats" style="visibility: collapse; height: 0px;">
       <div>------------------------------------------------------</div>
       <div>Average fixed update time: <span id="tick_time">DEBUG TEXT</span>ms</div>
       <div>Average tick delta time: <span id="tick_delta_time">DEBUG TEXT</span>ms</div>
@@ -45,14 +49,16 @@
       <div>Object inspector (use -/+ to change object selection):</div>
       <div><span id="object_info">DEBUG TEXT</span></div>
     </div>
+  </div>
 
-    <!-- main canvas to be rendered -->
-    <canvas id="glCanvas" style="width: 100%; height: 100%; display:block"></canvas>
+  <!-- main canvas to be rendered -->
+  <canvas id="glCanvas" style="width: 100%; height: 100%; display:block"></canvas>
 
-    <!-- This is for displaying errors caused by our JavaScript -->
-    <!-- This will only be populated when an error on the JavaScript side occurs -->
-    <div id="webglError"></div>
+  <!-- This is for displaying errors caused by our JavaScript -->
+  <!-- This will only be populated when an error on the JavaScript side occurs -->
+  <div id="webglError"></div>
 
-    <script src="./dist/src/main.js" type="module"></script>
-  </body>
+  <script src="./dist/src/main.js" type="module"></script>
+</body>
+
 </html>

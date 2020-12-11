@@ -46,6 +46,7 @@ declare type AppState = {
   viewMatrix: mat4
   // samplerExists: number
   // samplerNormExists: number
+  statsEnabled: boolean
 }
 
 declare type StateFile = StateFileScene[]
