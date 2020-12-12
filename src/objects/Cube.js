@@ -457,6 +457,7 @@ export class Cube {
         ambientVal: this.gl.getUniformLocation(shaderProgram, 'ambientVal'),
         specularVal: this.gl.getUniformLocation(shaderProgram, 'specularVal'),
         nVal: this.gl.getUniformLocation(shaderProgram, 'nVal'),
+        alphaVal: this.gl.getUniformLocation(shaderProgram, 'alphaVal'),
         cameraPosition: this.gl.getUniformLocation(
           shaderProgram,
           'uCameraPosition'
