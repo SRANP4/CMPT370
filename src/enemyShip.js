@@ -14,7 +14,7 @@ import { cannonballPool, getGameTime } from './myGame.js'
 import { containsObject, getObject, getTime } from './sceneFunctions.js'
 /* eslint-enable */
 
-const ships = ['mainShip', 'Ship1', 'Ship2', 'Ship3']
+export const ships = ['mainShip', 'Ship1', 'Ship2', 'Ship3']
 
 export class EnemyShip extends GameObject {
   /**
@@ -94,7 +94,7 @@ export class EnemyShip extends GameObject {
     // sink the ship if it has no health
     if (this.health <= 0) {
       this.rigidbody.gravityStrength = 9.81
-    }
+    } 
 
     // move x seconds then reverse direction
     // update timeout for reversal
