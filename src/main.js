@@ -227,6 +227,13 @@ function main () {
           vec3 specular = Ks * uLightColours * hnPow;
   
           vec3 lightShading = (ambient + diffuse);
+
+          // this is specific to the ship sails
+          float a = alphaVal;
+          if (textureColor.a < .5) { // 0.5 threshold looks nice
+              discard; // just do a 'cutout', trying to do alpha transparency on only some
+                       // parts of the ship would be a nightmare
+          }
           
           fragColor = vec4(lightShading, a);
           
