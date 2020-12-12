@@ -184,8 +184,10 @@ function main () {
           vec3 lightDirection = normalize(uLightPositions - oFragPosition);
           vec3 cameraDirection = normalize(oCameraPosition - oFragPosition);
 
-          // idk why but the texture coordinates for the ship were flipped          
-          float u = 1.0 - oUV.x;
+          // idk why but the texture coordinates for the ship were flipped on the y/v axis      
+          // because all of our other objects are textured very simply, not worried about affecting
+          // their look with this  
+          float u = oUV.x;
           float v = 1.0 - oUV.y;
           vec2 flippedUV = vec2(u, v);
           vec4 textureColor = texture(uTexture, flippedUV); // NOTE: This is where the texture is accessed
