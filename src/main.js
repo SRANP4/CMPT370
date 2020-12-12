@@ -208,7 +208,7 @@ function main () {
           // calculate diffuse colour for texture and no-texture  
           vec3 Kd = diffuseVal;
           if (samplerExists == 1) {
-              Kd = mix(diffuseVal, textureColor.rgb, 0.3);
+              Kd = mix(diffuseVal, textureColor.rgb, 0.7);
               //Kd = diffuseVal * textureColor.rgb;
           }
           vec3 diffuse = Kd * uLightColours * diff;
