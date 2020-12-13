@@ -113,7 +113,6 @@ export class PlayerShip extends GameObject {
     // sink the ship if health is 0 (or less)
     if (this.health <= 0) {
       this.rigidbody.gravityStrength = 9.81
-      
       setTimeout(function(){document.location.reload(true)}, 1000)
     }
 
