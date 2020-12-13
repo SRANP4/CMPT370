@@ -171,6 +171,7 @@ function main () {
         uniform vec3 specularVal;
         uniform sampler2D uTexture;
         uniform float nVal;
+        uniform float alphaVal;
         uniform int samplerExists;
 
         out vec4 fragColor;
@@ -183,8 +184,10 @@ function main () {
           vec3 lightDirection = normalize(uLightPositions - oFragPosition);
           vec3 cameraDirection = normalize(oCameraPosition - oFragPosition);
 
-          // idk why but the texture coordinates for the ship were flipped          
-          float u = 1.0 - oUV.x;
+          // idk why but the texture coordinates for the ship were flipped on the y/v axis      
+          // because all of our other objects are textured very simply, not worried about affecting
+          // their look with this  
+          float u = oUV.x;
           float v = 1.0 - oUV.y;
           vec2 flippedUV = vec2(u, v);
           vec4 textureColor = texture(uTexture, flippedUV); // NOTE: This is where the texture is accessed
@@ -205,7 +208,7 @@ function main () {
           // calculate diffuse colour for texture and no-texture  
           vec3 Kd = diffuseVal;
           if (samplerExists == 1) {
-              Kd = mix(diffuseVal, textureColor.rgb, 0.3);
+              Kd = mix(diffuseVal, textureColor.rgb, 0.7);
               //Kd = diffuseVal * textureColor.rgb;
           }
           vec3 diffuse = Kd * uLightColours * diff;
@@ -224,8 +227,17 @@ function main () {
           vec3 specular = Ks * uLightColours * hnPow;
   
           vec3 lightShading = (ambient + diffuse);
+
+          // this is specific to the ship sails
+          float a = alphaVal;
+          if (textureColor.a < .5) { // 0.5 threshold looks nice
+              discard; // just do a 'cutout', trying to do alpha transparency on only some
+                       // parts of the ship would be a nightmare
+          }
           
-          fragColor = vec4(lightShading, 1.0);
+          fragColor = vec4(lightShading, a);
+          
+          //fragColor = vec4(alphaVal, 0.0, 0.0, 1.0);
 
           //fragColor = vec4(textureColor.rgb, 1.0);
 
@@ -310,7 +322,7 @@ function addObjectToScene (state, object) {
   if (state.objectCount === state.loadObjects.length) {
     uiOnLoaded(state)
     // sort objects so that parents render first
-    sortRenderOrderByParent(state)
+    sortRenderOrder(state)
     startGameLogic()
   }
 }
@@ -420,16 +432,31 @@ function startRendering (gl, state) {
  * Ensure that parents are first in the render order
  * @param {import('./types.js').AppState} state
  */
-function sortRenderOrderByParent (state) {
+function sortRenderOrder (state) {
   // ensure parents are being rendered first, this is a problem because at low frame rates (and therefore
   // high position deltas) children objects are noticeably out of place, need to sort the render list
   // so that parent's model matrices are being calculated FIRST before their children
+
+  // additionally we have a single transparent plane, which objects will be intersecting with
+  // we want to use z-buffering with this plane so that objects will render intersecting with it
+  // correctly, so what we'll do is simply render the transparent plane last
 
   state.objects.sort((objA, objB) => {
     // if first object has no parent
     const objANoParent = objA.parent === '' || objA.parent === null || objA.parent === undefined
     const objBNoParent = objB.parent === '' || objB.parent === null || objB.parent === undefined
 
+    const objAIsWater = objA.name === 'tempPlane'
+    const objBIsWater = objB.name === 'tempPlane'
+
+    // transparent plane sort conditions (we want the water last)
+    if (objAIsWater === objBIsWater) { return 0 }
+
+    if (objAIsWater && !objBIsWater) { return 1 }
+
+    if (!objAIsWater && objBIsWater) { return -1 }
+
+    // parent sort conditions (we want the water first)
     if (objANoParent === objBNoParent) { return 0 }
 
     if (objANoParent && !objBNoParent) { return -1 }
@@ -451,10 +478,13 @@ function drawScene (gl, state) {
     state.settings.backgroundColor[2],
     1.0
   ) // Here we are drawing the background color that is saved in our state
+  gl.enable(gl.BLEND)
+  gl.blendFunc(gl.ONE_MINUS_CONSTANT_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
   gl.enable(gl.DEPTH_TEST) // Enable depth testing
   gl.depthFunc(gl.LEQUAL) // Near things obscure far things
-  gl.disable(gl.CULL_FACE) // Cull the backface of our objects to be more efficient
-  gl.cullFace(gl.BACK)
+  // gl.enable(gl.CULL_FACE) // Cull the backface of our objects to be more efficient
+  gl.depthMask(true)
+  // gl.cullFace(gl.BACK)
   gl.frontFace(gl.CCW)
   gl.clearDepth(1.0) // Clear everything
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -546,6 +576,7 @@ function drawScene (gl, state) {
       object.material.specular
     )
     gl.uniform1f(object.programInfo.uniformLocations.nVal, object.material.n)
+    gl.uniform1f(object.programInfo.uniformLocations.alphaVal, object.material.alpha)
 
     // gl.uniform1i(object.programInfo.uniformLocations.numLights, state.numLights)
 

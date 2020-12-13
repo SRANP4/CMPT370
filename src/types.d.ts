@@ -176,6 +176,7 @@ declare type ProgramInfo = {
     ambientVal: WebGLUniformLocation
     specularVal: WebGLUniformLocation
     nVal: WebGLUniformLocation
+    alphaVal: WebGLUniformLocation
     cameraPosition: WebGLUniformLocation
     // numLights: WebGLUniformLocation
     lightPositions: WebGLUniformLocation

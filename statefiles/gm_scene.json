@@ -8,7 +8,7 @@
           "ambient": [0.5, 0.5, 0.5],
           "specular": [0.5, 0.5, 0.5],
           "n": 1,
-          "alpha": 1,
+          "alpha": 0.75,
           "shaderType": 3
         },
         "type": "plane",
@@ -23,10 +23,10 @@
       {
         "name": "mainShip",
         "material": {
-          "diffuse": [0.5, 0.5, 0.5],
+          "diffuse": [0.4, 0.4, 0.4],
           "ambient": [0.3, 0.3, 0.3],
-          "specular": [0.5, 0.5, 0.5],
-          "n": 25.000002,
+          "specular": [0.3, 0.3, 0.3],
+          "n": 500.000002,
           "shaderType": 1,
           "alpha": 1
         },
@@ -611,11 +611,11 @@
       "camera": [
         {
           "name": "flyCamera",
-          "position": [20.94,5.41,14.96],
+          "position": [26.03,7.17,3.65],
           "front": [0, 0, 1],
           "up": [0, 1, 0],
-          "pitch": -25.77,
-          "yaw": 177.57,
+          "pitch": -21.47,
+          "yaw": 114.83,
           "roll": 0,
           "moveSpeed": 10,
           "move": false,
