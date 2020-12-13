@@ -13,7 +13,7 @@
         },
         "type": "plane",
         "position": [0, -1.8, 0],
-        "scale": [10240, 10240, 10240],
+        "scale": [10240, 1, 10240],
         "diffuseTexture": "Water.jpg",
         "normalTexture": "Water_001_NORM.jpg",
         "rotation": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
