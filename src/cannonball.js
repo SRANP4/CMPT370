@@ -109,15 +109,6 @@ export class Cannonball extends GameObject {
       // reduce health of ship
       this.collidedShip.health -= 1
 
-      for(let i=0; i<ships.length; i++){
-        if (this.collidedShip.health <=0 && this.collidedShip.drawingObject.name === ships[i]){
-          ships.splice(i,1)
-        }
-      }
-
-      if (ships.length <2){
-        setTimeout(function(){document.location.reload(true)}, 1000)  
-      }
     } else {
       if (this.collidedShip != null) {
         // will be set to the last ship intersecting with, so will become blue again
