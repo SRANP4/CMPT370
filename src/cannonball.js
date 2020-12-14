@@ -6,7 +6,7 @@ import { vec3 } from '../lib/gl-matrix/index.js'
 import { createRigidbody, createSphere, setRigidbodyPosition } from './collisionFunctions.js'
 import { GameObject } from './gameObject.js'
 import { containsObject, getObject } from './sceneFunctions.js'
-import { EnemyShip } from './enemyShip.js'
+import { ships, EnemyShip } from './enemyShip.js'
 import { PlayerShip } from './playerShip.js'
 /* eslint-enable */
 
@@ -108,6 +108,7 @@ export class Cannonball extends GameObject {
 
       // reduce health of ship
       this.collidedShip.health -= 1
+
     } else {
       if (this.collidedShip != null) {
         // will be set to the last ship intersecting with, so will become blue again

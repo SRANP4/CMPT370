@@ -35,6 +35,7 @@ export class PlayerShip extends GameObject {
 
     this.drawingObject = shipObj
     this.rigidbody = shipRb
+
     this.health = 15
     this.speed = 2
     this.xDir = 0
@@ -99,8 +100,8 @@ export class PlayerShip extends GameObject {
       vec3.add(camCenter, camCenter, vec3.fromValues(0, 59, 0))
     } else {
       // first person camera
-      vec3.add(camPos, camPos, vec3.fromValues(-2.5, -0.25, 0))
-      vec3.add(camCenter, camCenter, vec3.fromValues(-3.5, -0.25, 0))
+      vec3.add(camPos, camPos, vec3.fromValues(-3.68, -0.35, 0))
+      vec3.add(camCenter, camCenter, vec3.fromValues(-4.68, -0.35, 0))
     }
     setCameraLookAt(
       state.camera,
@@ -112,6 +113,7 @@ export class PlayerShip extends GameObject {
     // sink the ship if health is 0 (or less)
     if (this.health <= 0) {
       this.rigidbody.gravityStrength = 9.81
+      setTimeout(function(){document.location.reload(true)}, 1000)
     }
 
     // handle firing the cannon

@@ -14,7 +14,7 @@ import { cannonballPool, getGameTime } from './myGame.js'
 import { containsObject, getObject, getTime } from './sceneFunctions.js'
 /* eslint-enable */
 
-const ships = ['mainShip', 'Ship1', 'Ship2', 'Ship3']
+export const ships = ['mainShip', 'Ship1', 'Ship2', 'Ship3']
 
 export class EnemyShip extends GameObject {
   /**
@@ -68,7 +68,7 @@ export class EnemyShip extends GameObject {
   onStart (state) {
     // pick a left/right direction randomly (no rotation cuz I don't wanna deal with updating
     // the bounding box)
-    // pick 0 or 1, then mafths it to be -1 or 1
+    // pick 0 or 1, then maths it to be -1 or 1
     this.xDir = getRandomInt(0, 1) * 2 - 1
 
     // offsetting this further back by half the changeTime so that the ship's
@@ -94,7 +94,7 @@ export class EnemyShip extends GameObject {
     // sink the ship if it has no health
     if (this.health <= 0) {
       this.rigidbody.gravityStrength = 9.81
-    }
+    } 
 
     // move x seconds then reverse direction
     // update timeout for reversal
@@ -167,6 +167,18 @@ export class EnemyShip extends GameObject {
       otherRb.gravityStrength = 9.81
       rb.drawingObj.material.diffuse = [1.0, 0, 0]
       otherRb.drawingObj.material.diffuse = [1.0, 0, 0]
+    }
+    else{
+      
+      for(let i=0; i<ships.length; i++){
+        if (this.health <=0 && this.drawingObject.name === ships[i]){
+          ships.splice(i,1)
+        }
+      }
+
+      if (ships.length <2){
+        setTimeout(function(){document.location.reload(true)}, 1000)  
+      }
     }
   }
 }
