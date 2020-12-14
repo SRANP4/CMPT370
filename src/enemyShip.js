@@ -14,7 +14,7 @@ import { cannonballPool, getGameTime } from './myGame.js'
 import { containsObject, getObject, getTime } from './sceneFunctions.js'
 /* eslint-enable */
 
-export const ships = ['mainShip', 'Ship1', 'Ship2', 'Ship3']
+const ships = ['mainShip', 'Ship1', 'Ship2', 'Ship3']
 
 export class EnemyShip extends GameObject {
   /**
